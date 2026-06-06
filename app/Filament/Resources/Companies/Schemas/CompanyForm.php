@@ -33,8 +33,20 @@ class CompanyForm
                     ->columns(2),
                 Section::make('الأصول البصرية')
                     ->schema([
-                        FileUpload::make('logo_path')->label('الشعار')->image()->directory('companies/logos')->imageEditor(),
-                        FileUpload::make('image_path')->label('الصورة')->image()->directory('companies/images')->imageEditor(),
+                        FileUpload::make('logo_path')
+                            ->label('الشعار')
+                            ->disk('public')
+                            ->visibility('public')
+                            ->image()
+                            ->directory('companies/logos')
+                            ->imageEditor(),
+                        FileUpload::make('image_path')
+                            ->label('الصورة')
+                            ->disk('public')
+                            ->visibility('public')
+                            ->image()
+                            ->directory('companies/images')
+                            ->imageEditor(),
                     ])
                     ->columns(2),
             ]);

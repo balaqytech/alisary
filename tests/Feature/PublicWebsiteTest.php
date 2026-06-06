@@ -76,3 +76,21 @@ test('home hero slides render uploaded background images from public storage', f
         ->assertSee('Uploaded slide background')
         ->assertSee('storage/hero/slides/uploaded-background.jpg', false);
 });
+
+test('home founder block renders uploaded founder image from public storage', function () {
+    $homepageSettings = app(HomepageSettings::class);
+    $homepageSettings->founder = [
+        ...$homepageSettings->founder,
+        'title' => 'Founder image section',
+        'name' => 'Founder Name',
+        'body' => 'Founder body',
+        'image_path' => 'homepage/founder/founder-with-children.png',
+    ];
+    $homepageSettings->save();
+
+    $this->get('/')
+        ->assertSuccessful()
+        ->assertSee('Founder image section')
+        ->assertSee('data-founder-image', false)
+        ->assertSee('storage/homepage/founder/founder-with-children.png', false);
+});
