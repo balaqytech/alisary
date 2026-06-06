@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "E:\\laragon\\bin\\php\\php-8.4.16-nts-Win32-vs17-x64\\php.exe",
+            "args": [
+                "E:\\laragon\\www\\alaisary\\artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
