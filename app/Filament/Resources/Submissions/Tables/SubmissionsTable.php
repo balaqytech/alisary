@@ -16,9 +16,10 @@ class SubmissionsTable
         return $table
             ->columns([
                 TextColumn::make('created_at')->label('تاريخ الطلب')->dateTime()->sortable(),
-                TextColumn::make('listing.title')->label('الإعلان')->searchable(),
+                TextColumn::make('submittable.title')->label('الإعلان')->searchable(),
+                TextColumn::make('submittable_type')->label('النوع')->formatStateUsing(fn (string $state): string => class_basename($state)),
                 TextColumn::make('status')->label('الحالة')->badge(),
-                TextColumn::make('name')->label('الاسم')->searchable(),
+                TextColumn::make('full_name')->label('الاسم')->searchable(),
                 TextColumn::make('email')->label('البريد')->searchable(),
                 TextColumn::make('phone')->label('الهاتف')->searchable(),
             ])

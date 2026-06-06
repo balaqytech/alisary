@@ -2,27 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreListingSubmissionRequest;
-use App\Models\Listing;
+use App\Http\Requests\StoreJobSubmissionRequest;
+use App\Http\Requests\StoreTenderSubmissionRequest;
+use App\Models\JobListing;
+use App\Models\TenderListing;
+use App\Support\CustomFormFields;
 use Illuminate\Http\RedirectResponse;
 
 class ListingSubmissionController extends Controller
 {
-    public function store(StoreListingSubmissionRequest $request, Listing $listing): RedirectResponse
+    public function storeJob(StoreJobSubmissionRequest $request, JobListing $jobListing): RedirectResponse
     {
         $validated = $request->validated();
-        $storedFiles = [];
+        $cvPath = $request->file('cv')?->store("submissions/jobs/{$jobListing->id}/cv", 'public');
 
-        foreach ($request->file('files', []) as $key => $file) {
-            $storedFiles[$key] = $file->store("submissions/{$listing->id}", 'public');
-        }
-
-        $listing->submissions()->create([
-            'name' => $validated['name'],
+        $jobListing->submissions()->create([
+            'full_name' => $validated['full_name'],
+            'phone' => $validated['phone'],
             'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
+            'birthday' => $validated['birthday'],
+            'cv_path' => $cvPath,
             'answers' => $validated['answers'] ?? [],
-            'files' => $storedFiles,
+            'files' => CustomFormFields::storeFiles($request, "submissions/jobs/{$jobListing->id}/files"),
+        ]);
+
+        return back()->with('status', 'تم استلام طلبكم بنجاح، وسيتواصل معكم الفريق عند الحاجة.');
+    }
+
+    public function storeTender(StoreTenderSubmissionRequest $request, TenderListing $tenderListing): RedirectResponse
+    {
+        $validated = $request->validated();
+
+        $tenderListing->submissions()->create([
+            'full_name' => $validated['full_name'],
+            'phone' => $validated['phone'],
+            'email' => $validated['email'],
+            'answers' => $validated['answers'] ?? [],
+            'files' => CustomFormFields::storeFiles($request, "submissions/tenders/{$tenderListing->id}/files"),
         ]);
 
         return back()->with('status', 'تم استلام طلبكم بنجاح، وسيتواصل معكم الفريق عند الحاجة.');

@@ -347,4 +347,48 @@
         color: #b91c1c;
         font-weight: 500;
     }
+
+    .rich-content {
+        color: var(--color-alisary-ink);
+    }
+
+    .rich-content :where(p, ul, ol, blockquote) {
+        margin-block: 1rem;
+    }
+
+    .rich-content :where(h1, h2, h3) {
+        margin-block: 2rem 1rem;
+        color: var(--color-alisary-green);
+        line-height: 1.25;
+    }
+
+    .rich-content :where(ul, ol) {
+        padding-inline-start: 1.5rem;
+    }
+
+    .rich-content ul {
+        list-style: disc;
+    }
+
+    .rich-content ol {
+        list-style: decimal;
+    }
+
+    .wizard-indicator {
+        display: inline-grid;
+        width: 2.25rem;
+        height: 2.25rem;
+        place-items: center;
+        border-radius: 999px;
+        border: 1px solid rgb(28 70 60 / 18%);
+        color: var(--color-alisary-soft);
+        background: rgb(234 223 206 / 0.55);
+        font-weight: 700;
+    }
+
+    .wizard-indicator.is-active {
+        border-color: var(--color-alisary-gold);
+        color: var(--color-alisary-deep);
+        background: var(--color-alisary-gold);
+    }
 }

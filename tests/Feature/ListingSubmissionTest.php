@@ -1,70 +1,79 @@
 <?php
 
 use App\Enums\CustomFieldType;
-use App\Enums\ListingKind;
 use App\Enums\ListingStatus;
-use App\Models\Listing;
+use App\Models\JobListing;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
-test('visitor can submit a valid listing application with custom answers and files', function () {
+test('visitor can submit a valid job application with default fields, cv, and custom fields', function () {
     Storage::fake('public');
 
-    $listing = Listing::factory()->create([
-        'kind' => ListingKind::Job,
-        'status' => ListingStatus::Published,
+    $jobListing = JobListing::factory()->create([
         'form_fields' => [
             ['key' => 'experience_years', 'label' => 'سنوات الخبرة', 'type' => CustomFieldType::Number->value, 'required' => true],
-            ['key' => 'cv', 'label' => 'السيرة الذاتية', 'type' => CustomFieldType::File->value, 'required' => true, 'accepted_file_types' => ['pdf'], 'max_file_size_kb' => 2048],
+            ['key' => 'portfolio', 'label' => 'ملف إضافي', 'type' => CustomFieldType::File->value, 'required' => true, 'accepted_file_types' => ['pdf'], 'max_file_size_kb' => 2048],
         ],
     ]);
 
-    $this->post(route('jobs.apply', $listing), [
-        'name' => 'أحمد العيسري',
-        'email' => 'ahmed@example.com',
+    $this->post(route('jobs.apply', $jobListing), [
+        'full_name' => 'أحمد العيسري',
         'phone' => '90000000',
+        'email' => 'ahmed@example.com',
+        'birthday' => '1995-01-01',
+        'cv' => UploadedFile::fake()->create('cv.pdf', 250, 'application/pdf'),
         'answers' => [
             'experience_years' => 5,
         ],
         'files' => [
-            'cv' => UploadedFile::fake()->create('cv.pdf', 250, 'application/pdf'),
+            'portfolio' => UploadedFile::fake()->create('portfolio.pdf', 250, 'application/pdf'),
         ],
     ])->assertRedirect();
 
-    $submission = $listing->submissions()->first();
+    $submission = $jobListing->submissions()->first();
 
     expect($submission)->not->toBeNull()
-        ->and($submission->answers['experience_years'])->toBe(5)
-        ->and($submission->files)->toHaveKey('cv');
+        ->and($submission->full_name)->toBe('أحمد العيسري')
+        ->and($submission->email)->toBe('ahmed@example.com')
+        ->and($submission->phone)->toBe('90000000')
+        ->and($submission->birthday->toDateString())->toBe('1995-01-01')
+        ->and((int) $submission->answers['experience_years'])->toBe(5)
+        ->and($submission->files)->toHaveKey('portfolio')
+        ->and($submission->submittable->is($jobListing))->toBeTrue();
 
-    Storage::disk('public')->assertExists($submission->files['cv']);
+    Storage::disk('public')->assertExists($submission->cv_path);
+    Storage::disk('public')->assertExists($submission->files['portfolio']);
 });
 
-test('required custom fields are validated', function () {
-    $listing = Listing::factory()->create([
-        'kind' => ListingKind::Tender,
-        'status' => ListingStatus::Published,
+test('required job custom fields are validated', function () {
+    $jobListing = JobListing::factory()->create([
         'form_fields' => [
-            ['key' => 'company_name', 'label' => 'اسم الشركة', 'type' => CustomFieldType::Text->value, 'required' => true],
+            ['key' => 'experience_years', 'label' => 'سنوات الخبرة', 'type' => CustomFieldType::Number->value, 'required' => true],
         ],
     ]);
 
-    $this->from(route('tenders.show', $listing))
-        ->post(route('tenders.apply', $listing), [
-            'name' => 'شركة اختبار',
-            'email' => 'supplier@example.com',
+    $this->from(route('jobs.show', $jobListing))
+        ->post(route('jobs.apply', $jobListing), [
+            'full_name' => 'أحمد',
+            'phone' => '90000000',
+            'email' => 'ahmed@example.com',
+            'birthday' => '1995-01-01',
+            'cv' => UploadedFile::fake()->create('cv.pdf', 250, 'application/pdf'),
         ])
-        ->assertRedirect(route('tenders.show', $listing))
-        ->assertSessionHasErrors('answers.company_name');
+        ->assertRedirect(route('jobs.show', $jobListing))
+        ->assertSessionHasErrors('answers.experience_years');
 });
 
-test('closed listings reject submissions', function () {
-    $listing = Listing::factory()->closed()->create([
-        'kind' => ListingKind::Job,
+test('closed jobs reject submissions', function () {
+    $jobListing = JobListing::factory()->create([
+        'status' => ListingStatus::Closed,
     ]);
 
-    $this->post(route('jobs.apply', $listing), [
-        'name' => 'أحمد',
+    $this->post(route('jobs.apply', $jobListing), [
+        'full_name' => 'أحمد',
+        'phone' => '90000000',
         'email' => 'ahmed@example.com',
+        'birthday' => '1995-01-01',
+        'cv' => UploadedFile::fake()->create('cv.pdf', 250, 'application/pdf'),
     ])->assertForbidden();
 });

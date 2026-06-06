@@ -3,6 +3,7 @@
 <head>
     @php
         $configuredLogoPath = $settings->logo_path;
+        $configuredLogoPath = is_array($configuredLogoPath) ? collect($configuredLogoPath)->first() : $configuredLogoPath;
         $logoUrl = $configuredLogoPath
             ? (\Illuminate\Support\Str::startsWith($configuredLogoPath, ['http://', 'https://', '/'])
                 ? $configuredLogoPath
@@ -35,7 +36,10 @@
                 <a href="{{ route('tenders.index') }}">المناقصات</a>
                 <a href="{{ route('story') }}">الحكاية</a>
                 @if ($settings->assistant_url)
-                    <a href="{{ $settings->assistant_url }}" class="border border-alisary-gold/70 px-4 py-2 text-alisary-gold hover:bg-alisary-gold hover:text-alisary-deep">المساعد الذكي</a>
+                    <a href="{{ $settings->assistant_url }}" class="inline-flex items-center gap-2 border border-alisary-gold/70 px-4 py-2 text-alisary-gold hover:bg-alisary-gold hover:text-alisary-deep">
+                        المساعد الذكي
+                        <x-icons.remix.arrow-left class="size-4" />
+                    </a>
                 @endif
             </div>
         </nav>
@@ -57,7 +61,20 @@
                 <a href="{{ route('tenders.index') }}">المناقصات</a>
                 <a href="{{ route('story') }}">الحكاية</a>
             </div>
-            <div class="mt-8 text-sm text-white/50">{{ $settings->email }} @if ($settings->phone) · {{ $settings->phone }} @endif</div>
+            <div class="mt-8 flex flex-wrap justify-center gap-5 text-sm text-white/60">
+                @if ($settings->email)
+                    <a href="mailto:{{ $settings->email }}" class="inline-flex items-center gap-2">
+                        <x-icons.remix.mail class="size-4 text-alisary-gold" />
+                        {{ $settings->email }}
+                    </a>
+                @endif
+                @if ($settings->phone)
+                    <a href="tel:{{ $settings->phone }}" class="inline-flex items-center gap-2">
+                        <x-icons.remix.phone class="size-4 text-alisary-gold" />
+                        {{ $settings->phone }}
+                    </a>
+                @endif
+            </div>
             <div class="mt-8 border-t border-white/10 pt-6 text-xs text-white/40">© {{ $settings->site_name }} — جميع الحقوق محفوظة</div>
         </div>
     </footer>

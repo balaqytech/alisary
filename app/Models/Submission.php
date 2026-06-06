@@ -6,7 +6,7 @@ use App\Enums\SubmissionStatus;
 use Database\Factories\SubmissionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Submission extends Model
 {
@@ -25,13 +25,14 @@ class Submission extends Model
     {
         return [
             'status' => SubmissionStatus::class,
+            'birthday' => 'date',
             'answers' => 'array',
             'files' => 'array',
         ];
     }
 
-    public function listing(): BelongsTo
+    public function submittable(): MorphTo
     {
-        return $this->belongsTo(Listing::class);
+        return $this->morphTo();
     }
 }

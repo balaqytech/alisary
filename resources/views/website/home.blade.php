@@ -52,6 +52,7 @@
             @foreach ($heroSlides as $index => $slide)
                 @php
                     $imagePath = $slide['image_path'] ?? null;
+                    $imagePath = is_array($imagePath) ? collect($imagePath)->first() : $imagePath;
                     $slideImage = $imagePath
                         ? (\Illuminate\Support\Str::startsWith($imagePath, ['http://', 'https://', '/'])
                             ? $imagePath
@@ -217,6 +218,6 @@
         </div>
     </section>
 
-    @include('website.partials.listing-strip', ['title' => 'أحدث الوظائف', 'route' => route('jobs.index'), 'listings' => $jobs])
-    @include('website.partials.listing-strip', ['title' => 'أحدث المناقصات', 'route' => route('tenders.index'), 'listings' => $tenders])
+    @include('website.partials.listing-strip', ['title' => 'أحدث الوظائف', 'route' => route('jobs.index'), 'listings' => $jobs, 'type' => 'jobs'])
+    @include('website.partials.listing-strip', ['title' => 'أحدث المناقصات', 'route' => route('tenders.index'), 'listings' => $tenders, 'type' => 'tenders'])
 </x-website.layout>

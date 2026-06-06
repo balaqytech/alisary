@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Submissions;
 
-use App\Filament\Resources\Submissions\Pages\CreateSubmission;
 use App\Filament\Resources\Submissions\Pages\EditSubmission;
 use App\Filament\Resources\Submissions\Pages\ListSubmissions;
 use App\Filament\Resources\Submissions\Schemas\SubmissionForm;
@@ -47,7 +46,6 @@ class SubmissionResource extends Resource
     {
         return [
             'index' => ListSubmissions::route('/'),
-            'create' => CreateSubmission::route('/create'),
             'edit' => EditSubmission::route('/{record}/edit'),
         ];
     }

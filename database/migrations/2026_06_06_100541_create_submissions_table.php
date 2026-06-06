@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('submissions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('listing_id')->constrained()->cascadeOnDelete();
+            $table->morphs('submittable');
             $table->string('status')->default('new')->index();
-            $table->string('name');
+            $table->string('full_name');
             $table->string('email');
-            $table->string('phone')->nullable();
+            $table->string('phone');
+            $table->date('birthday')->nullable();
+            $table->string('cv_path')->nullable();
             $table->json('answers')->nullable();
             $table->json('files')->nullable();
             $table->text('internal_notes')->nullable();

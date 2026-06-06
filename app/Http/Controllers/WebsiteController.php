@@ -2,87 +2,96 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ListingKind;
-use App\Enums\ListingStatus;
 use App\Models\Company;
-use App\Models\HomeSection;
-use App\Models\Listing;
-use App\Models\SiteSetting;
+use App\Models\JobListing;
+use App\Models\TenderListing;
+use App\Settings\GeneralSettings;
+use App\Settings\HomepageSettings;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Fluent;
 
 class WebsiteController extends Controller
 {
-    public function home(): View
+    public function home(GeneralSettings $settings, HomepageSettings $homepageSettings): View
     {
-        $sections = HomeSection::query()
-            ->active()
-            ->orderBy('sort_order')
-            ->get()
-            ->keyBy('key');
-
         return view('website.home', [
-            'settings' => SiteSetting::current(),
-            'sections' => $sections,
+            'settings' => $settings,
+            'sections' => $this->sections($homepageSettings),
             'companies' => Company::query()->active()->orderBy('sort_order')->get(),
-            'jobs' => $this->listings(ListingKind::Job)->take(3)->get(),
-            'tenders' => $this->listings(ListingKind::Tender)->take(3)->get(),
+            'jobs' => JobListing::query()->published()->with('company')->latest('published_at')->take(3)->get(),
+            'tenders' => TenderListing::query()->published()->with('contractor')->latest('published_at')->take(3)->get(),
         ]);
     }
 
-    public function story(): View
+    public function story(GeneralSettings $settings): View
     {
         return view('website.story', [
-            'settings' => SiteSetting::current(),
+            'settings' => $settings,
         ]);
     }
 
-    public function jobs(): View
-    {
-        return $this->listingIndex(ListingKind::Job);
-    }
-
-    public function tenders(): View
-    {
-        return $this->listingIndex(ListingKind::Tender);
-    }
-
-    public function showJob(Listing $listing): View
-    {
-        return $this->listingShow($listing, ListingKind::Job);
-    }
-
-    public function showTender(Listing $listing): View
-    {
-        return $this->listingShow($listing, ListingKind::Tender);
-    }
-
-    protected function listingIndex(ListingKind $kind): View
+    public function jobs(GeneralSettings $settings): View
     {
         return view('website.listings.index', [
-            'settings' => SiteSetting::current(),
-            'kind' => $kind,
-            'listings' => $this->listings($kind)->paginate(9),
+            'settings' => $settings,
+            'type' => 'jobs',
+            'label' => 'الوظائف',
+            'description' => 'فرص مهنية لخدمة الطفل ومن يخدم الطفل، مع نماذج تقديم مخصصة بحسب احتياج كل وظيفة.',
+            'listings' => JobListing::query()->published()->with('company')->latest('published_at')->paginate(9),
         ]);
     }
 
-    protected function listingShow(Listing $listing, ListingKind $kind): View
+    public function tenders(GeneralSettings $settings): View
     {
-        abort_unless($listing->kind === $kind && $listing->status === ListingStatus::Published, 404);
+        return view('website.listings.index', [
+            'settings' => $settings,
+            'type' => 'tenders',
+            'label' => 'المناقصات',
+            'description' => 'دعوات منظمة للموردين والشركاء، بخطوات تقديم واضحة لكل مناقصة.',
+            'listings' => TenderListing::query()->published()->with('contractor')->latest('published_at')->paginate(9),
+        ]);
+    }
+
+    public function showJob(GeneralSettings $settings, JobListing $jobListing): View
+    {
+        abort_unless($jobListing->isAcceptingSubmissions(), 404);
 
         return view('website.listings.show', [
-            'settings' => SiteSetting::current(),
-            'kind' => $kind,
-            'listing' => $listing,
+            'settings' => $settings,
+            'type' => 'jobs',
+            'label' => 'وظيفة',
+            'listing' => $jobListing->load('company'),
         ]);
     }
 
-    protected function listings(ListingKind $kind): Builder
+    public function showTender(GeneralSettings $settings, TenderListing $tenderListing): View
     {
-        return Listing::query()
-            ->published()
-            ->kind($kind)
-            ->latest('published_at')
-            ->latest();
+        abort_unless($tenderListing->isAcceptingSubmissions(), 404);
+
+        return view('website.listings.show', [
+            'settings' => $settings,
+            'type' => 'tenders',
+            'label' => 'مناقصة',
+            'listing' => $tenderListing->load('contractor'),
+        ]);
+    }
+
+    protected function sections(HomepageSettings $homepageSettings): Collection
+    {
+        return collect([
+            'hero' => $homepageSettings->hero,
+            'proof' => $homepageSettings->proof,
+            'legacy' => $homepageSettings->legacy,
+            'impact' => $homepageSettings->impact,
+            'waqf' => $homepageSettings->waqf,
+            'doors' => $homepageSettings->doors,
+            'founder' => $homepageSettings->founder,
+        ])->map(fn (array $section, string $key): Fluent => new Fluent([
+            'key' => $key,
+            'title' => $section['title'] ?? null,
+            'eyebrow' => $section['eyebrow'] ?? null,
+            'content' => collect($section)->except(['title', 'eyebrow'])->all(),
+        ]));
     }
 }

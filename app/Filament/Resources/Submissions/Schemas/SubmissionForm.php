@@ -18,14 +18,17 @@ class SubmissionForm
             ->components([
                 Section::make('بيانات الطلب')
                     ->schema([
-                        Select::make('listing_id')->label('الإعلان')->relationship('listing', 'title')->required()->disabled(),
                         Select::make('status')
                             ->label('الحالة')
                             ->options(collect(SubmissionStatus::cases())->mapWithKeys(fn (SubmissionStatus $status): array => [$status->value => $status->label()]))
                             ->required(),
-                        TextInput::make('name')->label('الاسم')->disabled(),
+                        TextInput::make('submittable_type')->label('نوع الإعلان')->disabled(),
+                        TextInput::make('submittable_id')->label('رقم الإعلان')->disabled(),
+                        TextInput::make('full_name')->label('الاسم')->disabled(),
                         TextInput::make('email')->label('البريد الإلكتروني')->disabled(),
                         TextInput::make('phone')->label('الهاتف')->disabled(),
+                        TextInput::make('birthday')->label('تاريخ الميلاد')->disabled(),
+                        TextInput::make('cv_path')->label('السيرة الذاتية')->disabled()->columnSpanFull(),
                     ])
                     ->columns(2),
                 Section::make('الإجابات والملفات')

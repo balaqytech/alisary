@@ -185,8 +185,60 @@ function initHeader() {
     window.addEventListener('scroll', updateHeader, { passive: true });
 }
 
+function initFormWizards() {
+    document.querySelectorAll('[data-form-wizard]').forEach((form) => {
+        const steps = [...form.querySelectorAll('[data-wizard-step]')];
+        const indicators = [...form.querySelectorAll('[data-wizard-indicator]')];
+        const previousButton = form.querySelector('[data-wizard-prev]');
+        const nextButton = form.querySelector('[data-wizard-next]');
+        const submitButton = form.querySelector('[data-wizard-submit]');
+        let activeIndex = 0;
+
+        if (steps.length === 0) {
+            return;
+        }
+
+        const update = () => {
+            steps.forEach((step, index) => {
+                step.classList.toggle('hidden', index !== activeIndex);
+            });
+
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('is-active', index === activeIndex);
+            });
+
+            if (previousButton) {
+                previousButton.disabled = activeIndex === 0;
+            }
+
+            const isLastStep = activeIndex === steps.length - 1;
+
+            if (nextButton) {
+                nextButton.style.display = isLastStep ? 'none' : 'inline-flex';
+            }
+
+            if (submitButton) {
+                submitButton.style.display = isLastStep ? 'inline-flex' : 'none';
+            }
+        };
+
+        previousButton?.addEventListener('click', () => {
+            activeIndex = Math.max(0, activeIndex - 1);
+            update();
+        });
+
+        nextButton?.addEventListener('click', () => {
+            activeIndex = Math.min(steps.length - 1, activeIndex + 1);
+            update();
+        });
+
+        update();
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initHeader();
     initHeroSlider();
     initScrollReveals();
+    initFormWizards();
 });

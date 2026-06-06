@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Listing;
+use App\Models\JobListing;
 use App\Models\Submission;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,10 +19,13 @@ class SubmissionFactory extends Factory
     public function definition(): array
     {
         return [
-            'listing_id' => Listing::factory(),
-            'name' => $this->faker->name(),
+            'submittable_type' => JobListing::class,
+            'submittable_id' => JobListing::factory(),
+            'full_name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
             'phone' => $this->faker->phoneNumber(),
+            'birthday' => $this->faker->date(),
+            'cv_path' => null,
             'answers' => [],
             'files' => [],
         ];
