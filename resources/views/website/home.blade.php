@@ -7,13 +7,21 @@
         $waqf = $sections->get('waqf');
         $doors = $sections->get('doors');
         $founder = $sections->get('founder');
+        $toEasternNumbers = [\App\Support\NumberLocalizer::class, 'eastern'];
+        $assetUrl = function ($path, $fallback = null) {
+            $path = is_array($path) ? collect($path)->first() : $path;
+
+            if (!$path) {
+                return $fallback;
+            }
+
+            return \Illuminate\Support\Str::startsWith($path, ['http://', 'https://', '/'])
+                ? $path
+                : \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+        };
         $founderImagePath = data_get($founder?->content, 'image_path');
         $founderImagePath = is_array($founderImagePath) ? collect($founderImagePath)->first() : $founderImagePath;
-        $founderImage = $founderImagePath
-            ? (\Illuminate\Support\Str::startsWith($founderImagePath, ['http://', 'https://', '/'])
-                ? $founderImagePath
-                : \Illuminate\Support\Facades\Storage::disk('public')->url($founderImagePath))
-            : null;
+        $founderImage = $assetUrl($founderImagePath);
         $heroSlides = collect(data_get($hero?->content, 'slides', []))
             ->filter(fn($slide) => filled($slide['title'] ?? null))
             ->values();
@@ -28,6 +36,7 @@
                     'cta_url' => data_get($hero?->content, 'cta_url', route('story')),
                     'accent' => '#B88A3C',
                     'image_path' => '/placeholders/hero-legacy.svg',
+                    'mobile_image_path' => '/placeholders/hero-legacy.svg',
                 ],
                 [
                     'eyebrow' => 'مظلّة قابضة',
@@ -37,6 +46,7 @@
                     'cta_url' => '#companies',
                     'accent' => '#C3CD30',
                     'image_path' => '/placeholders/hero-holding.svg',
+                    'mobile_image_path' => '/placeholders/hero-holding.svg',
                 ],
                 [
                     'eyebrow' => 'أثر ممتد',
@@ -46,12 +56,13 @@
                     'cta_url' => route('jobs.index'),
                     'accent' => '#D7B56D',
                     'image_path' => '/placeholders/hero-impact.svg',
+                    'mobile_image_path' => '/placeholders/hero-impact.svg',
                 ],
             ]);
         }
     @endphp
 
-    <section data-hero-slider class="hero-slider relative min-h-screen overflow-hidden bg-hero text-white">
+    <section data-hero-slider class="hero-slider relative isolate min-h-screen overflow-hidden bg-hero text-white">
         <div
             class="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,24,21,.42)_1px,transparent_1px),linear-gradient(0deg,rgba(7,24,21,.34)_1px,transparent_1px)] bg-[size:96px_96px] opacity-30">
         </div>
@@ -60,24 +71,23 @@
         <div class="relative min-h-screen">
             @foreach ($heroSlides as $index => $slide)
                 @php
-                    $imagePath = $slide['image_path'] ?? null;
-                    $imagePath = is_array($imagePath) ? collect($imagePath)->first() : $imagePath;
-                    $slideImage = $imagePath
-                        ? (\Illuminate\Support\Str::startsWith($imagePath, ['http://', 'https://', '/'])
-                            ? $imagePath
-                            : \Illuminate\Support\Facades\Storage::disk('public')->url($imagePath))
-                        : asset('placeholders/hero-legacy.svg');
+                    $slideImage = $assetUrl($slide['image_path'] ?? null, asset('placeholders/hero-legacy.svg'));
+                    $slideMobileImage = $assetUrl($slide['mobile_image_path'] ?? null, $slideImage);
                     $accent = $slide['accent'] ?? '#B88A3C';
                 @endphp
                 <article data-hero-slide class="hero-slide absolute inset-0 grid min-h-screen items-end opacity-0"
                     style="--slide-accent: {{ $accent }};" aria-hidden="{{ $index === 0 ? 'false' : 'true' }}">
                     <div class="hero-slide-media absolute inset-0" data-hero-media>
                         <div class="hero-slide-bg absolute inset-0"></div>
-                        <img src="{{ $slideImage }}" alt=""
-                            class="hero-bg-visual absolute inset-0 h-full w-full object-cover" data-hero-image
-                            aria-hidden="true">
+                        <picture>
+                            <source media="(max-width: 767px)" srcset="{{ $slideMobileImage }}">
+                            <img src="{{ $slideImage }}" alt=""
+                                class="hero-bg-visual absolute inset-0 h-full w-full object-cover" data-hero-image
+                                aria-hidden="true">
+                        </picture>
+                        <div class="absolute inset-0 bg-alisary-deep/20"></div>
                         <div
-                            class="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,24,21,.28),rgba(7,24,21,.7)_58%,rgba(7,24,21,.92)),linear-gradient(0deg,rgba(7,24,21,.94),transparent_38%,rgba(7,24,21,.72))]">
+                            class="absolute inset-0 bg-gradient-to-t from-alisary-deep/90 via-alisary-deep/10 to-transparent">
                         </div>
                         <img src="{{ asset('logo.svg') }}" alt=""
                             class="hero-watermark absolute left-[8vw] top-1/2 w-[min(42vw,34rem)] -translate-y-1/2 opacity-[0.065] saturate-0"
@@ -88,8 +98,8 @@
                     </div>
 
                     <div
-                        class="relative z-10 mx-auto grid min-h-screen w-full max-w-[90rem] items-end gap-10 px-5 pb-24 pt-36 lg:grid-cols-[1fr_25rem] lg:px-10 lg:pb-28">
-                        <div class="max-w-5xl text-center md:text-right">
+                        class="relative z-10 mx-auto grid min-h-screen w-full max-w-[90rem] items-end gap-10 px-5 pb-24 pt-36 lg:grid-cols-[minmax(0,1fr)_23rem] lg:px-10 lg:pb-28">
+                        <div class="hero-copy max-w-5xl text-center md:text-right">
                             <div data-hero-reveal
                                 class="mb-6 flex items-center justify-center gap-4 text-xs font-bold uppercase tracking-[0.34em] text-alisary-gold md:justify-start">
                                 <span class="h-px w-16 bg-alisary-gold"></span>
@@ -98,23 +108,33 @@
                             <h1 data-hero-reveal data-split-words class="hero-title font-display text-alisary-ivory">
                                 {{ $slide['title'] ?? '' }}
                             </h1>
-                            <p data-hero-reveal
-                                class="mx-auto mt-8 max-w-[19rem] text-lg leading-loose text-white/74 md:mx-0 md:max-w-3xl md:text-2xl">
-                                {{ $slide['subtitle'] ?? '' }}
-                            </p>
-                            <div data-hero-reveal
-                                class="mt-10 flex flex-wrap items-center justify-center gap-5 md:justify-start">
-                                <a href="{{ $slide['cta_url'] ?? route('story') }}" class="lux-link">
-                                    {{ $slide['cta_label'] ?? 'اقرأ الحكاية' }} ←
-                                </a>
-                                <span class="text-sm text-white/45">0{{ $index + 1 }} /
-                                    0{{ $heroSlides->count() }}</span>
+                            @if (filled($slide['subtitle'] ?? null))
+                                <p data-hero-reveal class="hidden lg:block hero-subtitle mx-auto mt-8 md:mx-0">
+                                    {{ $slide['subtitle'] }}
+                                </p>
+                            @endif
+                            <div data-hero-reveal class="hero-cta-row mt-10">
+                                @if (filled($slide['cta_label'] ?? null))
+                                    <a href="{{ $slide['cta_url'] ?? route('story') }}"
+                                        class="hidden lg:block lux-link">
+                                        {{ $slide['cta_label'] }}
+                                    </a>
+                                @endif
+                                <span class="hero-count text-sm font-bold text-white/45">
+                                    <span>{{ $toEasternNumbers(str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT)) }}</span>
+                                    <span>/</span>
+                                    <span>{{ $toEasternNumbers(str_pad((string) $heroSlides->count(), 2, '0', STR_PAD_LEFT)) }}</span>
+                                </span>
                             </div>
                         </div>
 
-                        <aside data-hero-reveal class="hidden border-r border-white/12 pr-8 text-white/64 lg:block">
-                            <div class="font-display text-7xl text-[color:var(--slide-accent)]">0{{ $index + 1 }}
+                        <aside data-hero-reveal class="hero-side-panel hidden lg:block">
+                            <div class="font-display text-7xl text-[color:var(--slide-accent)]">
+                                {{ $toEasternNumbers(str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT)) }}
                             </div>
+                            @if (filled($slide['subtitle'] ?? null))
+                                <p class="mt-8 text-lg leading-loose">{{ $slide['subtitle'] }}</p>
+                            @endif
                         </aside>
                     </div>
                 </article>
@@ -126,7 +146,8 @@
             <div class="hidden h-px flex-1 bg-white/15 md:block"></div>
             <div class="flex items-center gap-3">
                 @foreach ($heroSlides as $index => $slide)
-                    <button type="button" data-hero-button aria-label="الشريحة {{ $index + 1 }}" class="hero-dot">
+                    <button type="button" data-hero-button aria-label="الشريحة {{ $toEasternNumbers($index + 1) }}"
+                        class="hero-dot">
                         <span></span>
                     </button>
                 @endforeach
@@ -141,26 +162,30 @@
         </div>
         <div class="mt-12 grid gap-6 md:grid-cols-3">
             @foreach (data_get($proof?->content, 'items', []) as $item)
-                <article class="lux-card">
-                    <div class="text-sm font-bold text-alisary-gold">{{ $item['label'] ?? '' }}</div>
+                <article class="lux-card proof-card">
+                    <div class="flex items-center justify-between gap-4">
+                        <div class="text-sm font-bold text-alisary-gold">{{ $item['label'] ?? '' }}</div>
+                        <div class="card-index">
+                            {{ $toEasternNumbers(str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT)) }}</div>
+                    </div>
                     <p class="mt-4 leading-loose">{{ $item['text'] ?? '' }}</p>
                 </article>
             @endforeach
         </div>
     </section>
 
-    <section id="legacy" class="section bg-alisary-muted">
+    <section id="legacy" class="section section-band section-band-muted">
         <div class="section-head">
             <span>{{ $legacy?->eyebrow }}</span>
             <h2>{{ $legacy?->title }}</h2>
             <p>{{ data_get($legacy?->content, 'lead') }}</p>
         </div>
-        <div class="mt-12 space-y-8 border-r-2 border-alisary-gold/40 pr-8">
+        <div class="legacy-timeline mt-12"
+            style="--timeline-count: {{ max(count(data_get($legacy?->content, 'items', [])), 1) }}">
             @foreach (data_get($legacy?->content, 'items', []) as $item)
-                <div class="relative">
-                    <span
-                        class="absolute -right-[41px] top-2 size-4 rounded-full border-4 border-alisary-green bg-alisary-muted"></span>
-                    <div class="font-display text-xl text-alisary-gold">{{ $item['year'] ?? '' }}</div>
+                <div class="timeline-item">
+                    <div class="font-display text-xl text-alisary-gold">{{ $toEasternNumbers($item['year'] ?? '') }}
+                    </div>
                     <h3 class="mt-1 text-xl font-bold text-alisary-green">{{ $item['title'] ?? '' }}</h3>
                     <p class="mt-2 max-w-3xl text-alisary-soft">{{ $item['text'] ?? '' }}</p>
                 </div>
@@ -168,34 +193,57 @@
         </div>
     </section>
 
-    <section class="section text-center">
-        <div class="font-display text-8xl text-alisary-green md:text-[12rem]">
-            {{ data_get($impact?->content, 'number', '٤٠٬٠٠٠+') }}</div>
-        <h2 class="mx-auto mt-4 max-w-3xl font-display text-3xl text-alisary-green">{{ $impact?->title }}</h2>
-        <p class="mt-5 text-alisary-soft">{{ data_get($impact?->content, 'caption') }}</p>
+    <section class="section">
+        <div class="impact-panel">
+            <div class="impact-number">
+                {{ $toEasternNumbers(data_get($impact?->content, 'number', '٤٠٬٠٠٠+')) }}</div>
+            <div>
+                <h2 class="max-w-3xl font-display text-4xl leading-tight text-alisary-green md:text-6xl">
+                    {{ $impact?->title }}</h2>
+                <p class="mt-6 max-w-2xl text-lg leading-loose text-alisary-soft">
+                    {{ data_get($impact?->content, 'caption') }}</p>
+            </div>
+        </div>
     </section>
 
-    <section id="companies" class="section bg-alisary-muted">
+    <section id="companies" class="section section-band section-band-muted">
         <div class="section-head">
             <span>مؤسّساتنا</span>
             <h2>مظلّةٌ واحدة، وألوانٌ تخدم طفلًا واحدًا.</h2>
         </div>
         <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             @foreach ($companies as $company)
-                <article class="lux-card border-t-4" style="border-top-color: {{ $company->brand_color }}">
-                    <h3 class="text-xl font-bold text-alisary-green">{{ $company->name }}</h3>
-                    <p class="mt-3 min-h-24 text-sm leading-loose text-alisary-soft">{{ $company->description }}</p>
+                @php
+                    $companyLogo = $assetUrl($company->logo_path);
+                @endphp
+                <article class="portfolio-card" style="--company-color: {{ $company->brand_color }}">
+                    <div class="relative z-10 mb-7 flex items-center justify-between gap-4">
+                        <div class="portfolio-logo">
+                            @if ($companyLogo)
+                                <img src="{{ $companyLogo }}" alt="{{ $company->name }}">
+                            @else
+                                <span class="portfolio-logo-fallback">{{ mb_substr($company->name, 0, 1) }}</span>
+                            @endif
+                        </div>
+                        <div class="card-index">
+                            {{ $toEasternNumbers(str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT)) }}</div>
+                    </div>
+                    <h3 class="relative z-10 text-2xl font-bold leading-tight text-alisary-green">{{ $company->name }}
+                    </h3>
+                    <p class="relative z-10 mt-3 min-h-24 text-sm leading-loose text-alisary-soft">
+                        {{ $company->description }}</p>
                     @if ($company->website_url)
                         <a href="{{ $company->website_url }}"
-                            class="mt-4 inline-flex text-sm font-bold text-alisary-gold">زيارة الموقع ←</a>
+                            class="relative z-10 mt-4 inline-flex text-sm font-bold text-alisary-gold">زيارة الموقع
+                            ←</a>
                     @endif
                 </article>
             @endforeach
         </div>
     </section>
 
-    <section id="waqf" class="section bg-alisary-green text-white">
-        <div class="grid gap-10 lg:grid-cols-[1.4fr_0.6fr] lg:items-center">
+    <section id="waqf" class="section section-deep">
+        <div class="feature-panel grid gap-10 p-6 lg:grid-cols-[1.4fr_0.6fr] lg:items-center lg:p-10">
             <div>
                 <div class="section-head !mx-0">
                     <span>{{ $waqf?->eyebrow }}</span>
@@ -205,7 +253,8 @@
                 </p>
             </div>
             <div class="border-t border-alisary-gold/40 pt-8 text-center lg:border-r lg:border-t-0 lg:pr-10">
-                <div class="font-display text-8xl text-alisary-gold">{{ data_get($waqf?->content, 'number') }}</div>
+                <div class="font-display text-8xl text-alisary-gold">
+                    {{ $toEasternNumbers(data_get($waqf?->content, 'number')) }}</div>
                 <p class="mt-4 text-white/75">{{ data_get($waqf?->content, 'number_label') }}</p>
             </div>
         </div>
@@ -218,7 +267,7 @@
         </div>
         <div class="mt-12 grid gap-6 md:grid-cols-3">
             @foreach (data_get($doors?->content, 'items', []) as $item)
-                <a href="{{ $item['url'] ?? '#' }}" class="lux-card block bg-alisary-muted">
+                <a href="{{ $item['url'] ?? '#' }}" class="lux-card door-card block bg-alisary-muted">
                     <h3 class="text-xl font-bold text-alisary-green">{{ $item['title'] ?? '' }}</h3>
                     <p class="mt-4 leading-loose text-alisary-soft">{{ $item['text'] ?? '' }}</p>
                     <span class="mt-5 inline-flex text-alisary-gold">الدخول ←</span>
@@ -227,18 +276,19 @@
         </div>
     </section>
 
-    <section class="section bg-alisary-deep text-white">
+    <section class="section section-deep">
         <div class="section-head !mx-0">
             <span>{{ $founder?->eyebrow }}</span>
             <h2 class="!text-white">{{ $founder?->title }}</h2>
         </div>
-        <div class="mt-12 grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
-            <div class="relative overflow-hidden rounded-lg border border-white/10 bg-white/[0.03] shadow-2xl shadow-black/30">
+        <div class="feature-panel mt-12 grid gap-10 p-6 lg:grid-cols-[0.8fr_1.2fr] lg:p-8">
+            <div class="founder-frame relative overflow-hidden border border-white/10 bg-white/[0.03]">
                 @if ($founderImage)
                     <img src="{{ $founderImage }}"
                         alt="{{ data_get($founder?->content, 'name') ?: $founder?->title }}"
                         class="aspect-[4/5] h-full w-full object-cover" data-founder-image>
-                    <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_48%,rgba(7,24,21,.72)),linear-gradient(90deg,rgba(184,138,60,.2),transparent_36%)]">
+                    <div
+                        class="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_48%,rgba(7,24,21,.72)),linear-gradient(90deg,rgba(184,138,60,.2),transparent_36%)]">
                     </div>
                 @else
                     <div
@@ -248,7 +298,10 @@
             </div>
             <div class="self-center">
                 <h3 class="font-display text-3xl text-alisary-gold">{{ data_get($founder?->content, 'name') }}</h3>
-                <p class="mt-6 text-xl leading-loose text-white/80">{{ data_get($founder?->content, 'body') }}</p>
+                <div class="founder-copy rich-content prose mt-6 max-w-none text-xl leading-loose prose-headings:font-display prose-headings:text-alisary-gold prose-p:text-white/80 prose-strong:text-alisary-gold prose-a:text-alisary-gold"
+                    style="color: rgba(255,255,255,.84);">
+                    {!! str(data_get($founder?->content, 'body'))->sanitizeHtml() !!}
+                </div>
             </div>
         </div>
     </section>

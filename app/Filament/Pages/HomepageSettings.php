@@ -42,15 +42,11 @@ class HomepageSettings extends SettingsPage
                                     ->schema([
                                         TextInput::make('hero.eyebrow')->label('النص العلوي')->maxLength(255),
                                         TextInput::make('hero.title')->label('العنوان الاحتياطي')->maxLength(255),
-                                        Textarea::make('hero.subtitle')->label('الوصف الاحتياطي')->rows(3)->columnSpanFull(),
                                         Repeater::make('hero.slides')
                                             ->label('الشرائح')
                                             ->schema([
                                                 TextInput::make('eyebrow')->label('النص العلوي')->maxLength(255),
                                                 TextInput::make('title')->label('العنوان')->required()->maxLength(255),
-                                                Textarea::make('subtitle')->label('الوصف')->rows(3)->columnSpanFull(),
-                                                TextInput::make('cta_label')->label('نص الزر')->maxLength(120),
-                                                TextInput::make('cta_url')->label('رابط الزر')->maxLength(255),
                                                 ColorPicker::make('accent')->label('لون الحركة')->default('#B88A3C'),
                                                 FileUpload::make('image_path')
                                                     ->label('صورة الخلفية')
@@ -58,6 +54,13 @@ class HomepageSettings extends SettingsPage
                                                     ->visibility('public')
                                                     ->image()
                                                     ->directory('homepage/hero')
+                                                    ->imageEditor(),
+                                                FileUpload::make('mobile_image_path')
+                                                    ->label('صورة الخلفية للجوال')
+                                                    ->disk('public')
+                                                    ->visibility('public')
+                                                    ->image()
+                                                    ->directory('homepage/hero/mobile')
                                                     ->imageEditor(),
                                             ])
                                             ->columns(2)

@@ -6,9 +6,9 @@
     @csrf
 
     <div class="mb-6 flex flex-wrap gap-2">
-        <span data-wizard-indicator class="wizard-indicator is-active">1</span>
+        <span data-wizard-indicator class="wizard-indicator is-active">{{ \App\Support\NumberLocalizer::eastern(1) }}</span>
         @foreach ($steps as $index => $step)
-            <span data-wizard-indicator class="wizard-indicator">{{ $index + 2 }}</span>
+            <span data-wizard-indicator class="wizard-indicator">{{ \App\Support\NumberLocalizer::eastern($index + 2) }}</span>
         @endforeach
     </div>
 

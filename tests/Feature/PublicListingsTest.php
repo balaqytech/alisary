@@ -26,6 +26,35 @@ test('jobs index and detail only render currently published jobs', function () {
     $this->get(route('jobs.show', $expired))->assertNotFound();
 });
 
+test('jobs index renders the group hiring introduction content', function () {
+    JobListing::factory()->create();
+
+    $this->get(route('jobs.index'))
+        ->assertSuccessful()
+        ->assertSee('مجموعةٌ قابضةٌ عُمانية · تخدم الطفل ومن يخدم الطفل')
+        ->assertSee('نُعِدّهم لحياةٍ طيّبة')
+        ->assertSee('قيمةٌ تُقاس')
+        ->assertSee('أدواتُ العصر')
+        ->assertSee('قيمةٌ قبل ربح');
+
+    $this->get(route('tenders.index'))
+        ->assertSuccessful()
+        ->assertDontSee('نُعِدّهم لحياةٍ طيّبة');
+});
+
+test('job detail renders sanitized rich editor description with typography styles', function () {
+    $jobListing = JobListing::factory()->create([
+        'description' => '<h2>Responsibilities</h2><p>Lead the classroom experience.</p><script>alert("xss")</script>',
+    ]);
+
+    $this->get(route('jobs.show', $jobListing))
+        ->assertSuccessful()
+        ->assertSee('rich-content prose', false)
+        ->assertSee('<h2>Responsibilities</h2>', false)
+        ->assertSee('<p>Lead the classroom experience.</p>', false)
+        ->assertDontSee('<script>', false);
+});
+
 test('tenders index and detail only render currently published tenders', function () {
     $published = TenderListing::factory()->create(['title' => 'مناقصة منشورة']);
     $draft = TenderListing::factory()->draft()->create(['title' => 'مناقصة مسودة']);
@@ -52,4 +81,17 @@ test('tenders index and detail only render currently published tenders', functio
     $this->get(route('tenders.show', $future))->assertNotFound();
     $this->get(route('tenders.show', $expired))->assertNotFound();
     $this->get(route('tenders.show', $closed))->assertNotFound();
+});
+
+test('tender detail renders sanitized rich editor description with typography styles', function () {
+    $tenderListing = TenderListing::factory()->create([
+        'description' => '<h2>Scope</h2><ul><li>Supply learning materials.</li></ul><script>alert("xss")</script>',
+    ]);
+
+    $this->get(route('tenders.show', $tenderListing))
+        ->assertSuccessful()
+        ->assertSee('rich-content prose', false)
+        ->assertSee('<h2>Scope</h2>', false)
+        ->assertSee('<li>Supply learning materials.</li>', false)
+        ->assertDontSee('<script>', false);
 });

@@ -115,21 +115,22 @@ function initHeroSlider() {
             slide.setAttribute('aria-hidden', index === nextIndex ? 'false' : 'true');
         });
 
-        setButtonState(nextIndex);
+        activeIndex = nextIndex;
+        setButtonState(activeIndex);
+        runProgress();
+
+        gsap.fromTo(nextMedia, { scale: 1.18, xPercent: -1.8 }, { scale: 1.045, xPercent: 0, duration: 8.8, ease: 'none' });
 
         const timeline = gsap.timeline({
             defaults: { ease: 'power3.out' },
             onComplete: () => {
-                activeIndex = nextIndex;
                 isAnimating = false;
-                runProgress();
             },
         });
 
         timeline
             .set(nextSlide, { zIndex: 3, autoAlpha: 1 })
             .set(nextWords, { y: 42 })
-            .fromTo(nextMedia, { scale: 1.18, xPercent: -1.8 }, { scale: 1.045, xPercent: 0, duration: 8.8, ease: 'none' }, 0)
             .fromTo(nextReveals, { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 1.25, stagger: 0.12 }, 0.18)
             .to(nextWords, { y: 0, duration: 1.12, ease: 'power4.out', stagger: 0.045 }, 0.18)
             .to(currentSlide, { autoAlpha: 0, duration: 1.1, ease: 'power2.out' }, 0.08)
@@ -185,6 +186,36 @@ function initHeader() {
     window.addEventListener('scroll', updateHeader, { passive: true });
 }
 
+function initMobileNavigation() {
+    const toggle = document.querySelector('[data-mobile-nav-toggle]');
+    const drawer = document.querySelector('[data-mobile-nav-drawer]');
+    const closeTargets = document.querySelectorAll('[data-mobile-nav-close]');
+
+    if (! toggle || ! drawer) {
+        return;
+    }
+
+    const setOpen = (isOpen) => {
+        document.documentElement.classList.toggle('mobile-nav-open', isOpen);
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        drawer.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    };
+
+    toggle.addEventListener('click', () => {
+        setOpen(! document.documentElement.classList.contains('mobile-nav-open'));
+    });
+
+    closeTargets.forEach((target) => {
+        target.addEventListener('click', () => setOpen(false));
+    });
+
+    window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            setOpen(false);
+        }
+    });
+}
+
 function initFormWizards() {
     document.querySelectorAll('[data-form-wizard]').forEach((form) => {
         const steps = [...form.querySelectorAll('[data-wizard-step]')];
@@ -238,6 +269,7 @@ function initFormWizards() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initHeader();
+    initMobileNavigation();
     initHeroSlider();
     initScrollReveals();
     initFormWizards();

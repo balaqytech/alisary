@@ -66,6 +66,7 @@ test('home hero slides render uploaded background images from public storage', f
                 'cta_url' => '/story',
                 'accent' => '#B88A3C',
                 'image_path' => 'hero/slides/uploaded-background.jpg',
+                'mobile_image_path' => 'hero/slides/mobile-uploaded-background.jpg',
             ],
         ],
     ];
@@ -74,7 +75,37 @@ test('home hero slides render uploaded background images from public storage', f
     $this->get('/')
         ->assertSuccessful()
         ->assertSee('Uploaded slide background')
-        ->assertSee('storage/hero/slides/uploaded-background.jpg', false);
+        ->assertSee('storage/hero/slides/uploaded-background.jpg', false)
+        ->assertSee('storage/hero/slides/mobile-uploaded-background.jpg', false);
+});
+
+test('home page renders configured numbers as eastern arabic numerals', function () {
+    $homepageSettings = app(HomepageSettings::class);
+    $homepageSettings->legacy = [
+        ...$homepageSettings->legacy,
+        'items' => [
+            [
+                'year' => '2006',
+                'title' => 'Timeline title',
+                'text' => 'Timeline text',
+            ],
+        ],
+    ];
+    $homepageSettings->impact = [
+        ...$homepageSettings->impact,
+        'number' => '40000+',
+    ];
+    $homepageSettings->waqf = [
+        ...$homepageSettings->waqf,
+        'number' => '46',
+    ];
+    $homepageSettings->save();
+
+    $this->get('/')
+        ->assertSuccessful()
+        ->assertSee('٢٠٠٦')
+        ->assertSee('٤٠٠٠٠+')
+        ->assertSee('٤٦');
 });
 
 test('home founder block renders uploaded founder image from public storage', function () {
@@ -83,7 +114,7 @@ test('home founder block renders uploaded founder image from public storage', fu
         ...$homepageSettings->founder,
         'title' => 'Founder image section',
         'name' => 'Founder Name',
-        'body' => 'Founder body',
+        'body' => '<p>Founder body</p><script>alert("xss")</script>',
         'image_path' => 'homepage/founder/founder-with-children.png',
     ];
     $homepageSettings->save();
@@ -91,6 +122,8 @@ test('home founder block renders uploaded founder image from public storage', fu
     $this->get('/')
         ->assertSuccessful()
         ->assertSee('Founder image section')
+        ->assertSee('<p>Founder body</p>', false)
+        ->assertDontSee('<script>', false)
         ->assertSee('data-founder-image', false)
         ->assertSee('storage/homepage/founder/founder-with-children.png', false);
 });

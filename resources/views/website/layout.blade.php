@@ -23,59 +23,102 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-alisary-ivory text-alisary-ink antialiased selection:bg-alisary-gold selection:text-alisary-deep">
-    <header data-site-header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-alisary-deep/55 text-white backdrop-blur-xl">
-        <nav class="mx-auto flex max-w-[90rem] items-center justify-center gap-6 px-5 py-4 md:justify-between lg:px-10">
+    <header data-site-header class="fixed inset-x-0 top-0 z-50 px-3 pt-3 text-white sm:px-5">
+        <nav class="site-nav-shell mx-auto flex items-center justify-between gap-6 px-4 py-3 lg:px-6">
             <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-3 sm:gap-4">
-                <img src="{{ $logoUrl }}" alt="{{ $settings->site_name }}" class="h-10 w-auto max-w-28 object-contain sm:h-14 sm:max-w-44">
+                <img src="{{ $logoUrl }}" alt="{{ $settings->site_name }}" class="h-10 w-auto max-w-24 object-contain sm:h-14 sm:max-w-44">
                 <span class="hidden font-display text-xl text-white/90 sm:inline">{{ $settings->site_name }}</span>
             </a>
             <div class="hidden items-center gap-8 text-sm text-white/80 md:flex">
-                <a href="{{ route('home') }}#legacy">الإرث</a>
-                <a href="{{ route('home') }}#companies">مؤسساتنا</a>
-                <a href="{{ route('jobs.index') }}">الوظائف</a>
-                <a href="{{ route('tenders.index') }}">المناقصات</a>
-                <a href="{{ route('story') }}">الحكاية</a>
+                <a href="{{ route('home') }}#legacy" class="nav-link">الإرث</a>
+                <a href="{{ route('home') }}#companies" class="nav-link">مؤسساتنا</a>
+                <a href="{{ route('jobs.index') }}" class="nav-link">الوظائف</a>
+                <a href="{{ route('tenders.index') }}" class="nav-link">المناقصات</a>
+                <a href="{{ route('story') }}" class="nav-link">الحكاية</a>
                 @if ($settings->assistant_url)
-                    <a href="{{ $settings->assistant_url }}" class="inline-flex items-center gap-2 border border-alisary-gold/70 px-4 py-2 text-alisary-gold hover:bg-alisary-gold hover:text-alisary-deep">
+                    <a href="{{ $settings->assistant_url }}" class="nav-action">
                         المساعد الذكي
                         <x-icons.remix.arrow-left class="size-4" />
                     </a>
                 @endif
             </div>
+            <button type="button" class="mobile-menu-button md:hidden" data-mobile-nav-toggle aria-controls="mobile-navigation" aria-expanded="false" aria-label="فتح القائمة">
+                <span class="hamburger-icon" aria-hidden="true"><span></span></span>
+            </button>
         </nav>
     </header>
+
+    <button type="button" class="mobile-nav-backdrop md:hidden" data-mobile-nav-close aria-label="إغلاق القائمة"></button>
+    <aside id="mobile-navigation" class="mobile-nav-drawer md:hidden" data-mobile-nav-drawer aria-hidden="true">
+        <div class="flex h-full flex-col px-6 py-5">
+            <div class="flex items-center justify-between gap-4 border-b border-white/10 pb-5">
+                <a href="{{ route('home') }}" class="flex items-center gap-3" data-mobile-nav-close>
+                    <img src="{{ $logoUrl }}" alt="{{ $settings->site_name }}" class="h-12 w-auto max-w-36 object-contain">
+                    <span class="font-display text-lg text-white/90">{{ $settings->site_name }}</span>
+                </a>
+                <button type="button" class="mobile-menu-button" data-mobile-nav-close aria-label="إغلاق القائمة">
+                    <span class="close-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+            <nav class="grid gap-2 py-8 text-lg font-bold text-white/82">
+                <a href="{{ route('home') }}#legacy" class="rounded-md border border-white/10 px-4 py-3 transition hover:border-alisary-gold/50 hover:text-white" data-mobile-nav-close>الإرث</a>
+                <a href="{{ route('home') }}#companies" class="rounded-md border border-white/10 px-4 py-3 transition hover:border-alisary-gold/50 hover:text-white" data-mobile-nav-close>مؤسساتنا</a>
+                <a href="{{ route('jobs.index') }}" class="rounded-md border border-white/10 px-4 py-3 transition hover:border-alisary-gold/50 hover:text-white" data-mobile-nav-close>الوظائف</a>
+                <a href="{{ route('tenders.index') }}" class="rounded-md border border-white/10 px-4 py-3 transition hover:border-alisary-gold/50 hover:text-white" data-mobile-nav-close>المناقصات</a>
+                <a href="{{ route('story') }}" class="rounded-md border border-white/10 px-4 py-3 transition hover:border-alisary-gold/50 hover:text-white" data-mobile-nav-close>الحكاية</a>
+            </nav>
+            @if ($settings->assistant_url)
+                <a href="{{ $settings->assistant_url }}" class="nav-action mt-auto justify-center" data-mobile-nav-close>
+                    المساعد الذكي
+                    <x-icons.remix.arrow-left class="size-4" />
+                </a>
+            @endif
+        </div>
+    </aside>
 
     <main>
         {{ $slot }}
     </main>
 
-    <footer class="relative overflow-hidden bg-alisary-deep text-white">
+    <footer class="section-deep relative overflow-hidden text-white">
         <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-alisary-gold/70 to-transparent"></div>
-        <div class="mx-auto max-w-7xl px-5 py-16 text-center lg:px-10">
-            <p class="mx-auto max-w-2xl font-display text-2xl leading-loose text-white/90">ما توفيقُنا إلّا بالله؛ عليه نتوكّل، وإليه نُنيب.</p>
-            <img src="{{ $logoUrl }}" alt="{{ $settings->site_name }}" class="mx-auto mt-8 h-20 w-auto max-w-64 object-contain">
-            <div class="mt-8 font-display text-5xl text-alisary-gold">{{ $settings->slogan }}</div>
-            <div class="mt-10 flex flex-wrap justify-center gap-6 text-sm text-white/70">
-                <a href="{{ route('home') }}">الرئيسية</a>
-                <a href="{{ route('jobs.index') }}">الوظائف</a>
-                <a href="{{ route('tenders.index') }}">المناقصات</a>
-                <a href="{{ route('story') }}">الحكاية</a>
+        <div class="mx-auto grid max-w-[90rem] gap-10 px-5 py-16 lg:grid-cols-[1.2fr_0.8fr] lg:px-10">
+            <div>
+                <img src="{{ $logoUrl }}" alt="{{ $settings->site_name }}" class="h-20 w-auto max-w-64 object-contain">
+                <div class="mt-8 max-w-2xl font-display text-4xl leading-relaxed text-alisary-gold md:text-5xl">{{ $settings->slogan }}</div>
+                <p class="mt-6 max-w-2xl text-lg leading-loose text-white/78">ما توفيقُنا إلّا بالله؛ عليه نتوكّل، وإليه نُنيب.</p>
             </div>
-            <div class="mt-8 flex flex-wrap justify-center gap-5 text-sm text-white/60">
-                @if ($settings->email)
-                    <a href="mailto:{{ $settings->email }}" class="inline-flex items-center gap-2">
-                        <x-icons.remix.mail class="size-4 text-alisary-gold" />
-                        {{ $settings->email }}
-                    </a>
-                @endif
-                @if ($settings->phone)
-                    <a href="tel:{{ $settings->phone }}" class="inline-flex items-center gap-2">
-                        <x-icons.remix.phone class="size-4 text-alisary-gold" />
-                        {{ $settings->phone }}
-                    </a>
-                @endif
+            <div class="feature-panel p-6">
+                <div class="grid gap-6 sm:grid-cols-2">
+                    <div>
+                        <div class="text-sm font-bold text-alisary-gold">روابط</div>
+                        <div class="mt-4 grid gap-3 text-sm text-white/68">
+                            <a href="{{ route('home') }}">الرئيسية</a>
+                            <a href="{{ route('jobs.index') }}">الوظائف</a>
+                            <a href="{{ route('tenders.index') }}">المناقصات</a>
+                            <a href="{{ route('story') }}">الحكاية</a>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold text-alisary-gold">تواصل</div>
+                        <div class="mt-4 grid gap-3 text-sm text-white/68">
+                            @if ($settings->email)
+                                <a href="mailto:{{ $settings->email }}" class="inline-flex items-center gap-2">
+                                    <x-icons.remix.mail class="size-4 text-alisary-gold" />
+                                    {{ $settings->email }}
+                                </a>
+                            @endif
+                            @if ($settings->phone)
+                                <a href="tel:{{ $settings->phone }}" class="inline-flex items-center gap-2">
+                                    <x-icons.remix.phone class="size-4 text-alisary-gold" />
+                                    {{ $settings->phone }}
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="mt-8 border-t border-white/10 pt-6 text-xs text-white/40">© {{ $settings->site_name }} — جميع الحقوق محفوظة</div>
+            <div class="border-t border-white/10 pt-6 text-xs text-white/40 lg:col-span-2">© {{ $settings->site_name }} — جميع الحقوق محفوظة</div>
         </div>
     </footer>
 </body>
