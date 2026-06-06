@@ -27,14 +27,19 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        SiteSetting::query()->firstOrCreate([], [
+        $settings = SiteSetting::query()->firstOrCreate([], [
             'site_name' => 'مجموعة العيسري',
             'slogan' => 'نُعِدُّهم لحياةٍ طيِّبة',
+            'logo_path' => 'logo.svg',
             'email' => 'info@alisary.com',
             'assistant_url' => 'https://assistant.alisary.com',
             'seo_title' => 'مجموعة العيسري — نُعِدُّهم لحياةٍ طيِّبة',
             'seo_description' => 'مجموعة العيسري القابضة العُمانية: نخدم الأطفال ومن يخدم الأطفال، من لحظة الميلاد، وفق خماسية السكينة.',
         ]);
+
+        if (blank($settings->logo_path)) {
+            $settings->forceFill(['logo_path' => 'logo.svg'])->save();
+        }
 
         foreach ($this->homeSections() as $section) {
             HomeSection::query()->updateOrCreate(
@@ -73,6 +78,35 @@ class DatabaseSeeder extends Seeder
                     'subtitle' => 'حكايةٌ بدأتْ في غرفةٍ مساحتُها اثنا عشر مترًا... ولم تنتهِ بعد.',
                     'cta_label' => 'اقرأ الحكاية',
                     'cta_url' => '/story',
+                    'slides' => [
+                        [
+                            'eyebrow' => 'مجموعة العيسري',
+                            'title' => 'جلستْ هنا طفلةً تقرأ. واليوم تُرسل أبناءها إلى المقعد ذاته.',
+                            'subtitle' => 'حكايةٌ بدأتْ في غرفةٍ مساحتُها اثنا عشر مترًا... ولم تنتهِ بعد.',
+                            'cta_label' => 'اقرأ الحكاية',
+                            'cta_url' => '/story',
+                            'accent' => '#B88A3C',
+                            'image_path' => '/placeholders/hero-legacy.svg',
+                        ],
+                        [
+                            'eyebrow' => 'مظلّة قابضة',
+                            'title' => 'نخدم الأطفال، ومن يخدم الأطفال.',
+                            'subtitle' => 'من التعليم إلى التقنية، ومن النشر إلى الاستثمار؛ مؤسّسات تتكامل تحت اسم واحد ورسالة واحدة.',
+                            'cta_label' => 'استكشف المؤسسات',
+                            'cta_url' => '#companies',
+                            'accent' => '#C3CD30',
+                            'image_path' => '/placeholders/hero-holding.svg',
+                        ],
+                        [
+                            'eyebrow' => 'أثر ممتد',
+                            'title' => 'جيلٌ أعددناه، صار يُعِدّ جيلًا.',
+                            'subtitle' => 'الأثر الحقيقي ليس رقمًا في تقرير؛ بل بيتٌ يعود إلينا بعد أعوام، وفي يده طفل جديد.',
+                            'cta_label' => 'فرص الانضمام',
+                            'cta_url' => '/jobs',
+                            'accent' => '#D7B56D',
+                            'image_path' => '/placeholders/hero-impact.svg',
+                        ],
+                    ],
                 ],
             ],
             [

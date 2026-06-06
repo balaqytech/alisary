@@ -20,6 +20,7 @@ class SiteSettingFactory extends Factory
         return [
             'site_name' => 'مجموعة العيسري',
             'slogan' => 'نُعِدُّهم لحياةٍ طيِّبة',
+            'logo_path' => 'logo.svg',
             'email' => 'info@alisary.com',
             'phone' => '+968 0000 0000',
             'address' => 'سلطنة عُمان',

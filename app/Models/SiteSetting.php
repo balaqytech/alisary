@@ -16,6 +16,7 @@ class SiteSetting extends Model
     protected $attributes = [
         'site_name' => 'مجموعة العيسري',
         'slogan' => 'نُعِدُّهم لحياةٍ طيِّبة',
+        'logo_path' => 'logo.svg',
     ];
 
     protected function casts(): array

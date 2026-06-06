@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 1100" role="img" aria-label="Placeholder cinematic background for Alaisary legacy">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a2b26"/>
+      <stop offset=".48" stop-color="#071815"/>
+      <stop offset="1" stop-color="#1f1710"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d8bc7e" stop-opacity=".88"/>
+      <stop offset="1" stop-color="#8f6528" stop-opacity=".28"/>
+    </linearGradient>
+    <filter id="soft">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <pattern id="grain" width="140" height="140" patternUnits="userSpaceOnUse">
+      <path d="M0 0h140v140H0z" fill="none"/>
+      <path d="M0 70h140M70 0v140" stroke="#fff" stroke-opacity=".035"/>
+      <path d="M35 0v140M105 0v140M0 35h140M0 105h140" stroke="#c8a24b" stroke-opacity=".025"/>
+    </pattern>
+  </defs>
+  <rect width="1800" height="1100" fill="url(#bg)"/>
+  <rect width="1800" height="1100" fill="url(#grain)"/>
+  <path d="M-70 970c250-140 457-208 621-204 245 7 383 168 632 134 175-24 329-138 687-130v370H-70Z" fill="#050d0c" opacity=".72"/>
+  <g transform="translate(1040 182)" opacity=".72">
+    <rect x="0" y="0" width="520" height="640" fill="#f8f2e8" opacity=".035"/>
+    <rect x="40" y="42" width="440" height="556" fill="none" stroke="url(#gold)" stroke-width="3" opacity=".8"/>
+    <path d="M100 500c74-102 140-170 197-202 66-36 125-33 177 10" fill="none" stroke="#d8bc7e" stroke-width="7" stroke-linecap="round" opacity=".34"/>
+    <path d="M116 180h288M116 238h240M116 296h308" stroke="#fff" stroke-opacity=".16" stroke-width="7" stroke-linecap="round"/>
+    <path d="M148 420h210" stroke="#c8a24b" stroke-opacity=".5" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <g opacity=".32" filter="url(#soft)">
+    <path d="M210 760c210-250 398-354 566-313 128 31 190 135 322 128 81-5 145-49 232-135" fill="none" stroke="#b88a3c" stroke-width="34" stroke-linecap="round"/>
+  </g>
+  <path d="M278 214h360M278 286h278M278 358h432" stroke="#f8f2e8" stroke-opacity=".12" stroke-width="8" stroke-linecap="round"/>
+  <path d="M278 458h238" stroke="#b88a3c" stroke-opacity=".45" stroke-width="5" stroke-linecap="round"/>
+</svg>

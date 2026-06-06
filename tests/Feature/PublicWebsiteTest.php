@@ -44,3 +44,30 @@ test('public website pages render Arabic CMS content', function () {
         ->assertSuccessful()
         ->assertSee('توريد مواد تعليمية');
 });
+
+test('home hero slides render uploaded background images from public storage', function () {
+    SiteSetting::factory()->create();
+    HomeSection::factory()->create([
+        'key' => 'hero',
+        'title' => 'Hero',
+        'content' => [
+            'slides' => [
+                [
+                    'eyebrow' => 'Hero',
+                    'title' => 'Uploaded slide background',
+                    'subtitle' => 'Uploaded slide background subtitle',
+                    'cta_label' => 'Read',
+                    'cta_url' => '/story',
+                    'accent' => '#B88A3C',
+                    'image_path' => 'hero/slides/uploaded-background.jpg',
+                ],
+            ],
+        ],
+        'sort_order' => 1,
+    ]);
+
+    $this->get('/')
+        ->assertSuccessful()
+        ->assertSee('Uploaded slide background')
+        ->assertSee('storage/hero/slides/uploaded-background.jpg', false);
+});

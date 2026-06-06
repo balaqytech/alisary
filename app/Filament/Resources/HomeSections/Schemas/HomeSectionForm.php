@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\HomeSections\Schemas;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
@@ -40,6 +41,26 @@ class HomeSectionForm
                                 TextInput::make('title')->label('العنوان')->maxLength(255),
                                 TextInput::make('url')->label('الرابط')->maxLength(255),
                                 Textarea::make('text')->label('النص')->rows(3)->columnSpanFull(),
+                            ])
+                            ->columns(2)
+                            ->columnSpanFull(),
+                        Repeater::make('content.slides')
+                            ->label('شرائح الواجهة الرئيسية')
+                            ->schema([
+                                TextInput::make('eyebrow')->label('التصنيف الصغير')->maxLength(255),
+                                TextInput::make('title')->label('العنوان')->required()->maxLength(255),
+                                Textarea::make('subtitle')->label('النص المساند')->rows(3)->columnSpanFull(),
+                                TextInput::make('cta_label')->label('نص الزر')->maxLength(255),
+                                TextInput::make('cta_url')->label('رابط الزر')->maxLength(255),
+                                TextInput::make('accent')->label('لون التمييز')->maxLength(32)->default('#B88A3C'),
+                                FileUpload::make('image_path')
+                                    ->label('صورة خلفية الشريحة')
+                                    ->image()
+                                    ->disk('public')
+                                    ->directory('hero/slides')
+                                    ->visibility('public')
+                                    ->imageEditor()
+                                    ->columnSpanFull(),
                             ])
                             ->columns(2)
                             ->columnSpanFull(),

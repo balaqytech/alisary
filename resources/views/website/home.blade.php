@@ -7,23 +7,114 @@
         $waqf = $sections->get('waqf');
         $doors = $sections->get('doors');
         $founder = $sections->get('founder');
+        $heroSlides = collect(data_get($hero?->content, 'slides', []))
+            ->filter(fn ($slide) => filled($slide['title'] ?? null))
+            ->values();
+
+        if ($heroSlides->isEmpty()) {
+            $heroSlides = collect([
+                [
+                    'eyebrow' => $hero?->eyebrow ?? 'مجموعة العيسري',
+                    'title' => $hero?->title,
+                    'subtitle' => data_get($hero?->content, 'subtitle'),
+                    'cta_label' => data_get($hero?->content, 'cta_label', 'اقرأ الحكاية'),
+                    'cta_url' => data_get($hero?->content, 'cta_url', route('story')),
+                    'accent' => '#B88A3C',
+                    'image_path' => '/placeholders/hero-legacy.svg',
+                ],
+                [
+                    'eyebrow' => 'مظلّة قابضة',
+                    'title' => 'نخدم الأطفال، ومن يخدم الأطفال.',
+                    'subtitle' => 'مؤسسات تتكامل في التعليم، والتقنية، والنشر، والاستثمار؛ تحت رسالة واحدة.',
+                    'cta_label' => 'استكشف المؤسسات',
+                    'cta_url' => '#companies',
+                    'accent' => '#C3CD30',
+                    'image_path' => '/placeholders/hero-holding.svg',
+                ],
+                [
+                    'eyebrow' => 'أثر ممتد',
+                    'title' => 'جيلٌ أعددناه، صار يُعِدّ جيلًا.',
+                    'subtitle' => 'الأثر الحقيقي بيتٌ يعود إلينا بعد أعوام، وفي يده طفل جديد.',
+                    'cta_label' => 'فرص الانضمام',
+                    'cta_url' => route('jobs.index'),
+                    'accent' => '#D7B56D',
+                    'image_path' => '/placeholders/hero-impact.svg',
+                ],
+            ]);
+        }
     @endphp
 
-    <section class="relative min-h-screen overflow-hidden bg-hero pt-32 text-white">
-        <div class="absolute -left-24 top-24 size-96 rounded-full border border-alisary-gold/20"></div>
-        <div class="mx-auto flex min-h-[calc(100vh-8rem)] max-w-7xl items-end px-5 pb-20 lg:px-10">
-            <div class="max-w-4xl">
-                <div class="mb-5 text-sm font-semibold text-alisary-gold">{{ $hero?->eyebrow ?? 'مجموعة العيسري' }}</div>
-                <h1 class="font-display text-5xl leading-tight md:text-7xl">{{ $hero?->title }}</h1>
-                <p class="mt-8 max-w-2xl text-xl leading-loose text-white/80">{{ data_get($hero?->content, 'subtitle') }}</p>
-                <a href="{{ data_get($hero?->content, 'cta_url', route('story')) }}" class="mt-10 inline-flex border-b-2 border-alisary-gold pb-2 text-lg text-alisary-gold">
-                    {{ data_get($hero?->content, 'cta_label', 'اقرأ الحكاية') }} ←
-                </a>
+    <section data-hero-slider class="hero-slider relative min-h-screen overflow-hidden bg-hero text-white">
+        <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,24,21,.42)_1px,transparent_1px),linear-gradient(0deg,rgba(7,24,21,.34)_1px,transparent_1px)] bg-[size:96px_96px] opacity-30"></div>
+        <div class="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-alisary-deep to-transparent"></div>
+
+        <div class="relative min-h-screen">
+            @foreach ($heroSlides as $index => $slide)
+                @php
+                    $imagePath = $slide['image_path'] ?? null;
+                    $slideImage = $imagePath
+                        ? (\Illuminate\Support\Str::startsWith($imagePath, ['http://', 'https://', '/'])
+                            ? $imagePath
+                            : \Illuminate\Support\Facades\Storage::disk('public')->url($imagePath))
+                        : asset('placeholders/hero-legacy.svg');
+                    $accent = $slide['accent'] ?? '#B88A3C';
+                @endphp
+                <article
+                    data-hero-slide
+                    class="hero-slide absolute inset-0 grid min-h-screen items-end opacity-0"
+                    style="--slide-accent: {{ $accent }};"
+                    aria-hidden="{{ $index === 0 ? 'false' : 'true' }}"
+                >
+                    <div class="hero-slide-media absolute inset-0" data-hero-media>
+                        <div class="hero-slide-bg absolute inset-0"></div>
+                        <img src="{{ $slideImage }}" alt="" class="hero-bg-visual absolute inset-0 h-full w-full object-cover" data-hero-image aria-hidden="true">
+                        <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,24,21,.28),rgba(7,24,21,.7)_58%,rgba(7,24,21,.92)),linear-gradient(0deg,rgba(7,24,21,.94),transparent_38%,rgba(7,24,21,.72))]"></div>
+                        <img src="{{ asset('logo.svg') }}" alt="" class="hero-watermark absolute left-[8vw] top-1/2 w-[min(42vw,34rem)] -translate-y-1/2 opacity-[0.065] saturate-0" aria-hidden="true">
+                        <div class="hero-art-frame absolute left-[7vw] top-[21vh] hidden h-[52vh] w-[34vw] border border-white/10 bg-white/[0.025] shadow-2xl shadow-black/20 lg:block"></div>
+                    </div>
+
+                    <div class="relative z-10 mx-auto grid min-h-screen w-full max-w-[90rem] items-end gap-10 px-5 pb-24 pt-36 lg:grid-cols-[1fr_25rem] lg:px-10 lg:pb-28">
+                        <div class="max-w-5xl text-center md:text-right">
+                            <div data-hero-reveal class="mb-6 flex items-center justify-center gap-4 text-xs font-bold uppercase tracking-[0.34em] text-alisary-gold md:justify-start">
+                                <span class="h-px w-16 bg-alisary-gold"></span>
+                                {{ $slide['eyebrow'] ?? $hero?->eyebrow ?? 'مجموعة العيسري' }}
+                            </div>
+                            <h1 data-hero-reveal data-split-words class="hero-title font-display text-alisary-ivory">
+                                {{ $slide['title'] ?? '' }}
+                            </h1>
+                            <p data-hero-reveal class="mx-auto mt-8 max-w-[19rem] text-lg leading-loose text-white/74 md:mx-0 md:max-w-3xl md:text-2xl">
+                                {{ $slide['subtitle'] ?? '' }}
+                            </p>
+                            <div data-hero-reveal class="mt-10 flex flex-wrap items-center justify-center gap-5 md:justify-start">
+                                <a href="{{ $slide['cta_url'] ?? route('story') }}" class="lux-link">
+                                    {{ $slide['cta_label'] ?? 'اقرأ الحكاية' }} ←
+                                </a>
+                                <span class="text-sm text-white/45">0{{ $index + 1 }} / 0{{ $heroSlides->count() }}</span>
+                            </div>
+                        </div>
+
+                        <aside data-hero-reveal class="hidden border-r border-white/12 pr-8 text-white/64 lg:block">
+                            <div class="font-display text-7xl text-[color:var(--slide-accent)]">0{{ $index + 1 }}</div>
+                            <p class="mt-6 text-sm leading-loose">حركة سينمائية هادئة، ومساحة بيضاء داكنة، وصوت بصري يليق بمجموعة قابضة ذات أثر عابر للأجيال.</p>
+                        </aside>
+                    </div>
+                </article>
+            @endforeach
+        </div>
+
+        <div class="absolute inset-x-0 bottom-8 z-20 mx-auto flex max-w-[90rem] items-center justify-between gap-6 px-5 lg:px-10">
+            <div class="hidden h-px flex-1 bg-white/15 md:block"></div>
+            <div class="flex items-center gap-3">
+                @foreach ($heroSlides as $index => $slide)
+                    <button type="button" data-hero-button aria-label="الشريحة {{ $index + 1 }}" class="hero-dot">
+                        <span></span>
+                    </button>
+                @endforeach
             </div>
         </div>
     </section>
 
-    <section class="section">
+    <section class="section" data-reveal>
         <div class="section-head">
             <span>{{ $proof?->eyebrow }}</span>
             <h2>{{ $proof?->title }}</h2>
