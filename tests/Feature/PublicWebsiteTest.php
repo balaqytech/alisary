@@ -5,6 +5,7 @@ use App\Models\JobListing;
 use App\Models\TenderListing;
 use App\Settings\GeneralSettings;
 use App\Settings\HomepageSettings;
+use App\Settings\StorySettings;
 
 test('public website pages render settings driven Arabic content', function () {
     $generalSettings = app(GeneralSettings::class);
@@ -126,4 +127,27 @@ test('home founder block renders uploaded founder image from public storage', fu
         ->assertDontSee('<script>', false)
         ->assertSee('data-founder-image', false)
         ->assertSee('storage/homepage/founder/founder-with-children.png', false);
+});
+
+test('story page renders settings managed content', function () {
+    $storySettings = app(StorySettings::class);
+    $storySettings->eyebrow = 'Story eyebrow';
+    $storySettings->title = 'Managed story title';
+    $storySettings->lead = 'Managed story lead';
+    $storySettings->image_path = 'story/managed-story.jpg';
+    $storySettings->image_caption = 'Managed story image caption';
+    $storySettings->body = '<p>Managed story body</p><script>alert("xss")</script>';
+    $storySettings->closing = 'Managed story closing';
+    $storySettings->save();
+
+    $this->get('/story')
+        ->assertSuccessful()
+        ->assertSee('Story eyebrow')
+        ->assertSee('Managed story title')
+        ->assertSee('Managed story lead')
+        ->assertSee('storage/story/managed-story.jpg', false)
+        ->assertSee('Managed story image caption')
+        ->assertSee('<p>Managed story body</p>', false)
+        ->assertDontSee('<script>', false)
+        ->assertSee('Managed story closing');
 });

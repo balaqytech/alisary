@@ -35,7 +35,7 @@ function initHeroSlider() {
     let activeIndex = 0;
     let progressTween = null;
     let isAnimating = false;
-    const interval = 7.6;
+    const interval = 3;
 
     gsap.set(slides, { autoAlpha: 0, zIndex: 0 });
     gsap.set(slides[0], { autoAlpha: 1, zIndex: 2 });
@@ -45,7 +45,7 @@ function initHeroSlider() {
     }, {
         scale: 1.045,
         xPercent: 0,
-        duration: 8.8,
+        duration: 4.8,
         ease: 'none',
     });
     gsap.set(slides[0].querySelectorAll('[data-hero-reveal]'), { autoAlpha: 1, y: 0 });
@@ -119,7 +119,7 @@ function initHeroSlider() {
         setButtonState(activeIndex);
         runProgress();
 
-        gsap.fromTo(nextMedia, { scale: 1.18, xPercent: -1.8 }, { scale: 1.045, xPercent: 0, duration: 8.8, ease: 'none' });
+        gsap.fromTo(nextMedia, { scale: 1.18, xPercent: -1.8 }, { scale: 1.045, xPercent: 0, duration: 4.8, ease: 'none' });
 
         const timeline = gsap.timeline({
             defaults: { ease: 'power3.out' },

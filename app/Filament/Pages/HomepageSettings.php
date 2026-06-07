@@ -46,7 +46,7 @@ class HomepageSettings extends SettingsPage
                                             ->label('الشرائح')
                                             ->schema([
                                                 TextInput::make('eyebrow')->label('النص العلوي')->maxLength(255),
-                                                TextInput::make('title')->label('العنوان')->required()->maxLength(255),
+                                                TextInput::make('title')->live(onBlur: true)->label('العنوان')->required()->maxLength(255),
                                                 ColorPicker::make('accent')->label('لون الحركة')->default('#B88A3C'),
                                                 FileUpload::make('image_path')
                                                     ->label('صورة الخلفية')
@@ -64,6 +64,10 @@ class HomepageSettings extends SettingsPage
                                                     ->imageEditor(),
                                             ])
                                             ->columns(2)
+                                            ->cloneable()
+                                            ->collapsible()
+                                            ->reorderable()
+                                            ->itemLabel(fn(array $state): ?string => $state['title'] ?? null)
                                             ->columnSpanFull(),
                                     ])
                                     ->columns(2)

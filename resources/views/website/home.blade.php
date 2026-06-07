@@ -101,7 +101,7 @@
                         class="relative z-10 mx-auto grid min-h-screen w-full max-w-[90rem] items-end gap-10 px-5 pb-24 pt-36 lg:grid-cols-[minmax(0,1fr)_23rem] lg:px-10 lg:pb-28">
                         <div class="hero-copy max-w-5xl text-center md:text-right">
                             <div data-hero-reveal
-                                class="mb-6 flex items-center justify-center gap-4 text-xs font-bold uppercase tracking-[0.34em] text-alisary-gold md:justify-start">
+                                class="mb-6 flex items-center justify-center gap-4 text-xs font-bold uppercase text-alisary-gold md:justify-start">
                                 <span class="h-px w-16 bg-alisary-gold"></span>
                                 {{ $slide['eyebrow'] ?? ($hero?->eyebrow ?? 'مجموعة العيسري') }}
                             </div>
@@ -120,7 +120,7 @@
                                         {{ $slide['cta_label'] }}
                                     </a>
                                 @endif
-                                <span class="hero-count text-sm font-bold text-white/45">
+                                <span class="hero-count text-sm font-display font-bold text-white/45">
                                     <span>{{ $toEasternNumbers(str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT)) }}</span>
                                     <span>/</span>
                                     <span>{{ $toEasternNumbers(str_pad((string) $heroSlides->count(), 2, '0', STR_PAD_LEFT)) }}</span>
@@ -144,7 +144,7 @@
         <div
             class="absolute inset-x-0 bottom-8 z-20 mx-auto flex max-w-[90rem] items-center justify-between gap-6 px-5 lg:px-10">
             <div class="hidden h-px flex-1 bg-white/15 md:block"></div>
-            <div class="flex items-center gap-3">
+            <div class="hero-pagination flex w-full min-w-0 items-center gap-2 md:w-auto md:gap-3">
                 @foreach ($heroSlides as $index => $slide)
                     <button type="button" data-hero-button aria-label="الشريحة {{ $toEasternNumbers($index + 1) }}"
                         class="hero-dot">
@@ -163,11 +163,17 @@
         <div class="mt-12 grid gap-6 md:grid-cols-3">
             @foreach (data_get($proof?->content, 'items', []) as $item)
                 <article class="lux-card proof-card">
-                    <div class="flex items-center justify-between gap-4">
-                        <div class="text-sm font-bold text-alisary-gold">{{ $item['label'] ?? '' }}</div>
+                    @php
+                        $proofIcons = ['icons.remix.bar-chart', 'icons.remix.heart-pulse', 'icons.remix.lightbulb'];
+                    @endphp
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="section-card-icon">
+                            <x-dynamic-component :component="$proofIcons[$loop->index % count($proofIcons)]" class="size-6" />
+                        </div>
                         <div class="card-index">
                             {{ $toEasternNumbers(str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT)) }}</div>
                     </div>
+                    <div class="mt-5 text-sm font-bold text-alisary-gold">{{ $item['label'] ?? '' }}</div>
                     <p class="mt-4 leading-loose">{{ $item['text'] ?? '' }}</p>
                 </article>
             @endforeach
@@ -215,9 +221,17 @@
             @foreach ($companies as $company)
                 @php
                     $companyLogo = $assetUrl($company->logo_path);
+                    $companyImage = $assetUrl($company->image_path);
                 @endphp
                 <article class="portfolio-card" style="--company-color: {{ $company->brand_color }}">
-                    <div class="relative z-10 mb-7 flex items-center justify-between gap-4">
+                    <div class="portfolio-media">
+                        @if ($companyImage)
+                            <img src="{{ $companyImage }}" alt="" aria-hidden="true">
+                        @else
+                            <x-icons.remix.building class="size-10" />
+                        @endif
+                    </div>
+                    <div class="relative z-10 mt-5 mb-7 flex items-center justify-between gap-4">
                         <div class="portfolio-logo">
                             @if ($companyLogo)
                                 <img src="{{ $companyLogo }}" alt="{{ $company->name }}">
@@ -268,6 +282,12 @@
         <div class="mt-12 grid gap-6 md:grid-cols-3">
             @foreach (data_get($doors?->content, 'items', []) as $item)
                 <a href="{{ $item['url'] ?? '#' }}" class="lux-card door-card block bg-alisary-muted">
+                    @php
+                        $doorIcons = ['icons.remix.briefcase', 'icons.remix.file-list', 'icons.remix.rocket'];
+                    @endphp
+                    <div class="section-card-icon">
+                        <x-dynamic-component :component="$doorIcons[$loop->index % count($doorIcons)]" class="size-6" />
+                    </div>
                     <h3 class="text-xl font-bold text-alisary-green">{{ $item['title'] ?? '' }}</h3>
                     <p class="mt-4 leading-loose text-alisary-soft">{{ $item['text'] ?? '' }}</p>
                     <span class="mt-5 inline-flex text-alisary-gold">الدخول ←</span>

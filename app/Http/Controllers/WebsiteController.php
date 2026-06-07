@@ -7,6 +7,7 @@ use App\Models\JobListing;
 use App\Models\TenderListing;
 use App\Settings\GeneralSettings;
 use App\Settings\HomepageSettings;
+use App\Settings\StorySettings;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
@@ -24,10 +25,11 @@ class WebsiteController extends Controller
         ]);
     }
 
-    public function story(GeneralSettings $settings): View
+    public function story(GeneralSettings $settings, StorySettings $storySettings): View
     {
         return view('website.story', [
             'settings' => $settings,
+            'storySettings' => $storySettings,
         ]);
     }
 

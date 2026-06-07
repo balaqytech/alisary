@@ -30,14 +30,23 @@
         <section class="section-deep text-white">
             <div class="mx-auto grid max-w-7xl gap-px bg-white/10 px-5 lg:grid-cols-3 lg:px-10">
                 <article class="value-tile">
+                    <div class="value-icon">
+                        <x-icons.remix.bar-chart class="size-6" />
+                    </div>
                     <h2 class="font-display text-3xl text-alisary-gold">قيمةٌ تُقاس</h2>
                     <p class="mt-4 leading-loose text-white/72">نُحاسبك على ما تُنجزه من أثرٍ ونتائج، لا على ساعات حضورك. من يُعطي أكثر بموارد أقل، يتقدّم.</p>
                 </article>
                 <article class="value-tile">
+                    <div class="value-icon">
+                        <x-icons.remix.lightbulb class="size-6" />
+                    </div>
                     <h2 class="font-display text-3xl text-alisary-gold">أدواتُ العصر</h2>
                     <p class="mt-4 leading-loose text-white/72">نعمل بمنطق: ما تُنجزه التقنية لا يُسند لبشر. نُقدّر من يُتقن الأتمتة والذكاء الاصطناعي ويتعلّم بسرعة.</p>
                 </article>
                 <article class="value-tile">
+                    <div class="value-icon">
+                        <x-icons.remix.heart-pulse class="size-6" />
+                    </div>
                     <h2 class="font-display text-3xl text-alisary-gold">قيمةٌ قبل ربح</h2>
                     <p class="mt-4 leading-loose text-white/72">العلامة عندنا قيميّة. من يبرع ويخون الرسالة يضرّها أكثر من الضعيف. الاصطفاف القيمي بوّابة عبور.</p>
                 </article>

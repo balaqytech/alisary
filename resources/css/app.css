@@ -26,6 +26,7 @@
 }
 
 @layer base {
+
     html,
     body {
         overflow-x: hidden;
@@ -33,13 +34,14 @@
 
     body {
         font-family: var(--font-sans);
+        letter-spacing: 0;
         line-height: 1.8;
         background:
+            linear-gradient(90deg, rgb(32 24 18 / 0.1) 1px, transparent 1px),
+            linear-gradient(0deg, rgb(32 24 18 / 0.085) 1px, transparent 1px),
             linear-gradient(180deg, rgb(255 250 242 / 0.98), rgb(248 242 232 / 0.94) 56%, rgb(246 248 243 / 0.9)),
-            linear-gradient(90deg, rgb(32 24 18 / 0.012) 1px, transparent 1px),
-            linear-gradient(0deg, rgb(32 24 18 / 0.01) 1px, transparent 1px),
             var(--color-alisary-ivory);
-        background-size: auto, 132px 132px, 132px 132px;
+        background-size: 96px 96px, 96px 96px, auto;
     }
 
     h1,
@@ -236,7 +238,7 @@
         margin-inline: 0;
     }
 
-    .section-band > * {
+    .section-band>* {
         max-width: 90rem;
         margin-inline: auto;
     }
@@ -257,7 +259,7 @@
         color: white;
     }
 
-    .section-deep > :not(.absolute) {
+    .section-deep> :not(.absolute) {
         max-width: 90rem;
         margin-inline: auto;
     }
@@ -442,19 +444,28 @@
         padding-block: 0.02em 0.08em;
     }
 
-    .hero-word > span {
+    .hero-word>span {
         display: inline-block;
         will-change: transform;
     }
 
     .hero-dot {
         position: relative;
-        width: clamp(2.75rem, 7vw, 6rem);
-        height: 0.625rem;
+        flex: 1 1 0;
+        min-width: 0;
+        height: 0.5rem;
         border: 0;
         background: rgb(255 255 255 / 0.18);
         cursor: pointer;
         overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+        .hero-dot {
+            flex: 0 0 auto;
+            width: clamp(2.75rem, 7vw, 6rem);
+            height: 0.625rem;
+        }
     }
 
     .hero-dot span {
@@ -610,6 +621,60 @@
         opacity: 0.8;
     }
 
+    .section-card-icon,
+    .value-icon {
+        display: grid;
+        width: 4.25rem;
+        height: 4.25rem;
+        place-items: center;
+        border-radius: 0.5rem;
+        color: var(--color-alisary-gold);
+        background: rgb(184 138 60 / 0.1);
+        box-shadow: inset 0 0 0 1px rgb(184 138 60 / 0.2);
+        transition:
+            transform 360ms cubic-bezier(0.2, 0.7, 0.2, 1),
+            background-color 360ms cubic-bezier(0.2, 0.7, 0.2, 1),
+            box-shadow 360ms cubic-bezier(0.2, 0.7, 0.2, 1),
+            color 360ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .section-card-icon svg,
+    .value-icon svg {
+        width: 2rem;
+        height: 2rem;
+        transition: transform 360ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .section-card-icon {
+        margin-bottom: 1.25rem;
+    }
+
+    .proof-card .section-card-icon {
+        margin-bottom: 0;
+    }
+
+    .value-icon {
+        margin-bottom: 1.5rem;
+        background: rgb(255 255 255 / 0.06);
+        box-shadow: inset 0 0 0 1px rgb(212 170 97 / 0.28);
+    }
+
+    @media (hover: hover) {
+
+        .lux-card:hover .section-card-icon,
+        .value-tile:hover .value-icon {
+            transform: translateY(-0.35rem) scale(1.06);
+            color: var(--color-alisary-deep);
+            background: var(--color-alisary-gold);
+            box-shadow: 0 18px 42px -26px rgb(212 170 97 / 0.9), inset 0 0 0 1px rgb(255 255 255 / 0.34);
+        }
+
+        .lux-card:hover .section-card-icon svg,
+        .value-tile:hover .value-icon svg {
+            transform: rotate(-7deg) scale(1.08);
+        }
+    }
+
     .card-index {
         display: inline-grid;
         width: 2.75rem;
@@ -705,7 +770,7 @@
 
     .portfolio-card {
         position: relative;
-        min-height: 20rem;
+        min-height: 30rem;
         overflow: hidden;
         border: 1px solid rgb(32 24 18 / 0.1);
         border-radius: 0.5rem;
@@ -738,6 +803,46 @@
         width: 5rem;
         background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--company-color, var(--color-alisary-brass)) 10%, transparent));
         pointer-events: none;
+    }
+
+    .portfolio-media {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        aspect-ratio: 4 / 5;
+        place-items: center;
+        overflow: hidden;
+        border: 1px solid color-mix(in srgb, var(--company-color, var(--color-alisary-brass)) 18%, transparent);
+        border-radius: 0.5rem;
+        background:
+            linear-gradient(135deg, color-mix(in srgb, var(--company-color, var(--color-alisary-brass)) 10%, white), rgb(255 255 255 / 0.82)),
+            var(--color-alisary-pearl);
+        color: color-mix(in srgb, var(--company-color, var(--color-alisary-brass)) 70%, var(--color-alisary-green));
+    }
+
+    .portfolio-media img,
+    .portfolio-media svg {
+        width: 100%;
+        height: 100%;
+        transition: transform 520ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .portfolio-media img {
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .portfolio-media svg {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    @media (hover: hover) {
+
+        .portfolio-card:hover .portfolio-media img,
+        .portfolio-card:hover .portfolio-media svg {
+            transform: scale(1.08);
+        }
     }
 
     .portfolio-logo {
@@ -889,6 +994,31 @@
         background: rgb(255 255 255 / 0.035);
         border-inline-start: 1px solid rgb(212 170 97 / 0.36);
         padding: 2.25rem;
+        transition:
+            background-color 360ms cubic-bezier(0.2, 0.7, 0.2, 1),
+            border-color 360ms cubic-bezier(0.2, 0.7, 0.2, 1),
+            transform 360ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    @media (hover: hover) {
+        .value-tile:hover {
+            transform: translateY(-0.35rem);
+            border-color: rgb(212 170 97 / 0.62);
+            background: rgb(255 255 255 / 0.06);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .section-card-icon,
+        .section-card-icon svg,
+        .value-icon,
+        .value-icon svg,
+        .portfolio-media img,
+        .portfolio-media svg,
+        .value-tile {
+            transition: none;
+        }
     }
 
     .meta-pill {
@@ -916,6 +1046,14 @@
     .story-article {
         border-inline-start: 1px solid rgb(184 138 60 / 0.24);
         padding-inline-start: clamp(1.5rem, 4vw, 3rem);
+    }
+
+    .story-media-full {
+        margin-inline: auto;
+        width: auto;
+        overflow: hidden;
+        border-radius: 0.5rem;
+        background: rgb(255 250 242 / 0.72);
     }
 
     .media-placeholder {
