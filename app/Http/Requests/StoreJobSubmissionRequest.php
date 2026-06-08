@@ -31,7 +31,9 @@ class StoreJobSubmissionRequest extends FormRequest
             'email' => ['required', 'email', 'max:255'],
             'birthday' => ['required', 'date', 'before:today'],
             'cv' => ['required', File::types(['pdf', 'doc', 'docx'])->max(5120)],
-            ...CustomFormFields::validationRules($this->jobListing()?->form_fields ?? []),
+            ...CustomFormFields::validationRules(
+                CustomFormFields::flattenFields($this->jobListing()?->form_fields ?? [])
+            ),
         ];
     }
 

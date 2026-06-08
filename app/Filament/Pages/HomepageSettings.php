@@ -139,6 +139,14 @@ class HomepageSettings extends SettingsPage
                                         Textarea::make('waqf.body')->label('نص الوقف')->rows(4)->columnSpanFull(),
                                         TextInput::make('waqf.number')->label('رقم الوقف')->maxLength(80),
                                         TextInput::make('waqf.number_label')->label('وصف الرقم')->maxLength(255),
+                                        FileUpload::make('waqf.image_path')
+                                            ->label('صورة الوقف')
+                                            ->disk('public')
+                                            ->visibility('public')
+                                            ->image()
+                                            ->directory('homepage/waqf')
+                                            ->imageEditor()
+                                            ->columnSpanFull(),
                                     ])
                                     ->columns(2)
                                     ->columnSpanFull(),

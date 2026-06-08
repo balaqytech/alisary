@@ -17,10 +17,59 @@ class CustomFormFields
     public static function flattenSteps(array $steps): array
     {
         return collect($steps)
-            ->flatMap(fn (array $step): array => $step['fields'] ?? [])
+            ->flatMap(fn (mixed $step): array => is_array($step) ? ($step['fields'] ?? []) : [])
             ->filter(fn (mixed $field): bool => is_array($field) && filled($field['key'] ?? null))
             ->values()
             ->all();
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $fields
+     * @return array<int, array<string, mixed>>
+     */
+    public static function flattenFields(array $fields): array
+    {
+        if (collect($fields)->contains(fn (mixed $field): bool => is_array($field) && array_key_exists('fields', $field))) {
+            return self::flattenSteps($fields);
+        }
+
+        return collect($fields)
+            ->filter(fn (mixed $field): bool => is_array($field) && filled($field['key'] ?? null))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $fields
+     * @return array<int, array<string, mixed>>
+     */
+    public static function sections(array $fields): array
+    {
+        if (collect($fields)->contains(fn (mixed $field): bool => is_array($field) && array_key_exists('fields', $field))) {
+            return collect($fields)
+                ->filter(fn (mixed $section): bool => is_array($section))
+                ->map(fn (array $section): array => [
+                    'title' => $section['title'] ?? null,
+                    'description' => $section['description'] ?? null,
+                    'fields' => collect($section['fields'] ?? [])
+                        ->filter(fn (mixed $field): bool => is_array($field) && filled($field['key'] ?? null))
+                        ->values()
+                        ->all(),
+                ])
+                ->filter(fn (array $section): bool => count($section['fields']) > 0)
+                ->values()
+                ->all();
+        }
+
+        $flatFields = self::flattenFields($fields);
+
+        return count($flatFields) > 0
+            ? [[
+                'title' => 'أسئلة إضافية',
+                'description' => null,
+                'fields' => $flatFields,
+            ]]
+            : [];
     }
 
     /**
@@ -44,6 +93,20 @@ class CustomFormFields
 
             $target = $type === CustomFieldType::File->value ? "files.{$key}" : "answers.{$key}";
             $fieldRules = ($field['required'] ?? false) ? ['required'] : ['nullable'];
+
+            if ($type === CustomFieldType::CheckboxList->value) {
+                $rules[$target] = [
+                    ...$fieldRules,
+                    'array',
+                    ...(($field['required'] ?? false) ? ['min:1'] : []),
+                ];
+                $rules["{$target}.*"] = [
+                    'string',
+                    Rule::in(collect($field['options'] ?? [])->pluck('value')->filter()->values()->all()),
+                ];
+
+                continue;
+            }
 
             $rules[$target] = [
                 ...$fieldRules,

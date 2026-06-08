@@ -3,6 +3,7 @@
 use App\Enums\CustomFieldType;
 use App\Enums\ListingStatus;
 use App\Models\JobListing;
+use App\Support\DefaultJobApplicationForm;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -62,6 +63,72 @@ test('required job custom fields are validated', function () {
         ])
         ->assertRedirect(route('jobs.show', $jobListing))
         ->assertSessionHasErrors('answers.experience_years');
+});
+
+test('visitor can submit grouped job application fields with checkbox lists', function () {
+    Storage::fake('public');
+
+    $jobListing = JobListing::factory()->create([
+        'form_fields' => [
+            [
+                'title' => 'الوظيفة والمؤسسة',
+                'description' => 'تفاصيل التقديم',
+                'fields' => [
+                    [
+                        'key' => 'contract_types',
+                        'label' => 'نمط التعاقد الذي تقبله',
+                        'type' => CustomFieldType::CheckboxList->value,
+                        'required' => true,
+                        'options' => [
+                            ['label' => 'دوام كامل', 'value' => 'full_time'],
+                            ['label' => 'عن بعد', 'value' => 'remote'],
+                        ],
+                    ],
+                    [
+                        'key' => 'expected_salary',
+                        'label' => 'الراتب الشهري المتوقع',
+                        'type' => CustomFieldType::Text->value,
+                        'required' => true,
+                    ],
+                ],
+            ],
+        ],
+    ]);
+
+    $this->post(route('jobs.apply', $jobListing), [
+        'full_name' => 'أحمد العيسري',
+        'phone' => '90000000',
+        'email' => 'ahmed@example.com',
+        'birthday' => '1995-01-01',
+        'cv' => UploadedFile::fake()->create('cv.pdf', 250, 'application/pdf'),
+        'answers' => [
+            'contract_types' => ['full_time', 'remote'],
+            'expected_salary' => '900',
+        ],
+    ])->assertRedirect();
+
+    $submission = $jobListing->submissions()->first();
+
+    expect($submission)->not->toBeNull()
+        ->and($submission->answers['contract_types'])->toBe(['full_time', 'remote'])
+        ->and($submission->answers['expected_salary'])->toBe('900');
+});
+
+test('default job application schema matches the grouped careers form', function () {
+    $sections = DefaultJobApplicationForm::sections();
+
+    expect($sections)->toHaveCount(7)
+        ->and(collect($sections)->pluck('title')->all())->toBe([
+            'البيانات الأساسية',
+            'الوظيفة والمؤسسة',
+            'الخبرة والأدوات',
+            'الكفاءة والإنجاز',
+            'مواقف',
+            'آفاقٌ مستقبلية',
+            'الإقرارات',
+        ])
+        ->and($sections[1]['fields'][3]['type'])->toBe(CustomFieldType::CheckboxList->value)
+        ->and($sections[6]['fields'][0]['required'])->toBeTrue();
 });
 
 test('closed jobs reject submissions', function () {

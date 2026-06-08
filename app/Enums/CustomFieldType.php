@@ -12,6 +12,7 @@ enum CustomFieldType: string
     case Date = 'date';
     case Select = 'select';
     case Checkbox = 'checkbox';
+    case CheckboxList = 'checkbox_list';
     case File = 'file';
 
     public function label(): string
@@ -25,6 +26,7 @@ enum CustomFieldType: string
             self::Date => 'تاريخ',
             self::Select => 'قائمة اختيار',
             self::Checkbox => 'مربع موافقة',
+            self::CheckboxList => 'قائمة اختيار متعدد',
             self::File => 'ملف',
         };
     }

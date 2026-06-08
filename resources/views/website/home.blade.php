@@ -22,6 +22,7 @@
         $founderImagePath = data_get($founder?->content, 'image_path');
         $founderImagePath = is_array($founderImagePath) ? collect($founderImagePath)->first() : $founderImagePath;
         $founderImage = $assetUrl($founderImagePath);
+        $waqfImage = $assetUrl(data_get($waqf?->content, 'image_path'));
         $heroSlides = collect(data_get($hero?->content, 'slides', []))
             ->filter(fn($slide) => filled($slide['title'] ?? null))
             ->values();
@@ -257,7 +258,7 @@
     </section>
 
     <section id="waqf" class="section section-deep">
-        <div class="feature-panel grid gap-10 p-6 lg:grid-cols-[1.4fr_0.6fr] lg:items-center lg:p-10">
+        <div class="feature-panel grid gap-10 p-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:p-10">
             <div>
                 <div class="section-head !mx-0">
                     <span>{{ $waqf?->eyebrow }}</span>
@@ -266,10 +267,17 @@
                 <p class="mt-8 max-w-3xl text-lg leading-loose text-white/80">{{ data_get($waqf?->content, 'body') }}
                 </p>
             </div>
-            <div class="border-t border-alisary-gold/40 pt-8 text-center lg:border-r lg:border-t-0 lg:pr-10">
-                <div class="font-display text-8xl text-alisary-gold">
-                    {{ $toEasternNumbers(data_get($waqf?->content, 'number')) }}</div>
-                <p class="mt-4 text-white/75">{{ data_get($waqf?->content, 'number_label') }}</p>
+            <div class="grid gap-5 border-t border-alisary-gold/40 pt-8 lg:border-r lg:border-t-0 lg:pr-10">
+                @if ($waqfImage)
+                    <figure class="waqf-media">
+                        <img src="{{ $waqfImage }}" alt="{{ $waqf?->title }}" data-waqf-image>
+                    </figure>
+                @endif
+                <div class="text-center">
+                    <div class="font-display text-8xl text-alisary-gold">
+                        {{ $toEasternNumbers(data_get($waqf?->content, 'number')) }}</div>
+                    <p class="mt-4 text-white/75">{{ data_get($waqf?->content, 'number_label') }}</p>
+                </div>
             </div>
         </div>
     </section>

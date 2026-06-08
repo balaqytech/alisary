@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\CustomFieldType;
 use App\Enums\ListingStatus;
 use App\Models\JobListing;
 use App\Models\TenderListing;
@@ -53,6 +54,36 @@ test('job detail renders sanitized rich editor description with typography style
         ->assertSee('<h2>Responsibilities</h2>', false)
         ->assertSee('<p>Lead the classroom experience.</p>', false)
         ->assertDontSee('<script>', false);
+});
+
+test('job detail renders grouped application sections', function () {
+    $jobListing = JobListing::factory()->create([
+        'form_fields' => [
+            [
+                'title' => 'الوظيفة والمؤسسة',
+                'description' => 'تفاصيل التقديم',
+                'fields' => [
+                    [
+                        'key' => 'contract_types',
+                        'label' => 'نمط التعاقد الذي تقبله',
+                        'type' => CustomFieldType::CheckboxList->value,
+                        'required' => true,
+                        'options' => [
+                            ['label' => 'دوام كامل', 'value' => 'full_time'],
+                            ['label' => 'عن بعد', 'value' => 'remote'],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ]);
+
+    $this->get(route('jobs.show', $jobListing))
+        ->assertSuccessful()
+        ->assertSee('data-form-wizard', false)
+        ->assertSee('الوظيفة والمؤسسة')
+        ->assertSee('نمط التعاقد الذي تقبله')
+        ->assertSee('name="answers[contract_types][]"', false);
 });
 
 test('tenders index and detail only render currently published tenders', function () {

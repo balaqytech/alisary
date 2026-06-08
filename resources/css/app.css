@@ -1070,6 +1070,37 @@
         color: rgb(255 255 255 / 0.78);
     }
 
+    .waqf-media {
+        position: relative;
+        aspect-ratio: 4 / 5;
+        overflow: hidden;
+        border-radius: 0.5rem;
+        border: 1px solid rgb(255 255 255 / 0.12);
+        background: rgb(255 255 255 / 0.04);
+        box-shadow: 0 32px 80px -56px rgb(0 0 0 / 0.92);
+    }
+
+    .waqf-media::after {
+        position: absolute;
+        inset: 0;
+        content: "";
+        background:
+            linear-gradient(180deg, rgb(11 51 45 / 0), rgb(11 51 45 / 0.2)),
+            linear-gradient(135deg, rgb(184 138 60 / 0.2), transparent 42%);
+        pointer-events: none;
+    }
+
+    .waqf-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 420ms ease;
+    }
+
+    .waqf-media:hover img {
+        transform: scale(1.035);
+    }
+
     .application-panel {
         position: sticky;
         top: 7rem;
@@ -1138,6 +1169,202 @@
     .form-field small {
         color: #b91c1c;
         font-weight: 500;
+    }
+
+    .job-application-form {
+        margin-top: 1.5rem;
+    }
+
+    .application-progress {
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .application-step {
+        display: grid;
+        gap: 1.25rem;
+    }
+
+    .application-step.hidden {
+        display: none;
+    }
+
+    .application-step-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.9rem;
+        border-bottom: 1px solid rgb(28 70 60 / 12%);
+        padding-bottom: 1rem;
+    }
+
+    .application-step-head h3 {
+        color: var(--color-alisary-green);
+        font-size: clamp(1.2rem, 2vw, 1.45rem);
+        font-weight: 800;
+        line-height: 1.35;
+    }
+
+    .application-step-head p {
+        margin-top: 0.35rem;
+        color: var(--color-alisary-soft);
+        font-size: 0.92rem;
+        line-height: 1.9;
+    }
+
+    .application-step-kicker {
+        display: inline-grid;
+        min-width: 2.35rem;
+        height: 2.35rem;
+        place-items: center;
+        border-radius: 0.45rem;
+        background: linear-gradient(135deg, var(--color-alisary-green), var(--color-alisary-deep));
+        color: white;
+        font-weight: 800;
+        box-shadow: 0 16px 34px -24px rgb(11 51 45 / 0.86);
+    }
+
+    .application-field-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+    }
+
+    .application-upload {
+        position: relative;
+        display: flex;
+        min-height: 7rem;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        overflow: hidden;
+        border-radius: 0.5rem;
+        border: 1px dashed rgb(184 138 60 / 0.45);
+        background:
+            linear-gradient(180deg, rgb(255 255 255 / 0.9), rgb(250 246 238 / 0.78)),
+            rgb(234 223 206 / 0.38);
+        padding: 1.15rem;
+        color: var(--color-alisary-soft);
+        text-align: center;
+        font-weight: 600;
+        transition:
+            border-color 180ms ease,
+            box-shadow 180ms ease,
+            transform 180ms ease;
+    }
+
+    .application-upload:hover {
+        border-color: rgb(184 138 60 / 0.8);
+        box-shadow: 0 22px 48px -36px rgb(184 138 60 / 0.8);
+        transform: translateY(-0.12rem);
+    }
+
+    .application-upload input {
+        position: absolute;
+        inset: 0;
+        cursor: pointer;
+        opacity: 0;
+    }
+
+    .choice-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.65rem;
+    }
+
+    .choice-pill {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        border-radius: 0.45rem;
+        border: 1px solid rgb(28 70 60 / 14%);
+        background: rgb(255 255 255 / 0.72);
+        padding: 0.82rem 0.9rem;
+        color: var(--color-alisary-ink);
+        font-weight: 600;
+        transition:
+            border-color 180ms ease,
+            background-color 180ms ease,
+            transform 180ms ease;
+    }
+
+    .choice-pill:hover {
+        transform: translateY(-0.12rem);
+        border-color: rgb(184 138 60 / 0.55);
+        background: rgb(255 255 255 / 0.95);
+    }
+
+    .choice-pill input {
+        width: 1.1rem;
+        height: 1.1rem;
+        accent-color: var(--color-alisary-green);
+    }
+
+    .application-actions {
+        margin-top: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .application-nav-button,
+    .application-submit-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border-radius: 0.45rem;
+        padding: 0.82rem 1.1rem;
+        font-weight: 800;
+        transition:
+            transform 180ms ease,
+            box-shadow 180ms ease,
+            background-color 180ms ease,
+            border-color 180ms ease;
+    }
+
+    .application-nav-button {
+        border: 1px solid rgb(28 70 60 / 18%);
+        color: var(--color-alisary-green);
+    }
+
+    .application-nav-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.42;
+    }
+
+    .application-submit-button {
+        background: var(--color-alisary-green);
+        color: white;
+        box-shadow: 0 18px 42px -30px rgb(11 51 45 / 0.9);
+    }
+
+    .application-nav-button:not(:disabled):hover,
+    .application-submit-button:hover {
+        transform: translateY(-0.12rem);
+    }
+
+    .application-submit-button:hover {
+        background: var(--color-alisary-deep);
+    }
+
+    @media (min-width: 768px) {
+        .application-field-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .form-field:has(textarea),
+        .form-field:has(.application-upload),
+        .form-field:has(.choice-grid) {
+            grid-column: 1 / -1;
+        }
+
+        .choice-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
     }
 
     .rich-content {

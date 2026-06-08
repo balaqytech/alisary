@@ -43,7 +43,9 @@ test('public website pages render settings driven Arabic content', function () {
 
     $this->get('/story')
         ->assertSuccessful()
-        ->assertSee('دائرة');
+        ->assertSee('حكاية البلجاء')
+        ->assertSee('من حَيرةِ أبٍ على ابنته')
+        ->assertSee('/placeholders/story-baljaa.jpg', false);
 
     $this->get('/jobs')
         ->assertSuccessful()
@@ -128,6 +130,20 @@ test('home proof cards render configured portrait images', function () {
         ->assertSee('Proof image label')
         ->assertSee('Proof image text')
         ->assertSee('storage/homepage/proof/proof-portrait.jpg', false);
+});
+
+test('home waqf section renders configured image', function () {
+    $homepageSettings = app(HomepageSettings::class);
+    $homepageSettings->waqf = [
+        ...$homepageSettings->waqf,
+        'image_path' => 'homepage/waqf/waqf-photo.jpg',
+    ];
+    $homepageSettings->save();
+
+    $this->get('/')
+        ->assertSuccessful()
+        ->assertSee('data-waqf-image', false)
+        ->assertSee('storage/homepage/waqf/waqf-photo.jpg', false);
 });
 
 test('home founder block renders uploaded founder image from public storage', function () {
