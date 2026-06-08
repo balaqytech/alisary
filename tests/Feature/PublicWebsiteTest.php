@@ -109,6 +109,27 @@ test('home page renders configured numbers as eastern arabic numerals', function
         ->assertSee('٤٦');
 });
 
+test('home proof cards render configured portrait images', function () {
+    $homepageSettings = app(HomepageSettings::class);
+    $homepageSettings->proof = [
+        ...$homepageSettings->proof,
+        'items' => [
+            [
+                'label' => 'Proof image label',
+                'text' => 'Proof image text',
+                'image_path' => 'homepage/proof/proof-portrait.jpg',
+            ],
+        ],
+    ];
+    $homepageSettings->save();
+
+    $this->get('/')
+        ->assertSuccessful()
+        ->assertSee('Proof image label')
+        ->assertSee('Proof image text')
+        ->assertSee('storage/homepage/proof/proof-portrait.jpg', false);
+});
+
 test('home founder block renders uploaded founder image from public storage', function () {
     $homepageSettings = app(HomepageSettings::class);
     $homepageSettings->founder = [

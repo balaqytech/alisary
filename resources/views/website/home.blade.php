@@ -164,14 +164,14 @@
             @foreach (data_get($proof?->content, 'items', []) as $item)
                 <article class="lux-card proof-card">
                     @php
-                        $proofIcons = ['icons.remix.bar-chart', 'icons.remix.heart-pulse', 'icons.remix.lightbulb'];
+                        $proofImage = $assetUrl($item['image_path'] ?? null);
                     @endphp
-                    <div class="flex items-start justify-between gap-4">
-                        <div class="section-card-icon">
-                            <x-dynamic-component :component="$proofIcons[$loop->index % count($proofIcons)]" class="size-6" />
-                        </div>
-                        <div class="card-index">
-                            {{ $toEasternNumbers(str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT)) }}</div>
+                    <div class="proof-card-media">
+                        @if ($proofImage)
+                            <img src="{{ $proofImage }}" alt="{{ $item['label'] ?? '' }}">
+                        @else
+                            <span>{{ $item['label'] ?? '' }}</span>
+                        @endif
                     </div>
                     <div class="mt-5 text-sm font-bold text-alisary-gold">{{ $item['label'] ?? '' }}</div>
                     <p class="mt-4 leading-loose">{{ $item['text'] ?? '' }}</p>

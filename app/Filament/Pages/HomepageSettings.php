@@ -47,6 +47,9 @@ class HomepageSettings extends SettingsPage
                                             ->schema([
                                                 TextInput::make('eyebrow')->label('النص العلوي')->maxLength(255),
                                                 TextInput::make('title')->live(onBlur: true)->label('العنوان')->required()->maxLength(255),
+                                                Textarea::make('subtitle')->label('الوصف')->rows(3)->columnSpanFull(),
+                                                TextInput::make('cta_label')->label('نص الزر')->maxLength(120),
+                                                TextInput::make('cta_url')->label('رابط الزر')->maxLength(255),
                                                 ColorPicker::make('accent')->label('لون الحركة')->default('#B88A3C'),
                                                 FileUpload::make('image_path')
                                                     ->label('صورة الخلفية')
@@ -67,7 +70,7 @@ class HomepageSettings extends SettingsPage
                                             ->cloneable()
                                             ->collapsible()
                                             ->reorderable()
-                                            ->itemLabel(fn(array $state): ?string => $state['title'] ?? null)
+                                            ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
                                             ->columnSpanFull(),
                                     ])
                                     ->columns(2)
@@ -83,7 +86,15 @@ class HomepageSettings extends SettingsPage
                                             ->label('البطاقات')
                                             ->schema([
                                                 TextInput::make('label')->label('التسمية')->required()->maxLength(120),
-                                                Textarea::make('text')->label('النص')->required()->rows(3),
+                                                FileUpload::make('image_path')
+                                                    ->label('الصورة الطولية')
+                                                    ->disk('public')
+                                                    ->visibility('public')
+                                                    ->image()
+                                                    ->directory('homepage/proof')
+                                                    ->imageEditor()
+                                                    ->imageEditorAspectRatios(['4:5', '3:4']),
+                                                Textarea::make('text')->label('النص')->required()->rows(3)->columnSpanFull(),
                                             ])
                                             ->columns(2)
                                             ->columnSpanFull(),
