@@ -188,3 +188,25 @@ test('story page renders settings managed content', function () {
         ->assertDontSee('<script>', false)
         ->assertSee('Managed story closing');
 });
+
+test('home hero cta is visible on mobile layouts', function () {
+    $homepageSettings = app(HomepageSettings::class);
+    $homepageSettings->hero = [
+        ...$homepageSettings->hero,
+        'slides' => [
+            [
+                'title' => 'Mobile CTA slide',
+                'cta_label' => 'Mobile CTA',
+                'cta_url' => '/story',
+                'image_path' => '/placeholders/hero-legacy.svg',
+            ],
+        ],
+    ];
+    $homepageSettings->save();
+
+    $this->get('/')
+        ->assertSuccessful()
+        ->assertSee('Mobile CTA')
+        ->assertSee('inline-flex lux-link', false)
+        ->assertDontSee('hidden lg:block lux-link', false);
+});

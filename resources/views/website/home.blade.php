@@ -117,7 +117,7 @@
                             <div data-hero-reveal class="hero-cta-row mt-10">
                                 @if (filled($slide['cta_label'] ?? null))
                                     <a href="{{ $slide['cta_url'] ?? route('story') }}"
-                                        class="hidden lg:block lux-link">
+                                        class="inline-flex lux-link">
                                         {{ $slide['cta_label'] }}
                                     </a>
                                 @endif
