@@ -26,6 +26,40 @@ class GeneralSettings extends Settings
 
     public array $social_links;
 
+    public array $job_submission_recipients;
+
+    public array $tender_submission_recipients;
+
+    /**
+     * @return array<int, string>
+     */
+    public function jobSubmissionRecipientEmails(): array
+    {
+        return $this->recipientEmails($this->job_submission_recipients);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function tenderSubmissionRecipientEmails(): array
+    {
+        return $this->recipientEmails($this->tender_submission_recipients);
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $recipients
+     * @return array<int, string>
+     */
+    protected function recipientEmails(array $recipients): array
+    {
+        return collect($recipients)
+            ->pluck('email')
+            ->filter(fn (mixed $email): bool => is_string($email) && filter_var($email, FILTER_VALIDATE_EMAIL) !== false)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
     public static function group(): string
     {
         return 'general';

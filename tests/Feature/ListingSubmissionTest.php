@@ -2,9 +2,12 @@
 
 use App\Enums\CustomFieldType;
 use App\Enums\ListingStatus;
+use App\Mail\JobSubmissionReceived;
 use App\Models\JobListing;
+use App\Settings\GeneralSettings;
 use App\Support\DefaultJobApplicationForm;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 test('visitor can submit a valid job application with default fields, cv, and custom fields', function () {
@@ -44,6 +47,95 @@ test('visitor can submit a valid job application with default fields, cv, and cu
 
     Storage::disk('public')->assertExists($submission->cv_path);
     Storage::disk('public')->assertExists($submission->files['portfolio']);
+});
+
+test('job submissions queue notifications to configured internal recipients', function () {
+    Storage::fake('public');
+    Mail::fake();
+
+    $settings = app(GeneralSettings::class);
+    $settings->job_submission_recipients = [
+        ['email' => 'hr@example.com'],
+        ['email' => 'jobs@example.com'],
+    ];
+    $settings->tender_submission_recipients = [];
+    $settings->save();
+
+    $jobListing = JobListing::factory()->create([
+        'title' => 'Frontend Engineer',
+        'form_fields' => [
+            ['key' => 'portfolio', 'label' => 'Portfolio', 'type' => CustomFieldType::File->value, 'required' => true, 'accepted_file_types' => ['pdf']],
+        ],
+    ]);
+
+    $this->post(route('jobs.apply', $jobListing), [
+        'full_name' => 'Applicant Name',
+        'phone' => '90000000',
+        'email' => 'applicant@example.com',
+        'birthday' => '1995-01-01',
+        'cv' => UploadedFile::fake()->create('cv.pdf', 250, 'application/pdf'),
+        'files' => [
+            'portfolio' => UploadedFile::fake()->create('portfolio.pdf', 250, 'application/pdf'),
+        ],
+    ])->assertRedirect();
+
+    $submission = $jobListing->submissions()->first();
+
+    Mail::assertQueued(JobSubmissionReceived::class, function (JobSubmissionReceived $mail) use ($jobListing, $submission): bool {
+        return $mail->hasTo(['hr@example.com', 'jobs@example.com'])
+            && $mail->jobListing->is($jobListing)
+            && $mail->submission->is($submission);
+    });
+});
+
+test('job submissions do not queue notifications without configured recipients', function () {
+    Storage::fake('public');
+    Mail::fake();
+
+    $settings = app(GeneralSettings::class);
+    $settings->job_submission_recipients = [];
+    $settings->tender_submission_recipients = [];
+    $settings->save();
+
+    $jobListing = JobListing::factory()->create();
+
+    $this->post(route('jobs.apply', $jobListing), [
+        'full_name' => 'Applicant Name',
+        'phone' => '90000000',
+        'email' => 'applicant@example.com',
+        'birthday' => '1995-01-01',
+        'cv' => UploadedFile::fake()->create('cv.pdf', 250, 'application/pdf'),
+    ])->assertRedirect();
+
+    Mail::assertNothingOutgoing();
+});
+
+test('job submission email renders basic details without file references', function () {
+    Storage::fake('public');
+
+    $jobListing = JobListing::factory()->create(['title' => 'Frontend Engineer'])->load('company');
+    $submission = $jobListing->submissions()->create([
+        'full_name' => 'Applicant Name',
+        'phone' => '90000000',
+        'email' => 'applicant@example.com',
+        'birthday' => '1995-01-01',
+        'cv_path' => 'submissions/jobs/1/cv/cv.pdf',
+        'answers' => [],
+        'files' => ['portfolio' => 'submissions/jobs/1/files/portfolio.pdf'],
+    ]);
+
+    $mailable = new JobSubmissionReceived($jobListing, $submission);
+
+    $mailable
+        ->assertSeeInHtml('Frontend Engineer')
+        ->assertSeeInHtml('طلب تقديم على وظيفة')
+        ->assertSeeInHtml('Applicant Name')
+        ->assertSeeInHtml('applicant@example.com')
+        ->assertSeeInHtml('90000000')
+        ->assertSeeInHtml('logo.svg')
+        ->assertDontSeeInHtml('laravel.com/img/notification-logo')
+        ->assertDontSeeInHtml('submissions/jobs/1/cv/cv.pdf')
+        ->assertDontSeeInHtml('submissions/jobs/1/files/portfolio.pdf');
 });
 
 test('required job custom fields are validated', function () {

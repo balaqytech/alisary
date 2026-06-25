@@ -82,6 +82,41 @@ class GeneralSettings extends SettingsPage
                                     ->columns(2)
                                     ->columnSpanFull(),
                             ]),
+                        Tab::make('إشعارات التقديم')
+                            ->schema([
+                                Section::make('مستلمو طلبات الوظائف')
+                                    ->schema([
+                                        Repeater::make('job_submission_recipients')
+                                            ->label('البريد المستلم')
+                                            ->schema([
+                                                TextInput::make('email')
+                                                    ->label('البريد الإلكتروني')
+                                                    ->email()
+                                                    ->required()
+                                                    ->maxLength(255),
+                                            ])
+                                            ->addActionLabel('إضافة بريد')
+                                            ->columns(1)
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columnSpanFull(),
+                                Section::make('مستلمو طلبات المناقصات')
+                                    ->schema([
+                                        Repeater::make('tender_submission_recipients')
+                                            ->label('البريد المستلم')
+                                            ->schema([
+                                                TextInput::make('email')
+                                                    ->label('البريد الإلكتروني')
+                                                    ->email()
+                                                    ->required()
+                                                    ->maxLength(255),
+                                            ])
+                                            ->addActionLabel('إضافة بريد')
+                                            ->columns(1)
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columnSpanFull(),
+                            ]),
                     ])
                     ->columnSpanFull(),
             ])
