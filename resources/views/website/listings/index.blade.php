@@ -10,14 +10,19 @@
             <div class="page-hero-inner">
                 <div class="page-kicker">
                     <x-icons.remix.briefcase class="size-5" />
-                    مجموعةٌ قابضةٌ عُمانية · تخدم الطفل ومن يخدم الطفل
+                    انضمّ إلى المجموعة
                 </div>
-                <h1 class="mt-5 font-display text-5xl leading-tight md:text-7xl">مجموعة العيسري</h1>
-                <div class="mt-5 font-display text-3xl text-alisary-gold md:text-5xl">نُعِدّهم لحياةٍ طيّبة</div>
+                <h1 class="mt-5 font-display text-5xl leading-tight md:text-7xl">نبني فريقًا يُعِدّ جيلًا لحياةٍ طيّبة</h1>
                 <p class="mt-8 max-w-3xl text-xl leading-loose text-white/78">
-                    نبحث عمّن يُقدّم أعلى قيمةٍ بأقلّ وقتٍ وجهدٍ ومال، ويُتقن أدوات العصر، ويؤمن بقيم خماسية السكينة فيعيشها قبل أن يُعلّمها. إن كنت منهم، فهذه استمارتك.
+                    وظائفُ قياديةٌ وتخصّصيةٌ وتشغيليةٌ في مؤسساتٍ تخدم الطفل من الميلاد حتى الثامنة عشرة. اعرف مهامّ كلّ وظيفةٍ وشروطها ومؤشّر نجاحها، ثم قدّم عبر استمارةٍ موحّدةٍ مرّةً واحدة.
                 </p>
-                <div class="brand-stripes mt-10">
+                
+                <div class="mt-10 flex flex-wrap justify-center gap-4">
+                    <a href="#vacancies" class="flex items-center gap-2 rounded-full bg-alisary-gold px-8 py-4 font-bold text-alisary-deep transition hover:bg-[#D7B56D]">تصفّح الوظائف</a>
+                    <a href="#how" class="flex items-center gap-2 rounded-full border border-white/30 bg-transparent px-8 py-4 font-bold text-white transition hover:bg-white/10">كيف نوظّف؟</a>
+                </div>
+
+                <div class="brand-stripes mt-14">
                     <span class="flex-1 bg-[#B88A3C]"></span>
                     <span class="flex-1 bg-[#C3CD30]"></span>
                     <span class="flex-1 bg-[#2F8F83]"></span>
@@ -31,24 +36,24 @@
             <div class="mx-auto grid max-w-7xl gap-px bg-white/10 px-5 lg:grid-cols-3 lg:px-10">
                 <article class="value-tile">
                     <div class="value-icon">
-                        <x-icons.remix.bar-chart class="size-6" />
+                        <x-icons.remix.check class="size-6" />
                     </div>
-                    <h2 class="font-display text-3xl text-alisary-gold">قيمةٌ تُقاس</h2>
-                    <p class="mt-4 leading-loose text-white/72">نُحاسبك على ما تُنجزه من أثرٍ ونتائج، لا على ساعات حضورك. من يُعطي أكثر بموارد أقل، يتقدّم.</p>
+                    <h2 class="font-display text-3xl text-alisary-gold">الاصطفاف القيمي أولًا</h2>
+                    <p class="mt-4 leading-loose text-white/72">خماسية السكينة بوّابةُ عبورٍ غير قابلةٍ للتفاوض: تعيشها قبل أن تُعلّمها. نقيسها سلوكًا لا شعارًا.</p>
                 </article>
                 <article class="value-tile">
                     <div class="value-icon">
                         <x-icons.remix.lightbulb class="size-6" />
                     </div>
-                    <h2 class="font-display text-3xl text-alisary-gold">أدواتُ العصر</h2>
-                    <p class="mt-4 leading-loose text-white/72">نعمل بمنطق: ما تُنجزه التقنية لا يُسند لبشر. نُقدّر من يُتقن الأتمتة والذكاء الاصطناعي ويتعلّم بسرعة.</p>
+                    <h2 class="font-display text-3xl text-alisary-gold">القابلية للتعلّم</h2>
+                    <p class="mt-4 leading-loose text-white/72">نُقدّم من يُعلّم نفسه ويتكيّف على من يكتفي بما يعرف. التخصّص يُكتسب؛ النزعةُ للتعلّم تُختار.</p>
                 </article>
                 <article class="value-tile">
                     <div class="value-icon">
-                        <x-icons.remix.heart-pulse class="size-6" />
+                        <x-icons.remix.bar-chart class="size-6" />
                     </div>
-                    <h2 class="font-display text-3xl text-alisary-gold">قيمةٌ قبل ربح</h2>
-                    <p class="mt-4 leading-loose text-white/72">العلامة عندنا قيميّة. من يبرع ويخون الرسالة يضرّها أكثر من الضعيف. الاصطفاف القيمي بوّابة عبور.</p>
+                    <h2 class="font-display text-3xl text-alisary-gold">نزعةٌ تجارية</h2>
+                    <p class="mt-4 leading-loose text-white/72">كلُّ قائدٍ مسؤولٌ عن إيرادٍ خارجيٍّ متنوّع. نبحث عمّن يرى الفرصة ويصنع القيمة، لا من ينتظر الميزانية.</p>
                 </article>
             </div>
         </section>
@@ -113,11 +118,23 @@
                             
                             {{-- Content hidden in DOM for drawer --}}
                             <div class="hidden" id="job-desc-{{ $listing->id }}">{!! $listing->description !!}</div>
+                            <div class="hidden" id="job-meta-{{ $listing->id }}" 
+                                 data-type="{{ $listing->type?->label() }}"
+                                 data-location="{{ $listing->location?->label() }}"
+                                 data-deadline="{{ $deadline ? \App\Support\NumberLocalizer::eastern($deadline->format('Y-m-d')) : '' }}">
+                            </div>
 
-                            <button type="button" onclick="openJobDrawer({{ $listing->id }}, {{ $organization?->id }})" class="flex w-full cursor-pointer items-center justify-between border-t border-alisary-green/10 px-6 py-4 font-bold text-alisary-gold transition hover:bg-alisary-ivory">
-                                عرض تفاصيل الوظيفة
-                                <x-icons.remix.arrow-left class="size-4" />
-                            </button>
+                            <div class="flex items-center border-t border-alisary-green/10">
+                                <button type="button" onclick="openJobDrawer({{ $listing->id }}, {{ $organization?->id }})" class="flex flex-1 cursor-pointer items-center justify-center gap-2 px-6 py-4 font-bold text-alisary-deep transition hover:bg-alisary-ivory">
+                                    <x-icons.remix.file-list class="size-4" />
+                                    التفاصيل
+                                </button>
+                                <div class="h-8 w-px bg-alisary-green/10"></div>
+                                <button type="button" onclick="quickApply('{{ addslashes($listing->title) }}', {{ $organization?->id }})" class="flex flex-1 cursor-pointer items-center justify-center gap-2 px-6 py-4 font-bold text-alisary-gold transition hover:bg-alisary-ivory hover:text-[#C5A359]">
+                                    قدّم الآن
+                                    <x-icons.remix.arrow-left class="size-4 rtl:rotate-180" />
+                                </button>
+                            </div>
                         </div>
                     @else
                         {{-- Standard listing card (Tenders) --}}
@@ -166,6 +183,45 @@
     </section>
 
     @if ($isJob)
+        {{-- How we hire --}}
+        <section class="section-deep text-white" id="how">
+            <div class="mx-auto max-w-7xl px-5 py-20 lg:px-10 lg:py-28">
+                <div class="mb-14 text-center">
+                    <span class="text-alisary-gold font-bold">شفافيةٌ من أوّل خطوة</span>
+                    <h2 class="mt-2 font-display text-4xl text-white">كيف نوظّف</h2>
+                    <p class="mt-2 text-white/80">مسارٌ موحّدٌ لكل مؤسسات المجموعة. التقديم عبر هذا الموقع فقط، ونتواصل مع كل متقدّم.</p>
+                </div>
+                
+                <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+                    <div class="rounded-xl border border-white/10 bg-white/5 p-6">
+                        <div class="mb-4 font-display text-4xl font-bold text-alisary-gold">١</div>
+                        <h4 class="mb-2 font-display text-xl font-bold">التقديم</h4>
+                        <p class="text-sm leading-relaxed text-white/70">تملأ استمارةً موحّدةً مرّةً واحدة، وترشّح نفسك لِما يصل إلى ثلاث وظائف.</p>
+                    </div>
+                    <div class="rounded-xl border border-white/10 bg-white/5 p-6">
+                        <div class="mb-4 font-display text-4xl font-bold text-alisary-gold">٢</div>
+                        <h4 class="mb-2 font-display text-xl font-bold">الفرز</h4>
+                        <p class="text-sm leading-relaxed text-white/70">نقرأ طلبك بعناية بمساعدة أدوات الذكاء الاصطناعي، ونقيس الاصطفاف القيمي والقابلية للتعلّم — ولا نرفض طلبًا إلا بمراجعةٍ بشرية.</p>
+                    </div>
+                    <div class="rounded-xl border border-white/10 bg-white/5 p-6">
+                        <div class="mb-4 font-display text-4xl font-bold text-alisary-gold">٣</div>
+                        <h4 class="mb-2 font-display text-xl font-bold">مقابلةٌ ومحاكاة</h4>
+                        <p class="text-sm leading-relaxed text-white/70">مقابلةٌ سلوكيةٌ مهيكلة، وحالةٌ عمليةٌ تكشف طريقة بنائك من الصفر.</p>
+                    </div>
+                    <div class="rounded-xl border border-white/10 bg-white/5 p-6">
+                        <div class="mb-4 font-display text-4xl font-bold text-alisary-gold">٤</div>
+                        <h4 class="mb-2 font-display text-xl font-bold">العرض</h4>
+                        <p class="text-sm leading-relaxed text-white/70">عرضُ عملٍ واضحٌ بتفاصيل العقد والمزايا والمؤشّرات المتّفق عليها.</p>
+                    </div>
+                    <div class="rounded-xl border border-white/10 bg-white/5 p-6">
+                        <div class="mb-4 font-display text-4xl font-bold text-alisary-gold">٥</div>
+                        <h4 class="mb-2 font-display text-xl font-bold">الانضمام والتأهيل</h4>
+                        <p class="text-sm leading-relaxed text-white/70">برنامجُ تأهيلٍ مكثّفٌ عند الالتحاق، ومتابعةٌ في فترة التجربة.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         @include('website.partials.careers-application-form')
         @include('website.partials.job-drawer')
 
