@@ -3,8 +3,8 @@
 <tr>
 <td style="padding:28px 30px;border-bottom:3px solid #B88A3C;">
 <div style="font-size:13px;font-weight:700;color:#D4AA61;">إشعار تقديم جديد</div>
-<div style="margin-top:10px;font-family:Georgia,Tahoma,serif;font-size:30px;line-height:1.45;font-weight:700;color:#FFFAF2;">طلب تقديم على وظيفة</div>
-<div style="margin-top:12px;font-size:15px;line-height:1.9;color:#EADFCEDD;">تم استلام طلب تقديم جديد على وظيفة: {{ $jobListing->title }}.</div>
+<div style="margin-top:10px;font-family:Georgia,Tahoma,serif;font-size:30px;line-height:1.45;font-weight:700;color:#FFFAF2;">طلب توظيف جديد</div>
+<div style="margin-top:12px;font-size:15px;line-height:1.9;color:#EADFCEDD;">تم استلام طلب تقديم جديد من: {{ $application->full_name }}.</div>
 </td>
 </tr>
 </table>
@@ -12,31 +12,31 @@
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" dir="rtl" style="direction:rtl;text-align:right;margin:0 0 22px;background:#FFFAF2;border:1px solid #EADFCE;border-radius:8px;">
 <tr>
 <td style="padding:22px 24px;">
-<div style="margin-bottom:16px;font-size:13px;font-weight:700;color:#9C6842;">بيانات الطلب</div>
+<div style="margin-bottom:16px;font-size:13px;font-weight:700;color:#9C6842;">بيانات الطلب ({{ $application->reference_number }})</div>
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
 <tr>
-<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#756553;width:34%;">الشركة</td>
-<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#201812;font-weight:700;">{{ $jobListing->company?->name ?? 'غير محدد' }}</td>
+<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#756553;width:34%;">المؤسسة المطلوبة</td>
+<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#201812;font-weight:700;">{{ $application->company?->name ?? 'غير محدد' }}</td>
 </tr>
 <tr>
 <td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#756553;">اسم المتقدم</td>
-<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#201812;font-weight:700;">{{ $submission->full_name }}</td>
+<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#201812;font-weight:700;">{{ $application->full_name }}</td>
 </tr>
 <tr>
 <td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#756553;">البريد الإلكتروني</td>
-<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#201812;">{{ $submission->email }}</td>
+<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#201812;">{{ $application->email }}</td>
 </tr>
 <tr>
 <td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#756553;">الهاتف</td>
-<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#201812;">{{ $submission->phone }}</td>
+<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#201812;">{{ $application->phone }}</td>
 </tr>
 <tr>
-<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#756553;">تاريخ الميلاد</td>
-<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#201812;">{{ $submission->birthday?->format('Y-m-d') ?? 'غير متوفر' }}</td>
+<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#756553;">الجنسية / الإقامة</td>
+<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#201812;">{{ $application->nationality }} - {{ $application->country }}</td>
 </tr>
 <tr>
 <td style="padding:10px 0;color:#756553;">وقت التقديم</td>
-<td style="padding:10px 0;color:#201812;">{{ $submission->created_at?->format('Y-m-d H:i') ?? now()->format('Y-m-d H:i') }}</td>
+<td style="padding:10px 0;color:#201812;">{{ $application->created_at?->format('Y-m-d H:i') ?? now()->format('Y-m-d H:i') }}</td>
 </tr>
 </table>
 </td>

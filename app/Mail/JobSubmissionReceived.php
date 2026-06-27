@@ -2,9 +2,8 @@
 
 namespace App\Mail;
 
-use App\Filament\Resources\Submissions\SubmissionResource;
-use App\Models\JobListing;
-use App\Models\Submission;
+use App\Filament\Resources\JobApplications\JobApplicationResource;
+use App\Models\JobApplication;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -20,8 +19,7 @@ class JobSubmissionReceived extends Mailable implements ShouldQueue
      * Create a new message instance.
      */
     public function __construct(
-        public JobListing $jobListing,
-        public Submission $submission,
+        public JobApplication $application,
     ) {
         $this->afterCommit();
     }
@@ -32,7 +30,7 @@ class JobSubmissionReceived extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "طلب تقديم جديد على وظيفة: {$this->jobListing->title}",
+            subject: "طلب توظيف جديد: {$this->application->full_name} ({$this->application->reference_number})",
         );
     }
 
@@ -44,7 +42,7 @@ class JobSubmissionReceived extends Mailable implements ShouldQueue
         return new Content(
             markdown: 'emails.submissions.job-submission-received',
             with: [
-                'adminUrl' => SubmissionResource::getUrl('edit', ['record' => $this->submission]),
+                'adminUrl' => JobApplicationResource::getUrl('view', ['record' => $this->application]),
             ],
         );
     }

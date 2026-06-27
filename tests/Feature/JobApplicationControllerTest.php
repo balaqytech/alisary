@@ -10,6 +10,7 @@ use function Pest\Laravel\post;
 
 it('stores a job application successfully and redirects back', function () {
     Storage::fake('public');
+    \Illuminate\Support\Facades\Mail::fake();
 
     $company = Company::factory()->create();
 
@@ -58,4 +59,8 @@ it('stores a job application successfully and redirects back', function () {
         ->contract_types->toBe(['دوام كامل', 'عمل حرّ مستقل (Freelance)']);
 
     Storage::disk('public')->assertExists($application->cv_path);
+
+    // If Settings returns emails in testing, it will queue.
+    // In tests, the database settings might be empty by default, 
+    // so we can just assert nothing broke, or mock Settings if needed.
 });
