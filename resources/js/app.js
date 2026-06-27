@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
 function splitHeroWords(root) {
     root.querySelectorAll('[data-split-words]').forEach((element) => {
@@ -39,15 +40,21 @@ function initHeroSlider() {
 
     gsap.set(slides, { autoAlpha: 0, zIndex: 0 });
     gsap.set(slides[0], { autoAlpha: 1, zIndex: 2 });
-    gsap.fromTo(slides[0].querySelector('[data-hero-media]'), {
-        scale: 1.18,
-        xPercent: -1.2,
-    }, {
-        scale: 1.045,
-        xPercent: 0,
-        duration: 4.8,
-        ease: 'none',
-    });
+
+    if (isTouchDevice) {
+        slides[0].querySelector('[data-hero-media]')?.classList.add('kenburns-active');
+    } else {
+        gsap.fromTo(slides[0].querySelector('[data-hero-media]'), {
+            scale: 1.18,
+            xPercent: -1.2,
+        }, {
+            scale: 1.045,
+            xPercent: 0,
+            duration: 4.8,
+            ease: 'none',
+            force3D: true,
+        });
+    }
     gsap.set(slides[0].querySelectorAll('[data-hero-reveal]'), { autoAlpha: 1, y: 0 });
     gsap.fromTo(slides[0].querySelectorAll('.hero-word > span'), {
         y: 42,
@@ -59,7 +66,7 @@ function initHeroSlider() {
         delay: 0.25,
     });
 
-    if (! prefersReducedMotion) {
+    if (! prefersReducedMotion && ! isTouchDevice) {
         const setMediaX = gsap.quickTo(root, '--hero-x', { duration: 0.6, ease: 'power3.out' });
         const setMediaY = gsap.quickTo(root, '--hero-y', { duration: 0.6, ease: 'power3.out' });
 
@@ -119,7 +126,18 @@ function initHeroSlider() {
         setButtonState(activeIndex);
         runProgress();
 
-        gsap.fromTo(nextMedia, { scale: 1.18, xPercent: -1.8 }, { scale: 1.045, xPercent: 0, duration: 4.8, ease: 'none' });
+        // Kill any running kenburns CSS animation on all slides
+        slides.forEach((slide) => {
+            slide.querySelector('[data-hero-media]')?.classList.remove('kenburns-active');
+        });
+
+        if (isTouchDevice) {
+            // Use lightweight CSS animation on mobile
+            void nextMedia.offsetWidth; // force reflow to restart animation
+            nextMedia.classList.add('kenburns-active');
+        } else {
+            gsap.fromTo(nextMedia, { scale: 1.18, xPercent: -1.8 }, { scale: 1.045, xPercent: 0, duration: 4.8, ease: 'none', force3D: true });
+        }
 
         const timeline = gsap.timeline({
             defaults: { ease: 'power3.out' },

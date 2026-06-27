@@ -41,31 +41,31 @@
             <div class="grid gap-4 sm:grid-cols-2">
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-medium text-alisary-deep">الاسم الكامل <span class="text-red-600">*</span></label>
-                    <input name="full_name" value="{{ old('full_name') }}" required class="rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                    <input name="full_name" value="{{ old('full_name') }}" required class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                     @error('full_name')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-medium text-alisary-deep">رقم الجوال <span class="text-red-600">*</span></label>
-                    <input name="phone" type="tel" value="{{ old('phone') }}" required class="rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                    <input name="phone" type="tel" value="{{ old('phone') }}" required class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                     @error('phone')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-medium text-alisary-deep">البريد الإلكتروني <span class="text-red-600">*</span></label>
-                    <input name="email" type="email" value="{{ old('email') }}" required class="rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                    <input name="email" type="email" value="{{ old('email') }}" required class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                     @error('email')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
                 </div>
                 <div class="grid gap-4 sm:col-span-2 sm:grid-cols-3">
                     <div class="flex flex-col gap-1.5">
                         <label class="text-sm font-medium text-alisary-deep">الجنسية</label>
-                        <input name="nationality" value="{{ old('nationality') }}" class="rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                        <input name="nationality" value="{{ old('nationality') }}" class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                     </div>
                     <div class="flex flex-col gap-1.5">
                         <label class="text-sm font-medium text-alisary-deep">دولة الإقامة</label>
-                        <input name="country" value="{{ old('country') }}" class="rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                        <input name="country" value="{{ old('country') }}" class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                     </div>
                     <div class="flex flex-col gap-1.5">
                         <label class="text-sm font-medium text-alisary-deep">المدينة</label>
-                        <input name="city" value="{{ old('city') }}" class="rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                        <input name="city" value="{{ old('city') }}" class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                     </div>
                 </div>
             </div>
@@ -82,7 +82,7 @@
             <div class="grid gap-4 sm:grid-cols-2">
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-medium text-alisary-deep">في أي مؤسسة تودّ العمل؟ <span class="text-red-600">*</span></label>
-                    <select name="company_id" id="companySelect" required class="rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                    <select name="company_id" id="companySelect" required class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                         <option value="">-- اختر المؤسسة --</option>
                         @foreach($companies ?? [] as $company)
                             <option value="{{ $company->id }}" @selected(old('company_id') == $company->id)>{{ $company->name }}</option>
@@ -92,20 +92,20 @@
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-medium text-alisary-deep">أولوية الوظيفة (1) <span class="text-red-600">*</span></label>
-                    <select name="job_priority_1" id="priority1Select" required disabled class="rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20 disabled:cursor-not-allowed disabled:opacity-60">
+                    <select name="job_priority_1" id="priority1Select" required disabled class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20 disabled:cursor-not-allowed disabled:opacity-60">
                         <option value="">-- اختر وظيفة --</option>
                     </select>
                     @error('job_priority_1')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-medium text-alisary-deep">أولوية الوظيفة (2)</label>
-                    <select name="job_priority_2" id="priority2Select" disabled class="rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20 disabled:cursor-not-allowed disabled:opacity-60">
+                    <select name="job_priority_2" id="priority2Select" disabled class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20 disabled:cursor-not-allowed disabled:opacity-60">
                         <option value="">-- اختر وظيفة --</option>
                     </select>
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-medium text-alisary-deep">أولوية الوظيفة (3)</label>
-                    <select name="job_priority_3" id="priority3Select" disabled class="rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20 disabled:cursor-not-allowed disabled:opacity-60">
+                    <select name="job_priority_3" id="priority3Select" disabled class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20 disabled:cursor-not-allowed disabled:opacity-60">
                         <option value="">-- اختر وظيفة --</option>
                     </select>
                 </div>
@@ -125,11 +125,11 @@
                 
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-medium text-alisary-deep">متى يمكنك المباشرة؟</label>
-                    <input name="ready_date" type="date" value="{{ old('ready_date') }}" class="rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                    <input name="ready_date" type="date" value="{{ old('ready_date') }}" class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-medium text-alisary-deep">الراتب الشهري المتوقّع <span class="text-red-600">*</span></label>
-                    <input name="expected_salary" value="{{ old('expected_salary') }}" required placeholder="اكتب الراتب المتوقع مع العملة" class="rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                    <input name="expected_salary" value="{{ old('expected_salary') }}" required placeholder="اكتب الراتب المتوقع مع العملة" class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                     @error('expected_salary')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
                 </div>
             </div>
@@ -151,16 +151,16 @@
                 
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-medium text-alisary-deep">سنوات الخبرة الإجمالية</label>
-                    <input name="years_experience" type="number" min="0" value="{{ old('years_experience') }}" class="rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                    <input name="years_experience" type="number" min="0" value="{{ old('years_experience') }}" class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-medium text-alisary-deep">رابط لمعرض أعمالك / حسابك (إن وجد)</label>
-                    <input name="cv_link" type="url" value="{{ old('cv_link') }}" placeholder="https://..." class="rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 text-left font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                    <input name="cv_link" type="url" value="{{ old('cv_link') }}" placeholder="https://..." class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 text-left font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                 </div>
                 
                 <div class="flex flex-col gap-1.5 sm:col-span-2">
                     <label class="text-sm font-medium text-alisary-deep">ما الأدوات والبرمجيات (ومنها الذكاء الاصطناعي) التي تُتقن استخدامها لتسريع عملك؟</label>
-                    <textarea name="tools_and_ai" rows="3" class="min-h-[78px] rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">{{ old('tools_and_ai') }}</textarea>
+                    <textarea name="tools_and_ai" placeholder="مثال: أستخدم ChatGPT في كذا، وأداة كذا في..." rows="3" class="w-full min-h-[78px] rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">{{ old('tools_and_ai') }}</textarea>
                 </div>
                 
                 <div class="flex flex-col gap-1.5 sm:col-span-2">
@@ -168,7 +168,7 @@
                         <input type="checkbox" name="previously_worked" value="1" class="text-alisary-green focus:ring-alisary-green" {{ old('previously_worked') ? 'checked' : '' }}>
                         هل سبق لك العمل في إحدى مؤسساتنا؟
                     </label>
-                    <input name="previously_worked_where" value="{{ old('previously_worked_where') }}" placeholder="إذا نعم، أين ومتى؟" class="mt-2 rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                    <input name="previously_worked_where" value="{{ old('previously_worked_where') }}" placeholder="إذا نعم، أين ومتى؟" class="mt-2 w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                 </div>
             </div>
         </div>

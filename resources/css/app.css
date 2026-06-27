@@ -313,6 +313,26 @@
         transition: filter 460ms ease;
     }
 
+    @media (hover: none), (pointer: coarse) {
+        .hero-bg-visual {
+            transform: scale(1.045);
+            will-change: transform;
+        }
+    }
+
+    @keyframes kenburns-mobile {
+        from {
+            transform: scale(1.08) translate3d(-0.8%, 0, 0);
+        }
+        to {
+            transform: scale(1.02) translate3d(0, 0, 0);
+        }
+    }
+
+    .kenburns-active .hero-bg-visual {
+        animation: kenburns-mobile 5s linear forwards;
+    }
+
     .hero-art-frame {
         overflow: hidden;
         transform: translate3d(calc(var(--hero-x, 0) * -0.32), calc(var(--hero-y, 0) * -0.28), 0);

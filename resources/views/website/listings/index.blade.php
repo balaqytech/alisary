@@ -70,7 +70,7 @@
         </section>
     @endif
 
-    <section class="section">
+    <section class="section" id="vacancies">
         <div class="mx-auto max-w-7xl px-5 lg:px-10">
             @if ($isJob)
                 {{-- Filter Chips (Only for Jobs) --}}
