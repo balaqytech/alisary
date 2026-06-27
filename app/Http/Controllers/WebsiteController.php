@@ -35,12 +35,24 @@ class WebsiteController extends Controller
 
     public function jobs(GeneralSettings $settings): View
     {
+        $companies = Company::query()->active()->orderBy('sort_order')->get();
+
+        $jobTitles = JobListing::query()
+            ->published()
+            ->select('title', 'company_id')
+            ->distinct()
+            ->get()
+            ->groupBy('company_id')
+            ->map(fn ($jobs) => $jobs->pluck('title'));
+
         return view('website.listings.index', [
             'settings' => $settings,
             'type' => 'jobs',
             'label' => 'الوظائف',
             'description' => 'فرص مهنية لخدمة الطفل ومن يخدم الطفل، مع نماذج تقديم مخصصة بحسب احتياج كل وظيفة.',
             'listings' => JobListing::query()->published()->with('company')->latest('published_at')->paginate(9),
+            'companies' => $companies,
+            'jobTitles' => $jobTitles,
         ]);
     }
 

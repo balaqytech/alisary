@@ -73,6 +73,7 @@ class JobListingForm
                     ])
                     ->columns(2),
                 Section::make('حقول نموذج التقديم')
+                    ->hidden()
                     ->schema([
                         Repeater::make('form_fields')
                             ->label('أقسام نموذج التقديم')
