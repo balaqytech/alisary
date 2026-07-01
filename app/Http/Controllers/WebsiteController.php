@@ -43,14 +43,14 @@ class WebsiteController extends Controller
             ->distinct()
             ->get()
             ->groupBy('company_id')
-            ->map(fn ($jobs) => $jobs->pluck('title'));
+            ->map(fn($jobs) => $jobs->pluck('title'));
 
         return view('website.listings.index', [
             'settings' => $settings,
             'type' => 'jobs',
             'label' => 'الوظائف',
             'description' => 'فرص مهنية لخدمة الطفل ومن يخدم الطفل، مع نماذج تقديم مخصصة بحسب احتياج كل وظيفة.',
-            'listings' => JobListing::query()->published()->with('company')->latest('published_at')->paginate(9),
+            'listings' => JobListing::query()->published()->with('company')->latest('published_at')->get(),
             'companies' => $companies,
             'jobTitles' => $jobTitles,
         ]);
@@ -101,7 +101,7 @@ class WebsiteController extends Controller
             'waqf' => $homepageSettings->waqf,
             'doors' => $homepageSettings->doors,
             'founder' => $homepageSettings->founder,
-        ])->map(fn (array $section, string $key): Fluent => new Fluent([
+        ])->map(fn(array $section, string $key): Fluent => new Fluent([
             'key' => $key,
             'title' => $section['title'] ?? null,
             'eyebrow' => $section['eyebrow'] ?? null,

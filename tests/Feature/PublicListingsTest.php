@@ -27,6 +27,15 @@ test('jobs index and detail only render currently published jobs', function () {
     $this->get(route('jobs.show', $expired))->assertNotFound();
 });
 
+test('jobs index renders pagination links when there are multiple pages', function () {
+    JobListing::factory()->count(10)->create();
+
+    $this->get(route('jobs.index'))
+        ->assertSuccessful()
+        ->assertSee('page=2', false)
+        ->assertSee('#vacancies', false);
+});
+
 test('jobs index renders the group hiring introduction content', function () {
     JobListing::factory()->create();
 
