@@ -1,7 +1,10 @@
 <?php
 
 use App\Enums\CustomFieldType;
+use App\Enums\JobLevel;
 use App\Enums\ListingStatus;
+use App\Models\Company;
+use App\Models\JobFamily;
 use App\Models\JobListing;
 use App\Models\TenderListing;
 
@@ -34,6 +37,36 @@ test('jobs index renders pagination links when there are multiple pages', functi
         ->assertSuccessful()
         ->assertSee('page=2', false)
         ->assertSee('#vacancies', false);
+});
+
+test('jobs index renders search filters and job reference codes', function () {
+    $company = Company::factory()->create([
+        'name' => 'G Reader School',
+        'reference_code' => 'SCH',
+    ]);
+    $jobFamily = JobFamily::factory()->create([
+        'name' => 'Teaching',
+        'code' => 'TEA',
+    ]);
+
+    $jobListing = JobListing::factory()
+        ->for($company)
+        ->for($jobFamily, 'jobFamily')
+        ->create([
+            'title' => 'Early Childhood Teacher',
+            'job_level' => JobLevel::L4,
+        ]);
+
+    $this->get(route('jobs.index'))
+        ->assertSuccessful()
+        ->assertSee('id="jobSearch"', false)
+        ->assertSee('id="jobLevelFilter"', false)
+        ->assertSee('data-family="family-'.$jobFamily->id.'"', false)
+        ->assertSee('data-level="L4"', false)
+        ->assertSee('data-code="'.$jobListing->job_code.'"', false)
+        ->assertSee($jobListing->job_code)
+        ->assertSee('Teaching')
+        ->assertSee('Early Childhood Teacher');
 });
 
 test('jobs index renders the group hiring introduction content', function () {

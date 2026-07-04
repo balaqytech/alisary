@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Models\JobFamily;
 use App\Models\JobListing;
 use App\Models\TenderListing;
 use App\Settings\GeneralSettings;
@@ -36,22 +37,29 @@ class WebsiteController extends Controller
     public function jobs(GeneralSettings $settings): View
     {
         $companies = Company::query()->active()->orderBy('sort_order')->get();
+        $jobFamilies = JobFamily::query()->active()->orderBy('sort_order')->orderBy('name')->get();
 
         $jobTitles = JobListing::query()
             ->published()
-            ->select('title', 'company_id')
-            ->distinct()
+            ->select('title', 'job_code', 'company_id')
+            ->orderBy('title')
             ->get()
             ->groupBy('company_id')
-            ->map(fn($jobs) => $jobs->pluck('title'));
+            ->map(fn ($jobs) => $jobs->map(fn (JobListing $job): array => [
+                'title' => $job->title,
+                'code' => $job->job_code,
+                'value' => $job->job_code ?? $job->title,
+                'label' => $job->job_code === null ? $job->title : "{$job->title} ({$job->job_code})",
+            ])->values());
 
         return view('website.listings.index', [
             'settings' => $settings,
             'type' => 'jobs',
             'label' => 'الوظائف',
             'description' => 'فرص مهنية لخدمة الطفل ومن يخدم الطفل، مع نماذج تقديم مخصصة بحسب احتياج كل وظيفة.',
-            'listings' => JobListing::query()->published()->with('company')->latest('published_at')->get(),
+            'listings' => JobListing::query()->published()->with(['company', 'jobFamily'])->latest('published_at')->get(),
             'companies' => $companies,
+            'jobFamilies' => $jobFamilies,
             'jobTitles' => $jobTitles,
         ]);
     }
@@ -75,7 +83,7 @@ class WebsiteController extends Controller
             'settings' => $settings,
             'type' => 'jobs',
             'label' => 'وظيفة',
-            'listing' => $jobListing->load('company'),
+            'listing' => $jobListing->load(['company', 'jobFamily']),
         ]);
     }
 
@@ -101,7 +109,7 @@ class WebsiteController extends Controller
             'waqf' => $homepageSettings->waqf,
             'doors' => $homepageSettings->doors,
             'founder' => $homepageSettings->founder,
-        ])->map(fn(array $section, string $key): Fluent => new Fluent([
+        ])->map(fn (array $section, string $key): Fluent => new Fluent([
             'key' => $key,
             'title' => $section['title'] ?? null,
             'eyebrow' => $section['eyebrow'] ?? null,

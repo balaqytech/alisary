@@ -9,6 +9,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
 
 class CompanyForm
 {
@@ -20,6 +21,12 @@ class CompanyForm
                     ->schema([
                         TextInput::make('name')->label('الاسم')->required()->maxLength(255),
                         TextInput::make('slug')->label('الرابط المختصر')->required()->unique(ignoreRecord: true)->maxLength(255),
+                        TextInput::make('reference_code')
+                            ->label('Reference code')
+                            ->required()
+                            ->maxLength(16)
+                            ->unique(ignoreRecord: true)
+                            ->dehydrateStateUsing(fn (?string $state): ?string => $state === null ? null : Str::upper($state)),
                         TextInput::make('website_url')->label('رابط الموقع')->url()->maxLength(255),
                         Select::make('status')->label('الحالة')->options([
                             'active' => 'نشطة',

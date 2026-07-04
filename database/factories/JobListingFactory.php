@@ -2,10 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Enums\JobLevel;
 use App\Enums\JobType;
 use App\Enums\ListingLocation;
 use App\Enums\ListingStatus;
 use App\Models\Company;
+use App\Models\JobFamily;
 use App\Models\JobListing;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -30,6 +32,8 @@ class JobListingFactory extends Factory
             'slug' => Str::slug($title).'-'.$this->faker->unique()->numberBetween(100, 999),
             'excerpt' => $this->faker->sentence(12),
             'company_id' => Company::factory(),
+            'job_family_id' => JobFamily::factory(),
+            'job_level' => $this->faker->randomElement(JobLevel::cases()),
             'description' => $this->faker->paragraphs(3, true),
             'type' => $this->faker->randomElement(JobType::cases()),
             'expires_at' => now()->addMonth(),

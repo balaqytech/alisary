@@ -2,14 +2,14 @@
 
 namespace Database\Factories;
 
-use App\Models\Company;
+use App\Models\JobFamily;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends Factory<Company>
+ * @extends Factory<JobFamily>
  */
-class CompanyFactory extends Factory
+class JobFamilyFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,15 +18,11 @@ class CompanyFactory extends Factory
      */
     public function definition(): array
     {
-        $name = $this->faker->unique()->company();
+        $name = $this->faker->unique()->jobTitle();
 
         return [
             'name' => $name,
-            'slug' => $this->faker->unique()->slug(2),
-            'reference_code' => Str::upper($this->faker->unique()->lexify('???')),
-            'description' => $this->faker->paragraph(),
-            'website_url' => $this->faker->url(),
-            'brand_color' => '#1C463C',
+            'code' => Str::upper($this->faker->unique()->lexify('???')),
             'status' => 'active',
             'sort_order' => $this->faker->numberBetween(1, 20),
         ];

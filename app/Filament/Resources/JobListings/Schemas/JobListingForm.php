@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\JobListings\Schemas;
 
+use App\Enums\JobLevel;
 use App\Enums\JobType;
 use App\Enums\ListingLocation;
 use App\Enums\ListingStatus;
@@ -41,11 +42,26 @@ class JobListingForm
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
+                        TextInput::make('job_code')
+                            ->label('Job reference')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->maxLength(64),
                         Select::make('company_id')
                             ->label('الشركة')
-                            ->relationship('company', 'name')
+                            ->relationship('company', 'name', fn ($query) => $query->whereNotNull('reference_code')->orderBy('name'))
                             ->searchable()
                             ->preload()
+                            ->required(),
+                        Select::make('job_family_id')
+                            ->label('Job family')
+                            ->relationship('jobFamily', 'name', fn ($query) => $query->active()->orderBy('sort_order')->orderBy('name'))
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        Select::make('job_level')
+                            ->label('Job level')
+                            ->options(collect(JobLevel::cases())->mapWithKeys(fn (JobLevel $level): array => [$level->value => $level->label()]))
                             ->required(),
                         Select::make('type')
                             ->label('نوع الوظيفة')

@@ -5,7 +5,14 @@
         <button type="button" class="text-3xl text-white transition hover:text-alisary-gold" onclick="closeJobDrawer()">×</button>
     </div>
     <div class="p-6 md:p-8">
-        <div class="mb-8 grid grid-cols-1 gap-4 rounded-2xl border border-alisary-green/10 bg-alisary-green/5 p-4 sm:grid-cols-3">
+        <div class="mb-8 grid grid-cols-1 gap-4 rounded-2xl border border-alisary-green/10 bg-alisary-green/5 p-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="flex flex-col justify-center gap-1.5 rounded-xl border border-[#e7d3a0] bg-[#fff8e8] p-4 shadow-sm" id="drawerCodeBox">
+                <div class="flex items-center gap-2 text-xs font-medium text-alisary-soft">
+                    <x-icons.remix.file-list class="size-4 text-[#A8862F]" />
+                    Reference
+                </div>
+                <div id="drawerCode" class="text-sm font-bold text-alisary-deep"></div>
+            </div>
             <div class="flex flex-col justify-center gap-1.5 rounded-xl border border-[#e7d3a0] bg-[#fef6e6] p-4 shadow-sm" id="drawerTypeBox">
                 <div class="flex items-center gap-2 text-xs font-medium text-alisary-soft">
                     <x-icons.remix.briefcase class="size-4 text-[#A8862F]" />
@@ -53,7 +60,19 @@
             const type = meta.getAttribute('data-type');
             const location = meta.getAttribute('data-location');
             const deadline = meta.getAttribute('data-deadline');
+            const code = meta.getAttribute('data-code');
+            const family = meta.getAttribute('data-family');
+            const level = meta.getAttribute('data-level');
+            const titleParts = [title];
+
+            if (code) {
+                titleParts.push(code);
+            }
             
+            document.getElementById('drawerTitle').innerText = titleParts.join(' · ');
+            document.getElementById('drawerCode').innerText = [code, family, level].filter(Boolean).join(' · ');
+            document.getElementById('drawerCodeBox').style.display = code || family || level ? 'flex' : 'none';
+
             document.getElementById('drawerType').innerText = type;
             document.getElementById('drawerTypeBox').style.display = type ? 'flex' : 'none';
             
@@ -71,6 +90,7 @@
         
         // Save the current job title to fill the form later
         window.currentApplyingJob = title;
+        window.currentApplyingJobValue = meta?.getAttribute('data-code') || title;
         window.currentApplyingCompany = companyId;
         
         document.body.style.overflow = 'hidden';
@@ -90,8 +110,9 @@
         scrollToForm();
     }
     
-    function quickApply(jobTitle, companyId) {
+    function quickApply(jobTitle, companyId, jobCode = null) {
         window.currentApplyingJob = jobTitle;
+        window.currentApplyingJobValue = jobCode || jobTitle;
         window.currentApplyingCompany = companyId;
         scrollToForm();
     }
@@ -102,7 +123,9 @@
         const applySection = document.getElementById('apply-form');
         
         if (banner && jobName && applySection && window.currentApplyingJob) {
-            jobName.innerText = window.currentApplyingJob;
+            jobName.innerText = window.currentApplyingJobValue && window.currentApplyingJobValue !== window.currentApplyingJob
+                ? `${window.currentApplyingJob} · ${window.currentApplyingJobValue}`
+                : window.currentApplyingJob;
             banner.classList.remove('hidden');
             banner.classList.add('flex');
             
@@ -125,12 +148,13 @@
             banner.classList.add('hidden');
             banner.classList.remove('flex');
             
-            const p1 = document.querySelector('input[name="job_priority_1"]');
-            if(p1 && p1.value === window.currentApplyingJob) {
+            const p1 = document.querySelector('[name="job_priority_1"]');
+            if(p1 && (p1.value === window.currentApplyingJob || p1.value === window.currentApplyingJobValue)) {
                 p1.value = '';
             }
             
             window.currentApplyingJob = null;
+            window.currentApplyingJobValue = null;
         }
     }
 </script>

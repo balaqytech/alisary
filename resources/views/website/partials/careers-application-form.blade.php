@@ -308,11 +308,18 @@
                     select.disabled = false;
                     
                     availableJobs.forEach(job => {
+                        const jobOption = typeof job === 'string'
+                            ? { title: job, value: job, label: job }
+                            : job;
                         const option = document.createElement('option');
-                        option.value = job;
-                        option.textContent = job;
+                        option.value = jobOption.value || jobOption.code || jobOption.title;
+                        option.textContent = jobOption.label || jobOption.title || option.value;
                         // Select old value if it exists
-                        if (oldValues[index] === job || (index === 0 && window.currentApplyingJob === job)) {
+                        if (
+                            oldValues[index] === option.value ||
+                            oldValues[index] === jobOption.title ||
+                            (index === 0 && (window.currentApplyingJobValue === option.value || window.currentApplyingJob === jobOption.title))
+                        ) {
                             option.selected = true;
                         }
                         select.appendChild(option);

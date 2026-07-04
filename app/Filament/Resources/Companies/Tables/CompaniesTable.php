@@ -18,6 +18,7 @@ class CompaniesTable
             ->columns([
                 TextColumn::make('sort_order')->label('الترتيب')->sortable(),
                 TextColumn::make('name')->label('الاسم')->searchable()->sortable(),
+                TextColumn::make('reference_code')->label('Code')->searchable()->sortable(),
                 TextColumn::make('status')->label('الحالة')->badge(),
                 ColorColumn::make('brand_color')->label('اللون'),
                 TextColumn::make('updated_at')->label('آخر تحديث')->dateTime()->sortable(),

@@ -17,8 +17,11 @@ class JobListingsTable
         return $table
             ->columns([
                 TextColumn::make('status')->label('الحالة')->badge()->sortable(),
+                TextColumn::make('job_code')->label('Reference')->searchable()->sortable(),
                 TextColumn::make('title')->label('العنوان')->searchable()->sortable(),
                 TextColumn::make('company.name')->label('الشركة')->searchable(),
+                TextColumn::make('jobFamily.name')->label('Family')->searchable(),
+                TextColumn::make('job_level')->label('Level')->badge(),
                 TextColumn::make('type')->label('النوع')->badge(),
                 TextColumn::make('location')->label('الموقع')->badge(),
                 TextColumn::make('published_at')->label('النشر')->dateTime()->sortable(),
@@ -36,6 +39,11 @@ class JobListingsTable
                 SelectFilter::make('company_id')
                     ->label('الشركة')
                     ->relationship('company', 'name')
+                    ->searchable()
+                    ->preload(),
+                SelectFilter::make('job_family_id')
+                    ->label('Job family')
+                    ->relationship('jobFamily', 'name')
                     ->searchable()
                     ->preload(),
             ])

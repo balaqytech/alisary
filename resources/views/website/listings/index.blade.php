@@ -84,8 +84,33 @@
     <section class="section" id="vacancies">
         <div class="mx-auto max-w-7xl px-5 lg:px-10">
             @if ($isJob)
+                <div class="mb-5 grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px]">
+                    <label class="relative block">
+                        <span class="sr-only">بحث في الوظائف</span>
+                        <x-icons.remix.briefcase class="pointer-events-none absolute right-4 top-1/2 size-5 -translate-y-1/2 text-alisary-soft" />
+                        <input
+                            id="jobSearch"
+                            type="search"
+                            class="w-full rounded-xl border border-alisary-green/15 bg-white py-3 pl-4 pr-12 text-alisary-deep shadow-sm outline-none transition placeholder:text-alisary-soft/75 focus:border-alisary-gold focus:ring-4 focus:ring-alisary-gold/15"
+                            placeholder="ابحث بالعنوان، الرمز، المؤسسة، العائلة، الموقع..."
+                            autocomplete="off"
+                            oninput="applyJobFilters()"
+                        >
+                    </label>
+
+                    <label class="block">
+                        <span class="sr-only">مستوى الوظيفة</span>
+                        <select id="jobLevelFilter" onchange="applyJobFilters()" class="w-full rounded-xl border border-alisary-green/15 bg-white px-4 py-3 text-alisary-deep shadow-sm outline-none transition focus:border-alisary-gold focus:ring-4 focus:ring-alisary-gold/15">
+                            <option value="all">كل المستويات</option>
+                            @foreach (\App\Enums\JobLevel::cases() as $level)
+                                <option value="{{ $level->value }}">{{ $level->label() }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                </div>
+
                 {{-- Filter Chips (Only for Jobs) --}}
-                <div class="mb-8 flex flex-wrap justify-center gap-3">
+                <div class="mb-4 flex flex-wrap justify-center gap-3">
                     <button type="button" data-filter="all"
                         class="filter-btn flex cursor-pointer items-center gap-2 rounded-full border border-alisary-green/20 bg-white px-5 py-2.5 font-bold text-alisary-deep ring-2 ring-alisary-gold transition hover:border-alisary-gold"
                         onclick="filterJobs('all')">
@@ -102,6 +127,25 @@
                         </button>
                     @endforeach
                 </div>
+
+                @if (($jobFamilies ?? collect())->isNotEmpty())
+                    <div class="mb-3 flex flex-wrap justify-center gap-2">
+                        <button type="button" data-family-filter="all"
+                            class="family-filter-btn rounded-full border border-alisary-green/15 bg-alisary-deep px-4 py-2 text-sm font-bold text-white transition hover:border-alisary-gold"
+                            onclick="filterJobFamily('all')">
+                            كل المسارات
+                        </button>
+                        @foreach ($jobFamilies as $jobFamily)
+                            <button type="button" data-family-filter="family-{{ $jobFamily->id }}"
+                                class="family-filter-btn rounded-full border border-alisary-green/15 bg-white px-4 py-2 text-sm font-bold text-alisary-deep transition hover:border-alisary-gold"
+                                onclick="filterJobFamily('family-{{ $jobFamily->id }}')">
+                                {{ $jobFamily->name }}
+                            </button>
+                        @endforeach
+                    </div>
+                @endif
+
+                <div id="jobs-count-line" class="mb-6 text-center text-sm text-alisary-soft"></div>
             @endif
 
             <div class="grid gap-6 md:grid-cols-2">
@@ -110,18 +154,47 @@
                         $organization = $isJob ? $listing->company : $listing->contractor;
                         $deadline = $isJob ? $listing->expires_at : $listing->last_day_to_apply;
                         $route = $isJob ? '#' : route('tenders.show', $listing);
+                        $searchText = $isJob
+                            ? collect([
+                                $listing->title,
+                                $listing->job_code,
+                                $listing->excerpt,
+                                $organization?->name,
+                                $listing->jobFamily?->name,
+                                $listing->job_level?->label(),
+                                $listing->type?->label(),
+                                $listing->location?->label(),
+                            ])->filter()->implode(' ')
+                            : '';
                     @endphp
 
                     @if ($isJob)
                         {{-- New Job Card Format --}}
                         <div class="group flex flex-col justify-between overflow-hidden rounded-2xl border border-alisary-green/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-alisary-green/5"
-                            data-company="company-{{ $organization?->id }}">
+                            data-company="company-{{ $organization?->id }}"
+                            data-family="family-{{ $listing->job_family_id }}"
+                            data-level="{{ $listing->job_level?->value ?? '' }}"
+                            data-code="{{ $listing->job_code }}"
+                            data-search="{{ e($searchText) }}">
                             <div class="flex h-2 w-full"
                                 style="background-color: {{ $organization?->brand_color ?? '#1C463C' }}"></div>
                             <div class="flex-1 p-6">
                                 <div class="mb-4 flex flex-wrap gap-2">
+                                    @if ($listing->job_code)
+                                        <span
+                                            class="rounded-lg bg-[#f3eee1] px-3 py-1 text-xs font-bold tracking-wide text-[#7a7160]"
+                                            title="Job reference">{{ $listing->job_code }}</span>
+                                    @endif
                                     <span
                                         class="rounded-full bg-alisary-ivory px-3 py-1 text-xs font-bold text-alisary-deep">{{ $organization?->name }}</span>
+                                    @if ($listing->jobFamily)
+                                        <span
+                                            class="rounded-full bg-alisary-green/10 px-3 py-1 text-xs font-bold text-alisary-green">{{ $listing->jobFamily->name }}</span>
+                                    @endif
+                                    @if ($listing->job_level)
+                                        <span
+                                            class="rounded-full bg-alisary-gold/15 px-3 py-1 text-xs font-bold text-alisary-deep">{{ $listing->job_level->label() }}</span>
+                                    @endif
                                     <span
                                         class="rounded-full bg-alisary-deep px-3 py-1 text-xs font-bold text-white">{{ $listing->type?->label() }}</span>
                                 </div>
@@ -143,6 +216,9 @@
                             {{-- Content hidden in DOM for drawer --}}
                             <div class="hidden" id="job-desc-{{ $listing->id }}">{!! $listing->description !!}</div>
                             <div class="hidden" id="job-meta-{{ $listing->id }}"
+                                data-code="{{ $listing->job_code }}"
+                                data-family="{{ $listing->jobFamily?->name }}"
+                                data-level="{{ $listing->job_level?->label() }}"
                                 data-type="{{ $listing->type?->label() }}"
                                 data-location="{{ $listing->location?->label() }}"
                                 data-deadline="{{ $deadline ? \App\Support\NumberLocalizer::eastern($deadline->format('Y-m-d')) : '' }}">
@@ -157,7 +233,7 @@
                                 </button>
                                 <div class="h-8 w-px bg-alisary-green/10"></div>
                                 <button type="button"
-                                    onclick="quickApply('{{ addslashes($listing->title) }}', {{ $organization?->id }})"
+                                    onclick="quickApply(@js($listing->title), {{ $organization?->id }}, @js($listing->job_code))"
                                     class="flex flex-1 cursor-pointer items-center justify-center gap-2 px-6 py-4 font-bold text-alisary-gold transition hover:bg-alisary-ivory hover:text-[#C5A359]">
                                     قدّم الآن
                                     <x-icons.remix.arrow-left class="size-4 rtl:rotate-180" />
@@ -265,22 +341,65 @@
         @include('website.partials.job-drawer')
 
         <script>
+            let activeCompanyFilter = 'all';
+            let activeFamilyFilter = 'all';
+
             function filterJobs(filterId) {
+                activeCompanyFilter = filterId;
+                applyJobFilters();
+            }
+
+            function filterJobFamily(filterId) {
+                activeFamilyFilter = filterId;
+                applyJobFilters();
+            }
+
+            function normalizeJobText(value) {
+                return (value || '')
+                    .toString()
+                    .toLowerCase()
+                    .replace(/[أإآا]/g, 'ا')
+                    .replace(/[ىي]/g, 'ي')
+                    .replace(/ة/g, 'ه')
+                    .trim();
+            }
+
+            function applyJobFilters() {
                 const cards = document.querySelectorAll('[data-company]');
                 const emptyState = document.getElementById('jobs-empty-state');
+                const countLine = document.getElementById('jobs-count-line');
+                const searchInput = document.getElementById('jobSearch');
+                const levelFilter = document.getElementById('jobLevelFilter');
+                const query = normalizeJobText(searchInput?.value);
+                const level = levelFilter?.value || 'all';
                 let visibleCount = 0;
 
                 // Update active state on buttons
                 document.querySelectorAll('.filter-btn').forEach(btn => {
-                    if (btn.getAttribute('data-filter') === filterId) {
+                    if (btn.getAttribute('data-filter') === activeCompanyFilter) {
                         btn.classList.add('ring-2', 'ring-alisary-gold', 'bg-alisary-ivory');
                     } else {
                         btn.classList.remove('ring-2', 'ring-alisary-gold', 'bg-alisary-ivory');
                     }
                 });
 
+                document.querySelectorAll('.family-filter-btn').forEach(btn => {
+                    if (btn.getAttribute('data-family-filter') === activeFamilyFilter) {
+                        btn.classList.add('bg-alisary-deep', 'text-white');
+                        btn.classList.remove('bg-white', 'text-alisary-deep');
+                    } else {
+                        btn.classList.remove('bg-alisary-deep', 'text-white');
+                        btn.classList.add('bg-white', 'text-alisary-deep');
+                    }
+                });
+
                 cards.forEach(card => {
-                    if (filterId === 'all' || card.getAttribute('data-company') === filterId) {
+                    const matchesCompany = activeCompanyFilter === 'all' || card.getAttribute('data-company') === activeCompanyFilter;
+                    const matchesFamily = activeFamilyFilter === 'all' || card.getAttribute('data-family') === activeFamilyFilter;
+                    const matchesLevel = level === 'all' || card.getAttribute('data-level') === level;
+                    const matchesSearch = query === '' || normalizeJobText(card.getAttribute('data-search')).includes(query);
+
+                    if (matchesCompany && matchesFamily && matchesLevel && matchesSearch) {
                         card.style.display = 'flex';
                         visibleCount++;
                     } else {
@@ -295,7 +414,23 @@
                         emptyState.style.display = 'none';
                     }
                 }
+
+                if (countLine) {
+                    const parts = [`يُعرض الآن ${visibleCount} من ${cards.length} وظيفة`];
+
+                    if (query !== '') {
+                        parts.push(`مطابقة لبحث "${searchInput.value}"`);
+                    }
+
+                    if (level !== 'all') {
+                        parts.push(`المستوى ${level}`);
+                    }
+
+                    countLine.textContent = parts.join(' · ');
+                }
             }
+
+            document.addEventListener('DOMContentLoaded', applyJobFilters);
         </script>
     @endif
 </x-website.layout>
