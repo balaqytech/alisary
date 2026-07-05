@@ -2,14 +2,17 @@
 
 namespace App\Enums;
 
-enum DataRightsRequestStatus: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+
+enum DataRightsRequestStatus: string implements HasColor, HasLabel
 {
     case New = 'new';
     case InReview = 'in_review';
     case Fulfilled = 'fulfilled';
     case Rejected = 'rejected';
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::New => 'جديد',
@@ -19,7 +22,7 @@ enum DataRightsRequestStatus: string
         };
     }
 
-    public function color(): string
+    public function getColor(): string|array|null
     {
         return match ($this) {
             self::New => 'info',

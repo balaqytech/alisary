@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class JobApplicationResource extends Resource
 {
@@ -22,6 +23,10 @@ class JobApplicationResource extends Resource
     protected static ?string $pluralModelLabel = 'طلبات التوظيف';
 
     protected static ?string $modelLabel = 'طلب توظيف';
+
+    protected static string|UnitEnum|null $navigationGroup = 'التوظيف';
+
+    protected static ?int $navigationSort = 30;
 
     public static function form(Schema $schema): Schema
     {

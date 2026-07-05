@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class SubmissionResource extends Resource
 {
@@ -24,6 +25,10 @@ class SubmissionResource extends Resource
     protected static ?string $modelLabel = 'طلب';
 
     protected static ?string $pluralModelLabel = 'طلبات التقديم';
+
+    protected static string|UnitEnum|null $navigationGroup = 'المجموعة';
+
+    protected static ?int $navigationSort = 30;
 
     public static function form(Schema $schema): Schema
     {

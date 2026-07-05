@@ -14,6 +14,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class DataRightsRequestResource extends Resource
 {
@@ -28,6 +29,8 @@ class DataRightsRequestResource extends Resource
     protected static ?string $modelLabel = 'طلب حقوق بيانات';
 
     protected static ?int $navigationSort = 30;
+
+    protected static string|UnitEnum|null $navigationGroup = 'التوظيف';
 
     public static function form(Schema $schema): Schema
     {

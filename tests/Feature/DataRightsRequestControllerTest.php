@@ -5,6 +5,7 @@ use App\Mail\DataRightsRequestReceived;
 use App\Models\DataRightsRequest;
 use App\Settings\GeneralSettings;
 use Illuminate\Support\Facades\Mail;
+use Livewire\Livewire;
 
 use function Pest\Laravel\post;
 
@@ -74,4 +75,27 @@ it('queues notification email to configured privacy recipients', function () {
     ]);
 
     Mail::assertQueued(DataRightsRequestReceived::class, ['privacy@example.com', 'legal@example.com']);
+});
+
+it('submits the public data rights form through livewire', function () {
+    Mail::fake();
+
+    Livewire::test('data-rights-request-form')
+        ->set('request_type', 'سحب الموافقة')
+        ->set('email', 'candidate@example.com')
+        ->set('details', 'Stop processing my recruitment data.')
+        ->call('submit')
+        ->assertHasNoErrors()
+        ->assertSet('request_type', '')
+        ->assertSet('email', '')
+        ->assertSet('details', '');
+
+    $rightsRequest = DataRightsRequest::first();
+
+    expect($rightsRequest)
+        ->not->toBeNull()
+        ->request_type->toBe('سحب الموافقة')
+        ->email->toBe('candidate@example.com')
+        ->details->toBe('Stop processing my recruitment data.')
+        ->reference_number->toStartWith('DR-'.now()->format('Ymd').'-');
 });
