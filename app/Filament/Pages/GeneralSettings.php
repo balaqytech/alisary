@@ -116,6 +116,22 @@ class GeneralSettings extends SettingsPage
                                             ->columnSpanFull(),
                                     ])
                                     ->columnSpanFull(),
+                                Section::make('مستلمو طلبات حقوق البيانات')
+                                    ->schema([
+                                        Repeater::make('privacy_rights_recipients')
+                                            ->label('البريد المستلم')
+                                            ->schema([
+                                                TextInput::make('email')
+                                                    ->label('البريد الإلكتروني')
+                                                    ->email()
+                                                    ->required()
+                                                    ->maxLength(255),
+                                            ])
+                                            ->addActionLabel('إضافة بريد')
+                                            ->columns(1)
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columnSpanFull(),
                             ]),
                     ])
                     ->columnSpanFull(),

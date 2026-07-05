@@ -17,7 +17,8 @@
                     <span class="block text-alisary-gold">وانمُ معنا في الدنيا والآخرة</span>
                 </h1>
                 <p class="mx-auto mt-6 max-w-3xl text-lg leading-loose text-alisary-soft">
-                    مهامُّ كلِّ وظيفةٍ وشروطُها ومؤشّرُ نجاحها معلنةٌ من أوّل نظرة، وراتبُك المتوقَّع نسألك عنه بوضوحٍ واحترام. ابحث عن دورك في مؤسستك وفرعك الأقرب، وقدّم باستمارةٍ واحدةٍ تُملأ مرّة، ونعِدُك بالردّ.
+                    مهامُّ كلِّ وظيفةٍ وشروطُها ومؤشّرُ نجاحها معلنةٌ من أوّل نظرة، وراتبُك المتوقَّع نسألك عنه بوضوحٍ
+                    واحترام. ابحث عن دورك في مؤسستك وفرعك الأقرب، وقدّم باستمارةٍ واحدةٍ تُملأ مرّة، ونعِدُك بالردّ.
                 </p>
 
                 <div class="mt-6 flex flex-wrap justify-center gap-3 text-sm text-alisary-soft">
@@ -46,7 +47,8 @@
                 <div
                     class="mx-auto mt-8 inline-flex max-w-4xl items-center gap-3 rounded-full border border-alisary-green/15 bg-white/60 px-5 py-3 font-display text-sm leading-relaxed text-alisary-green md:text-base">
                     <span class="size-2.5 flex-none rounded-full bg-alisary-gold"></span>
-                    <span>﴿رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً﴾ · عملٌ يجمع لك الأثرَ الطيّب والنماءَ العادل</span>
+                    <span>﴿رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً﴾ · عملٌ يجمع لك الأثرَ
+                        الطيّب والنماءَ العادل</span>
                 </div>
             </div>
         </section>
@@ -74,7 +76,8 @@
                         جِد دورَك: بالوظيفة، أو بالمؤسسة، أو بأقرب فرعٍ إليك
                     </h2>
                     <p class="mt-4 leading-loose text-alisary-soft">
-                        ابحث باسم الوظيفة، أو صفِّ بالمؤسسة والمسار والفرع، ثم افتح أيّ وظيفةٍ لتقرأ مهامّها وشروطها ونمط تعاقدها ومؤشّرَ نجاحها قبل أن تتقدّم.
+                        ابحث باسم الوظيفة، أو صفِّ بالمؤسسة والمسار والفرع، ثم افتح أيّ وظيفةٍ لتقرأ مهامّها وشروطها
+                        ونمط تعاقدها ومؤشّرَ نجاحها قبل أن تتقدّم.
                     </p>
                 </div>
 
@@ -208,8 +211,8 @@
 
                             {{-- Content hidden in DOM for drawer --}}
                             <div class="hidden" id="job-desc-{{ $listing->id }}">{!! $listing->description !!}</div>
-                            <div class="hidden" id="job-meta-{{ $listing->id }}"
-                                data-code="{{ $listing->job_code }}" data-family="{{ $listing->jobFamily?->name }}"
+                            <div class="hidden" id="job-meta-{{ $listing->id }}" data-code="{{ $listing->job_code }}"
+                                data-family="{{ $listing->jobFamily?->name }}"
                                 data-level="{{ $listing->job_level?->label() }}"
                                 data-type="{{ $listing->type?->label() }}"
                                 data-location="{{ $listing->location?->label() }}"
@@ -288,9 +291,11 @@
         <section class="section-deep text-white" id="how">
             <div class="mx-auto max-w-7xl px-5 py-20 lg:px-10 lg:py-28">
                 <div class="mx-auto mb-14 max-w-3xl text-center">
-                    <span class="font-display text-sm font-bold tracking-[0.22em] text-alisary-gold">شفافيةٌ من أوّل خطوة</span>
+                    <span class="font-display text-sm font-bold tracking-[0.22em] text-alisary-gold">شفافيةٌ من أوّل
+                        خطوة</span>
                     <h2 class="mt-2 font-display text-4xl text-white">كيف نوظّف</h2>
-                    <p class="mt-3 leading-loose text-white/80">مسارٌ موحّدٌ لكل مؤسسات المجموعة. التقديم عبر هذا الموقع فقط، ونتواصل مع كل متقدّم.</p>
+                    <p class="mt-3 leading-loose text-white/80">مسارٌ موحّدٌ لكل مؤسسات المجموعة. التقديم عبر هذا
+                        الموقع فقط، ونتواصل مع كل متقدّم.</p>
                 </div>
 
                 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
@@ -303,7 +308,8 @@
                     <div class="rounded-xl border border-white/10 bg-white/5 p-6">
                         <div class="mb-4 font-display text-4xl font-bold text-alisary-gold">٢</div>
                         <h4 class="mb-2 font-display text-xl font-bold">الفرز</h4>
-                        <p class="text-sm leading-relaxed text-white/70">نقرأ طلبك بعناية بمساعدة أدوات الذكاء الاصطناعي، ونقيس الاصطفاف القيمي والقابلية للتعلّم.</p>
+                        <p class="text-sm leading-relaxed text-white/70">نقرأ طلبك بعناية بمساعدة أدوات الذكاء
+                            الاصطناعي، ونقيس الاصطفاف القيمي والقابلية للتعلّم.</p>
                     </div>
                     <div class="rounded-xl border border-white/10 bg-white/5 p-6">
                         <div class="mb-4 font-display text-4xl font-bold text-alisary-gold">٣</div>
@@ -339,7 +345,8 @@
                 </div>
 
                 <div class="grid gap-5 md:grid-cols-3">
-                    <article class="relative overflow-hidden rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-xl shadow-alisary-green/5">
+                    <article
+                        class="relative overflow-hidden rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-xl shadow-alisary-green/5">
                         <div class="absolute inset-y-0 right-0 w-1 bg-alisary-gold"></div>
                         <div class="font-display text-3xl text-alisary-gold">◷</div>
                         <h3 class="mt-4 font-display text-2xl text-alisary-deep">قيمةٌ تُقاس</h3>
@@ -347,7 +354,8 @@
                             نُحاسبك على ما تُنجزه من أثرٍ ونتائج، لا على ساعات حضورك. من يُعطي أكثر بموارد أقل، يتقدّم.
                         </p>
                     </article>
-                    <article class="relative overflow-hidden rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-xl shadow-alisary-green/5">
+                    <article
+                        class="relative overflow-hidden rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-xl shadow-alisary-green/5">
                         <div class="absolute inset-y-0 right-0 w-1 bg-alisary-gold"></div>
                         <div class="font-display text-3xl text-alisary-gold">⚙</div>
                         <h3 class="mt-4 font-display text-2xl text-alisary-deep">أدواتُ العصر</h3>
@@ -355,12 +363,15 @@
                             ما تُنجزه التقنية لا يُسند لبشر. نُقدّر من يُتقن الأتمتة والذكاء الاصطناعي ويتعلّم بسرعة.
                         </p>
                     </article>
-                    <article class="relative overflow-hidden rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-xl shadow-alisary-green/5">
+                    <article
+                        class="relative overflow-hidden rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-xl shadow-alisary-green/5">
                         <div class="absolute inset-y-0 right-0 w-1 bg-alisary-gold"></div>
                         <div class="font-display text-3xl text-alisary-gold">✦</div>
                         <h3 class="mt-4 font-display text-2xl text-alisary-deep">أثرٌ ونماء</h3>
                         <p class="mt-3 leading-loose text-alisary-soft">
-                            رسالتُنا «نُعِدّهم لحياةٍ طيّبة»، ونؤمن أنّ صاحب الإتقان يستحقّ النماء: أجرٌ يُناقَش بوضوح، وتأهيلٌ مدفوع، وخطةُ تطويرٍ تُنمّيك لا تُقصيك. والاصطفاف مع خماسية السكينة بوّابة عبور؛ لأنه أساسُ بيئةٍ يطيب فيها عملُك.
+                            رسالتُنا «نُعِدّهم لحياةٍ طيّبة»، ونؤمن أنّ صاحب الإتقان يستحقّ النماء: أجرٌ يُناقَش بوضوح،
+                            وتأهيلٌ مدفوع، وخطةُ تطويرٍ تُنمّيك لا تُقصيك. والاصطفاف مع خماسية السكينة بوّابة عبور؛ لأنه
+                            أساسُ بيئةٍ يطيب فيها عملُك.
                         </p>
                     </article>
                 </div>
@@ -380,34 +391,41 @@
                 </div>
 
                 <div class="mx-auto grid max-w-6xl gap-5 lg:grid-cols-3">
-                    <details class="rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-xl shadow-alisary-green/5">
+                    <details
+                        class="rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-xl shadow-alisary-green/5">
                         <summary class="cursor-pointer font-display text-xl text-alisary-deep">
                             كيف تكتب طلبًا قويًّا في ربع ساعة؟
                         </summary>
                         <ul class="mt-5 space-y-3 text-sm leading-loose text-alisary-soft">
-                            <li>ابدأ بالوظيفة لا بالاستمارة: افتح بطاقة الوظيفة واقرأ «مؤشّر النجاح»؛ فهو ما سنقيسك عليه.</li>
-                            <li>في أسئلة الإنجاز، اذكر أرقامًا: «كانت المهمة تستغرق ساعتين فصارت عشرين دقيقةً بأداة كذا».</li>
+                            <li>ابدأ بالوظيفة لا بالاستمارة: افتح بطاقة الوظيفة واقرأ «مؤشّر النجاح»؛ فهو ما سنقيسك
+                                عليه.</li>
+                            <li>في أسئلة الإنجاز، اذكر أرقامًا: «كانت المهمة تستغرق ساعتين فصارت عشرين دقيقةً بأداة
+                                كذا».</li>
                             <li>رتّب أولوياتك الثلاث بصدق؛ الأولويةُ الأولى تُقرأ أوّلًا وبعنايةٍ أكبر.</li>
                             <li>اكتب راتبك المتوقّع بوضوح؛ فالوضوح عندنا يزيد فرصتك ولا يُنقصها.</li>
                         </ul>
                     </details>
-                    <details class="rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-xl shadow-alisary-green/5">
+                    <details
+                        class="rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-xl shadow-alisary-green/5">
                         <summary class="cursor-pointer font-display text-xl text-alisary-deep">
                             كيف نقرأ طلبك؟
                         </summary>
                         <ul class="mt-5 space-y-3 text-sm leading-loose text-alisary-soft">
-                            <li>تُساعدنا أدواتُ الذكاء الاصطناعي على الفرز الأوّلي بثلاثة محاور: القابلية للتعلّم، وروح المبادرة، والاصطفاف القيمي.</li>
+                            <li>تُساعدنا أدواتُ الذكاء الاصطناعي على الفرز الأوّلي بثلاثة محاور: القابلية للتعلّم، وروح
+                                المبادرة، والاصطفاف القيمي.</li>
                             <li>لا يصدر أيُّ اعتذارٍ إلا بمراجعةٍ بشريةٍ وسببٍ مكتوب — هذا التزامٌ معلن.</li>
                             <li>إجاباتك على «المواقف» لا تُقيَّم بصوابٍ وخطأ؛ نقرأ فيها طريقة تفكيرك.</li>
                         </ul>
                     </details>
-                    <details class="rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-xl shadow-alisary-green/5">
+                    <details
+                        class="rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-xl shadow-alisary-green/5">
                         <summary class="cursor-pointer font-display text-xl text-alisary-deep">
                             ماذا بعد الإرسال؟ وما الذي نقدّمه لنموّك؟
                         </summary>
                         <ul class="mt-5 space-y-3 text-sm leading-loose text-alisary-soft">
                             <li>يصلك رقمُ طلبٍ مرجعيّ فور الإرسال، ونتواصل مع كل متقدّمٍ بنتيجة طلبه.</li>
-                            <li>من ينضمّ إلينا يجد: تأهيلًا مدفوعًا قبل بدء العمل، وخطةَ تطويرٍ تعالج أيَّ فجوة، وأولويةً في الترقّي الداخلي بين مؤسسات المجموعة.</li>
+                            <li>من ينضمّ إلينا يجد: تأهيلًا مدفوعًا قبل بدء العمل، وخطةَ تطويرٍ تعالج أيَّ فجوة،
+                                وأولويةً في الترقّي الداخلي بين مؤسسات المجموعة.</li>
                             <li>وإن لم يُوفَّق طلبُك هذه المرّة، فبإذنك يبقى ملفُّك لنرشّحك لأدوارٍ قادمةٍ تناسبك.</li>
                         </ul>
                     </details>
@@ -420,25 +438,21 @@
         <section class="section bg-[#EFE8DA]" id="rights">
             <div class="mx-auto max-w-7xl px-5 lg:px-10">
                 <div class="mx-auto mb-10 max-w-3xl text-center">
-                    <span class="font-display text-sm font-bold tracking-[0.22em] text-alisary-gold">حماية بياناتك الشخصية</span>
+                    <span class="font-display text-sm font-bold tracking-[0.22em] text-alisary-gold">حماية بياناتك
+                        الشخصية</span>
                     <h2 class="mt-3 font-display text-3xl leading-tight text-alisary-deep md:text-4xl">
                         حقوقك وكيف تمارسها
                     </h2>
                     <p class="mt-4 leading-loose text-alisary-soft">
-                        بصفتك صاحبَ البيانات، يكفُل لك المرسومُ السلطاني ٦‏/٢٠٢٢ ولائحتُه التنفيذية ستّةَ حقوقٍ على بياناتك التي تُعالَج في هذه الصفحة. وفيما يلي بيانُها وقناةُ ممارستها.
+                        بصفتك صاحبَ البيانات، يكفُل لك المرسومُ السلطاني ٦‏/٢٠٢٢ ولائحتُه التنفيذية ستّةَ حقوقٍ على
+                        بياناتك التي تُعالَج في هذه الصفحة. وفيما يلي بيانُها وقناةُ ممارستها.
                     </p>
                 </div>
 
                 <div class="grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
-                    <div class="overflow-hidden rounded-2xl border border-alisary-green/10 bg-white shadow-xl shadow-alisary-green/5">
-                        @foreach ([
-                            ['الوصول والعلم', 'أن تعرف ما إذا كنّا نعالج بياناتك، وأن تطّلع عليها وعلى الغرض من معالجتها.'],
-                            ['التصحيح والتحديث', 'أن تطلب تصحيح بياناتٍ غير دقيقةٍ أو ناقصة، أو تحديثها.'],
-                            ['المحو', 'أن تطلب محو بياناتك عند انتهاء الغرض من جمعها، أو عند سحبك للموافقة.'],
-                            ['الحصول على نسخة', 'أن تحصل على نسخةٍ من بياناتك في صيغةٍ واضحةٍ ومقروءة.'],
-                            ['النقل', 'أن تطلب نقل بياناتك إلى متحكّمٍ آخر متى أمكن ذلك تقنيًّا.'],
-                            ['سحب الموافقة', 'أن تسحب موافقتك على المعالجة في أيّ وقت، دون أثرٍ رجعيٍّ على ما تمّ قبل السحب، ولك أن تطلب وقفَ المعالجة لحين البتّ في طلبك.'],
-                        ] as $index => [$rightTitle, $rightBody])
+                    <div
+                        class="overflow-hidden rounded-2xl border border-alisary-green/10 bg-white shadow-xl shadow-alisary-green/5">
+                        @foreach ([['الوصول والعلم', 'أن تعرف ما إذا كنّا نعالج بياناتك، وأن تطّلع عليها وعلى الغرض من معالجتها.'], ['التصحيح والتحديث', 'أن تطلب تصحيح بياناتٍ غير دقيقةٍ أو ناقصة، أو تحديثها.'], ['المحو', 'أن تطلب محو بياناتك عند انتهاء الغرض من جمعها، أو عند سحبك للموافقة.'], ['الحصول على نسخة', 'أن تحصل على نسخةٍ من بياناتك في صيغةٍ واضحةٍ ومقروءة.'], ['النقل', 'أن تطلب نقل بياناتك إلى متحكّمٍ آخر متى أمكن ذلك تقنيًّا.'], ['سحب الموافقة', 'أن تسحب موافقتك على المعالجة في أيّ وقت، دون أثرٍ رجعيٍّ على ما تمّ قبل السحب، ولك أن تطلب وقفَ المعالجة لحين البتّ في طلبك.']] as $index => [$rightTitle, $rightBody])
                             <article class="flex gap-4 border-b border-alisary-green/10 p-5 last:border-b-0">
                                 <span
                                     class="grid size-10 flex-none place-items-center rounded-xl bg-alisary-green/10 font-display font-bold text-alisary-green">
@@ -452,26 +466,91 @@
                         @endforeach
                     </div>
 
-                    <aside class="rounded-2xl border border-alisary-green/10 border-r-4 border-r-alisary-gold bg-white p-6 shadow-xl shadow-alisary-green/5">
+                    <aside
+                        class="rounded-2xl border border-alisary-green/10 border-r-4 border-r-alisary-gold bg-white p-6 shadow-xl shadow-alisary-green/5">
                         <h3 class="font-display text-2xl text-alisary-deep">كيف تمارس حقّك</h3>
                         <p class="mt-3 leading-loose text-alisary-soft">
-                            أرسل طلبك إلى القناة المخصّصة أدناه، فنتعهّد بما يلي:
+                            أرسل طلبك عبر النموذج المختصر أدناه، فنتعهّد بما يلي:
                         </p>
 
-                        <div class="mt-5 flex items-center gap-3 rounded-xl border border-alisary-green/10 bg-alisary-ivory p-4">
+                        <div
+                            class="mt-5 flex items-center gap-3 rounded-xl border border-alisary-green/10 bg-alisary-ivory p-4">
                             <span class="font-display text-2xl text-alisary-gold">✉</span>
                             <span class="text-alisary-soft">
                                 القناة المخصّصة:
                                 <a href="mailto:privacy@alisary.com?subject=طلب%20ممارسة%20حقوق%20البيانات%20الشخصية"
-                                    class="font-bold text-alisary-green underline underline-offset-4" dir="ltr">privacy@alisary.com</a>
+                                    class="font-bold text-alisary-green underline underline-offset-4"
+                                    dir="ltr">privacy@alisary.com</a>
                             </span>
                         </div>
 
                         <div class="mt-5 space-y-3 leading-loose text-alisary-soft">
-                            <p class="rounded-xl bg-alisary-ivory p-4">نبتّ في طلبك خلال <b class="text-alisary-deep">خمسةٍ وأربعين يومًا</b> من تسلّمه، <b class="text-alisary-deep">بلا مقابل</b>.</p>
-                            <p class="rounded-xl bg-alisary-ivory p-4">لك أن تطلب <b class="text-alisary-deep">وقف المعالجة</b> لحين البتّ في طلبك.</p>
-                            <p class="rounded-xl bg-alisary-ivory p-4">نحفظ سجلَّ طلبك ومعالجتنا له <b class="text-alisary-deep">إثباتًا للامتثال</b>.</p>
+                            <p class="rounded-xl bg-alisary-ivory p-4">نبتّ في طلبك خلال <b
+                                    class="text-alisary-deep">خمسةٍ وأربعين يومًا</b> من تسلّمه، <b
+                                    class="text-alisary-deep">بلا مقابل</b>.</p>
+                            <p class="rounded-xl bg-alisary-ivory p-4">لك أن تطلب <b class="text-alisary-deep">وقف
+                                    المعالجة</b> لحين البتّ في طلبك.</p>
+                            <p class="rounded-xl bg-alisary-ivory p-4">نحفظ سجلَّ طلبك ومعالجتنا له <b
+                                    class="text-alisary-deep">إثباتًا للامتثال</b>.</p>
                         </div>
+
+                        @if (session('data_rights_success'))
+                            <div
+                                class="mt-5 rounded-xl border border-alisary-green/20 bg-alisary-green/5 p-4 text-alisary-deep">
+                                <div class="font-display text-lg">تم تسجيل طلبك.</div>
+                                <p class="mt-1 text-sm leading-loose text-alisary-soft">
+                                    الرقم المرجعي:
+                                    <b class="text-alisary-deep">{{ session('data_rights_reference') }}</b>
+                                </p>
+                            </div>
+                        @endif
+
+                        <form action="{{ route('privacy-rights.store') }}" method="POST"
+                            class="mt-6 border-t border-dashed border-alisary-green/20 pt-5">
+                            @csrf
+
+                            <div class="flex flex-col gap-1.5">
+                                <label for="rights-request-type" class="text-sm font-medium text-alisary-deep">نوع
+                                    الطلب <span class="text-red-600">*</span></label>
+                                <select id="rights-request-type" name="request_type" required
+                                    class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                                    <option value="">— اختر الحقّ —</option>
+                                    @foreach (\App\Models\DataRightsRequest::REQUEST_TYPES as $requestType)
+                                        <option value="{{ $requestType }}" @selected(old('request_type') === $requestType)>
+                                            {{ $requestType }}</option>
+                                    @endforeach
+                                </select>
+                                @error('request_type')
+                                    <div class="text-xs text-red-600">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mt-4 flex flex-col gap-1.5">
+                                <label for="rights-email" class="text-sm font-medium text-alisary-deep">بريدك للتواصل
+                                    <span class="text-red-600">*</span></label>
+                                <input id="rights-email" name="email" type="email" value="{{ old('email') }}"
+                                    required placeholder="name@example.com" dir="ltr"
+                                    class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 text-left font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                                @error('email')
+                                    <div class="text-xs text-red-600">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mt-4 flex flex-col gap-1.5">
+                                <label for="rights-details" class="text-sm font-medium text-alisary-deep">تفاصيل الطلب
+                                    (اختياري)</label>
+                                <textarea id="rights-details" name="details" rows="3" maxlength="2000"
+                                    class="min-h-[92px] w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">{{ old('details') }}</textarea>
+                                @error('details')
+                                    <div class="text-xs text-red-600">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <button type="submit"
+                                class="mt-5 w-full cursor-pointer rounded-xl bg-alisary-green px-5 py-3 font-display text-lg text-white transition hover:bg-alisary-deep">
+                                إرسال طلب ممارسة الحقّ
+                            </button>
+                        </form>
                     </aside>
                 </div>
             </div>

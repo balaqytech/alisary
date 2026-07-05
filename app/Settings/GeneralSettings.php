@@ -30,6 +30,8 @@ class GeneralSettings extends Settings
 
     public array $tender_submission_recipients;
 
+    public array $privacy_rights_recipients;
+
     /**
      * @return array<int, string>
      */
@@ -44,6 +46,14 @@ class GeneralSettings extends Settings
     public function tenderSubmissionRecipientEmails(): array
     {
         return $this->recipientEmails($this->tender_submission_recipients);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function privacyRightsRecipientEmails(): array
+    {
+        return $this->recipientEmails($this->privacy_rights_recipients);
     }
 
     /**
