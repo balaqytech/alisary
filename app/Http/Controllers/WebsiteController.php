@@ -61,7 +61,7 @@ class WebsiteController extends Controller
                 'title' => $job->title,
                 'code' => $job->job_code,
                 'value' => $job->job_code ?? $job->title,
-                'label' => $job->job_code === null ? $job->title : "{$job->title} ({$job->job_code})",
+                'label' => $job->title,
                 'locations' => collect($job->locations ?? [])
                     ->map(fn (string $value): array => [
                         'value' => $value,
