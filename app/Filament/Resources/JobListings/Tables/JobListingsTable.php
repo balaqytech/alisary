@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\JobListings\Tables;
 
 use App\Enums\ListingLocation;
+use App\Models\JobApplication;
+use App\Models\JobListing;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -10,6 +12,8 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class JobListingsTable
 {
@@ -27,10 +31,24 @@ class JobListingsTable
                 TextColumn::make('locations')
                     ->label('الفروع')
                     ->badge()
+                    ->wrap()
                     ->formatStateUsing(fn (string $state): string => ListingLocation::tryFrom($state)?->label() ?? $state),
                 TextColumn::make('published_at')->label('النشر')->dateTime()->sortable(),
                 TextColumn::make('expires_at')->label('ينتهي')->dateTime()->sortable(),
-                TextColumn::make('submissions_count')->label('الطلبات')->counts('submissions')->sortable(),
+                TextColumn::make('applications_count')
+                    ->label('الطلبات')
+                    ->state(fn (JobListing $record): int => $record->applicationsCount())
+                    ->sortable(query: function (Builder $query, string $direction): Builder {
+                        $reference = DB::raw('COALESCE(job_listings.job_code, job_listings.title)');
+
+                        $countSubquery = JobApplication::query()
+                            ->selectRaw('COUNT(*)')
+                            ->whereColumn('job_priority_1', $reference)
+                            ->orWhereColumn('job_priority_2', $reference)
+                            ->orWhereColumn('job_priority_3', $reference);
+
+                        return $query->orderBy($countSubquery, $direction);
+                    }),
             ])
             ->filters([
                 SelectFilter::make('status')

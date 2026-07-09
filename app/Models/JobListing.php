@@ -84,6 +84,17 @@ class JobListing extends Model
             ->implode('، ');
     }
 
+    public function applicationsCount(): int
+    {
+        $reference = $this->job_code ?? $this->title;
+
+        return JobApplication::query()
+            ->where('job_priority_1', $reference)
+            ->orWhere('job_priority_2', $reference)
+            ->orWhere('job_priority_3', $reference)
+            ->count();
+    }
+
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
