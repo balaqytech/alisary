@@ -114,6 +114,8 @@
                     </button>
                     @foreach ($companies ?? [] as $company)
                         <button type="button" data-filter="company-{{ $company->id }}"
+                            data-company-slug="{{ $company->slug }}"
+                            @if ($company->slug === 'g-reader-school') data-school-company-filter="company-{{ $company->id }}" @endif
                             class="filter-btn flex cursor-pointer items-center gap-2 rounded-full border border-alisary-green/20 bg-white px-5 py-2.5 font-bold text-alisary-deep transition hover:border-alisary-gold"
                             onclick="filterJobs('company-{{ $company->id }}')">
                             <span class="size-2.5 rounded-full"
@@ -137,6 +139,26 @@
                                 {{ $jobFamily->name }}
                             </button>
                         @endforeach
+                    </div>
+                @endif
+
+                @if (($schoolBranchOptions ?? collect())->isNotEmpty() && $schoolCompany !== null)
+                    <div id="school-branch-filter" data-school-branch-filter
+                        data-school-company-filter="company-{{ $schoolCompany->id }}"
+                        class="mb-3 hidden justify-center">
+                        <label class="block w-full max-w-xs">
+                            <span class="sr-only">فرع المدرسة</span>
+                            <select id="schoolBranchSelect" onchange="filterJobBranch(this.value)"
+                                class="w-full rounded-xl border border-alisary-green/15 bg-white px-4 py-3 text-sm font-bold text-alisary-deep shadow-sm outline-none transition focus:border-alisary-gold focus:ring-4 focus:ring-alisary-gold/15">
+                                <option value="all" data-branch-filter="all">كل الفروع</option>
+                                @foreach ($schoolBranchOptions as $branch)
+                                    <option value="branch-{{ $branch['value'] }}"
+                                        data-branch-filter="branch-{{ $branch['value'] }}">
+                                        {{ $branch['label'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </label>
                     </div>
                 @endif
 
@@ -169,6 +191,8 @@
                         {{-- New Job Card Format --}}
                         <div class="group flex flex-col justify-between overflow-hidden rounded-2xl border border-alisary-green/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-alisary-green/5"
                             data-company="company-{{ $organization?->id }}"
+                            data-company-slug="{{ $organization?->slug }}"
+                            data-branch="{{ $listing->location?->value ?? '' }}"
                             data-family="family-{{ $listing->job_family_id }}"
                             data-level="{{ $listing->job_level?->value ?? '' }}" data-code="{{ $listing->job_code }}"
                             data-search="{{ e($searchText) }}">
@@ -505,6 +529,8 @@
         <script>
             let activeCompanyFilter = 'all';
             let activeFamilyFilter = 'all';
+            let activeBranchFilter = 'all';
+            const schoolCompanyFilter = @js($schoolCompany ? 'company-'.$schoolCompany->id : null);
 
             function filterJobs(filterId) {
                 activeCompanyFilter = filterId;
@@ -513,6 +539,11 @@
 
             function filterJobFamily(filterId) {
                 activeFamilyFilter = filterId;
+                applyJobFilters();
+            }
+
+            function filterJobBranch(filterId) {
+                activeBranchFilter = filterId;
                 applyJobFilters();
             }
 
@@ -532,9 +563,29 @@
                 const countLine = document.getElementById('jobs-count-line');
                 const searchInput = document.getElementById('jobSearch');
                 const levelFilter = document.getElementById('jobLevelFilter');
+                const branchFilter = document.getElementById('school-branch-filter');
+                const branchSelect = document.getElementById('schoolBranchSelect');
                 const query = normalizeJobText(searchInput?.value);
                 const level = levelFilter?.value || 'all';
+                const isSchoolCompanySelected = schoolCompanyFilter !== null && activeCompanyFilter === schoolCompanyFilter;
                 let visibleCount = 0;
+
+                if (!isSchoolCompanySelected) {
+                    activeBranchFilter = 'all';
+                    if (branchSelect) {
+                        branchSelect.value = 'all';
+                    }
+                }
+
+                if (branchFilter) {
+                    if (isSchoolCompanySelected) {
+                        branchFilter.classList.remove('hidden');
+                        branchFilter.classList.add('flex');
+                    } else {
+                        branchFilter.classList.add('hidden');
+                        branchFilter.classList.remove('flex');
+                    }
+                }
 
                 // Update active state on buttons
                 document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -560,11 +611,13 @@
                         activeCompanyFilter;
                     const matchesFamily = activeFamilyFilter === 'all' || card.getAttribute('data-family') ===
                         activeFamilyFilter;
+                    const matchesBranch = !isSchoolCompanySelected || activeBranchFilter === 'all' ||
+                        card.getAttribute('data-branch') === activeBranchFilter.replace('branch-', '');
                     const matchesLevel = level === 'all' || card.getAttribute('data-level') === level;
                     const matchesSearch = query === '' || normalizeJobText(card.getAttribute('data-search')).includes(
                         query);
 
-                    if (matchesCompany && matchesFamily && matchesLevel && matchesSearch) {
+                    if (matchesCompany && matchesFamily && matchesBranch && matchesLevel && matchesSearch) {
                         card.style.display = 'flex';
                         visibleCount++;
                     } else {

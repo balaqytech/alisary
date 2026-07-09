@@ -2,6 +2,7 @@
 
 use App\Enums\CustomFieldType;
 use App\Enums\JobLevel;
+use App\Enums\ListingLocation;
 use App\Enums\ListingStatus;
 use App\Models\Company;
 use App\Models\JobFamily;
@@ -67,6 +68,66 @@ test('jobs index renders search filters and job reference codes', function () {
         ->assertSee($jobListing->job_code)
         ->assertSee('Teaching')
         ->assertSee('Early Childhood Teacher');
+});
+
+test('jobs index scopes branch filter to the school institution', function () {
+    $school = Company::factory()->create([
+        'name' => 'Al-Qari Al-Abqari School',
+        'slug' => 'g-reader-school',
+        'reference_code' => 'SCH',
+    ]);
+    $otherCompany = Company::factory()->create([
+        'name' => 'Alisary Center',
+        'slug' => 'alisary-center-test',
+        'reference_code' => 'CTR',
+    ]);
+    $jobFamily = JobFamily::factory()->create([
+        'name' => 'Teaching',
+        'code' => 'TEA',
+    ]);
+
+    JobListing::factory()
+        ->for($school)
+        ->for($jobFamily, 'jobFamily')
+        ->create([
+            'title' => 'School Muscat Teacher',
+            'location' => ListingLocation::Muscat,
+        ]);
+
+    JobListing::factory()
+        ->for($school)
+        ->for($jobFamily, 'jobFamily')
+        ->create([
+            'title' => 'School Sohar Teacher',
+            'location' => ListingLocation::Sohar,
+        ]);
+
+    JobListing::factory()
+        ->for($otherCompany)
+        ->for($jobFamily, 'jobFamily')
+        ->create([
+            'title' => 'Center Salalah Trainer',
+            'location' => ListingLocation::Salalah,
+        ]);
+
+    $this->get(route('jobs.index'))
+        ->assertSuccessful()
+        ->assertSee('data-school-company-filter="company-'.$school->id.'"', false)
+        ->assertSee('data-company-slug="g-reader-school"', false)
+        ->assertSee('id="school-branch-filter"', false)
+        ->assertSee('data-school-branch-filter', false)
+        ->assertSee('data-branch-filter="branch-muscat"', false)
+        ->assertSee('data-branch-filter="branch-sohar"', false)
+        ->assertDontSee('data-branch-filter="branch-salalah"', false)
+        ->assertSee('data-branch="muscat"', false)
+        ->assertSee('data-branch="sohar"', false)
+        ->assertSee('data-branch="salalah"', false)
+        ->assertSee("let activeBranchFilter = 'all';", false)
+        ->assertSee('const schoolCompanyFilter =', false)
+        ->assertSee("activeBranchFilter = 'all';", false)
+        ->assertSee('const isSchoolCompanySelected = schoolCompanyFilter !== null && activeCompanyFilter === schoolCompanyFilter;', false)
+        ->assertSee('const matchesBranch = !isSchoolCompanySelected', false)
+        ->assertSee("activeBranchFilter.replace('branch-', '')", false);
 });
 
 test('jobs index renders the group hiring introduction content', function () {

@@ -38,12 +38,23 @@ class WebsiteController extends Controller
     {
         $companies = Company::query()->active()->orderBy('sort_order')->get();
         $jobFamilies = JobFamily::query()->active()->orderBy('sort_order')->orderBy('name')->get();
+        $listings = JobListing::query()->published()->with(['company', 'jobFamily'])->latest('published_at')->get();
+        $schoolCompany = $companies->firstWhere('slug', 'g-reader-school');
+        $schoolBranchOptions = $schoolCompany === null
+            ? collect()
+            : $listings
+                ->where('company_id', $schoolCompany->id)
+                ->pluck('location')
+                ->filter()
+                ->unique(fn ($location): string => $location->value)
+                ->map(fn ($location): array => [
+                    'value' => $location->value,
+                    'label' => $location->label(),
+                ])
+                ->values();
 
-        $jobTitles = JobListing::query()
-            ->published()
-            ->select('title', 'job_code', 'company_id')
-            ->orderBy('title')
-            ->get()
+        $jobTitles = $listings
+            ->sortBy('title')
             ->groupBy('company_id')
             ->map(fn ($jobs) => $jobs->map(fn (JobListing $job): array => [
                 'title' => $job->title,
@@ -57,10 +68,12 @@ class WebsiteController extends Controller
             'type' => 'jobs',
             'label' => 'الوظائف',
             'description' => 'فرص مهنية لخدمة الطفل ومن يخدم الطفل، مع نماذج تقديم مخصصة بحسب احتياج كل وظيفة.',
-            'listings' => JobListing::query()->published()->with(['company', 'jobFamily'])->latest('published_at')->get(),
+            'listings' => $listings,
             'companies' => $companies,
             'jobFamilies' => $jobFamilies,
             'jobTitles' => $jobTitles,
+            'schoolCompany' => $schoolCompany,
+            'schoolBranchOptions' => $schoolBranchOptions,
         ]);
     }
 
