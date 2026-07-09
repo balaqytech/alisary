@@ -8,6 +8,7 @@ use App\Enums\ListingLocation;
 use App\Enums\ListingStatus;
 use App\Filament\Forms\CustomFieldBuilder;
 use App\Support\DefaultJobApplicationForm;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -67,13 +68,16 @@ class JobListingForm
                             ->label('نوع الوظيفة')
                             ->options(collect(JobType::cases())->mapWithKeys(fn (JobType $type): array => [$type->value => $type->label()]))
                             ->required(),
-                        Select::make('location')
-                            ->label('الموقع')
-                            ->options(collect(ListingLocation::cases())->mapWithKeys(fn (ListingLocation $location): array => [$location->value => $location->label()]))
-                            ->required(),
                         DateTimePicker::make('expires_at')
                             ->label('تاريخ انتهاء التقديم')
                             ->seconds(false),
+                        CheckboxList::make('locations')
+                            ->label('الفروع / المواقع')
+                            ->helperText('اختر فرعًا واحدًا أو أكثر تتوفر فيه هذه الوظيفة. سيُطلب من المتقدّم اختيار فرعه عند التقديم إن توفّر أكثر من فرع.')
+                            ->options(collect(ListingLocation::cases())->mapWithKeys(fn (ListingLocation $location): array => [$location->value => $location->label()]))
+                            ->columns(3)
+                            ->required()
+                            ->columnSpanFull(),
                         Textarea::make('excerpt')
                             ->label('الملخص')
                             ->maxLength(500)

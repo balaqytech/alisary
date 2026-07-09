@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\JobApplications\Tables;
 
 use App\Enums\JobApplicationStatus;
+use App\Enums\ListingLocation;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -22,6 +23,7 @@ class JobApplicationsTable
                 TextColumn::make('full_name')->label('الاسم الكامل')->searchable(),
                 TextColumn::make('email')->label('البريد الإلكتروني')->searchable(),
                 TextColumn::make('company.name')->label('المؤسسة')->searchable(),
+                TextColumn::make('branch')->label('الفرع')->badge()->sortable(),
                 TextColumn::make('job_priority_1')->label('الوظيفة (أولوية 1)')->searchable(),
                 TextColumn::make('created_at')->label('تاريخ التقديم')->dateTime()->sortable(),
             ])
@@ -34,6 +36,9 @@ class JobApplicationsTable
                     ->relationship('company', 'name')
                     ->searchable()
                     ->preload(),
+                SelectFilter::make('branch')
+                    ->label('الفرع')
+                    ->options(collect(ListingLocation::cases())->mapWithKeys(fn (ListingLocation $location): array => [$location->value => $location->label()])),
             ])
             ->recordActions([
                 ViewAction::make(),

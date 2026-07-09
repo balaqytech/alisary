@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\JobListings\Tables;
 
+use App\Enums\ListingLocation;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -23,7 +24,10 @@ class JobListingsTable
                 TextColumn::make('jobFamily.name')->label('Family')->searchable(),
                 TextColumn::make('job_level')->label('Level')->badge(),
                 TextColumn::make('type')->label('النوع')->badge(),
-                TextColumn::make('location')->label('الموقع')->badge(),
+                TextColumn::make('locations')
+                    ->label('الفروع')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state): string => ListingLocation::tryFrom($state)?->label() ?? $state),
                 TextColumn::make('published_at')->label('النشر')->dateTime()->sortable(),
                 TextColumn::make('expires_at')->label('ينتهي')->dateTime()->sortable(),
                 TextColumn::make('submissions_count')->label('الطلبات')->counts('submissions')->sortable(),

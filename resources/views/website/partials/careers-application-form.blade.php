@@ -97,6 +97,13 @@
                     </select>
                     @error('job_priority_1')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
                 </div>
+                <div class="flex flex-col gap-1.5" id="branchWrapper" style="display:none;">
+                    <label class="text-sm font-medium text-alisary-deep">اختر الفرع <span class="text-red-600">*</span></label>
+                    <select name="branch" id="branchSelect" class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                        <option value="">-- اختر الفرع --</option>
+                    </select>
+                    @error('branch')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
+                </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-medium text-alisary-deep">أولوية الوظيفة (2)</label>
                     <select name="job_priority_2" id="priority2Select" disabled class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20 disabled:cursor-not-allowed disabled:opacity-60">
@@ -287,26 +294,74 @@
         ];
         
         const jobTitles = @json($jobTitles ?? new stdClass());
-        
+        const branchWrapper = document.getElementById('branchWrapper');
+        const branchSelect = document.getElementById('branchSelect');
+        const priority1Select = prioritySelects[0];
+
         // Restore old values from flashed session
         const oldP1 = @json(old('job_priority_1'));
         const oldP2 = @json(old('job_priority_2'));
         const oldP3 = @json(old('job_priority_3'));
+        const oldBranch = @json(old('branch'));
         const oldValues = [oldP1, oldP2, oldP3];
+
+        function findSelectedJob() {
+            const companyId = companySelect.value;
+            const availableJobs = jobTitles[companyId] || [];
+            const selectedValue = priority1Select.value;
+            return availableJobs.find(job => {
+                const jobOption = typeof job === 'string'
+                    ? { title: job, value: job, label: job }
+                    : job;
+                return (jobOption.value || jobOption.code || jobOption.title) === selectedValue;
+            });
+        }
+
+        function updateBranches() {
+            const job = findSelectedJob();
+            const locations = (job && job.locations) ? job.locations : [];
+
+            branchSelect.innerHTML = '<option value="">-- اختر الفرع --</option>';
+
+            if (locations.length > 1) {
+                branchWrapper.style.display = '';
+                branchSelect.required = true;
+                locations.forEach(loc => {
+                    const option = document.createElement('option');
+                    option.value = loc.value;
+                    option.textContent = loc.label;
+                    if (oldBranch === loc.value) {
+                        option.selected = true;
+                    }
+                    branchSelect.appendChild(option);
+                });
+            } else if (locations.length === 1) {
+                branchWrapper.style.display = 'none';
+                branchSelect.required = false;
+                const option = document.createElement('option');
+                option.value = locations[0].value;
+                option.textContent = locations[0].label;
+                option.selected = true;
+                branchSelect.appendChild(option);
+            } else {
+                branchWrapper.style.display = 'none';
+                branchSelect.required = false;
+            }
+        }
 
         function updateJobs() {
             const companyId = companySelect.value;
             const availableJobs = jobTitles[companyId] || [];
-            
+
             prioritySelects.forEach((select, index) => {
                 select.innerHTML = '<option value="">-- اختر وظيفة --</option>';
-                
+
                 // Only enable the select if there are enough jobs to fill this priority
                 // E.g. if a company has 1 job, only priority 1 is enabled
                 // If a company has 2 jobs, priority 1 and 2 are enabled
                 if (companyId && availableJobs.length > index) {
                     select.disabled = false;
-                    
+
                     availableJobs.forEach(job => {
                         const jobOption = typeof job === 'string'
                             ? { title: job, value: job, label: job }
@@ -328,6 +383,8 @@
                     select.disabled = true;
                 }
             });
+
+            updateBranches();
         }
 
         if (companySelect) {
@@ -337,7 +394,11 @@
                 updateJobs();
             }
         }
-        
+
+        if (priority1Select) {
+            priority1Select.addEventListener('change', updateBranches);
+        }
+
         // Expose function globally so the drawer can call it
         window.triggerJobSelectUpdate = function() {
             if (companySelect) {

@@ -180,7 +180,7 @@
                                 $listing->jobFamily?->name,
                                 $listing->job_level?->label(),
                                 $listing->type?->label(),
-                                $listing->location?->label(),
+                                $listing->locationsLabel(),
                             ])
                                 ->filter()
                                 ->implode(' ')
@@ -192,7 +192,7 @@
                         <div class="group flex flex-col justify-between overflow-hidden rounded-2xl border border-alisary-green/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-alisary-green/5"
                             data-company="company-{{ $organization?->id }}"
                             data-company-slug="{{ $organization?->slug }}"
-                            data-branch="{{ $listing->location?->value ?? '' }}"
+                            data-branch="{{ implode(' ', $listing->locations ?? []) }}"
                             data-family="family-{{ $listing->job_family_id }}"
                             data-level="{{ $listing->job_level?->value ?? '' }}" data-code="{{ $listing->job_code }}"
                             data-search="{{ e($searchText) }}">
@@ -224,7 +224,7 @@
 
                                 <div class="mt-4 flex flex-wrap gap-4 text-xs text-alisary-soft">
                                     <span class="flex items-center gap-1.5"><x-icons.remix.map-pin class="size-3.5" />
-                                        {{ $listing->location?->label() }}</span>
+                                        {{ $listing->locationsLabel() }}</span>
                                     @if ($deadline)
                                         <span class="flex items-center gap-1.5"><x-icons.remix.calendar
                                                 class="size-3.5 text-alisary-gold" /> ينتهي
@@ -239,7 +239,7 @@
                                 data-family="{{ $listing->jobFamily?->name }}"
                                 data-level="{{ $listing->job_level?->label() }}"
                                 data-type="{{ $listing->type?->label() }}"
-                                data-location="{{ $listing->location?->label() }}"
+                                data-location="{{ $listing->locationsLabel() }}"
                                 data-deadline="{{ $deadline ? \App\Support\NumberLocalizer::eastern($deadline->format('Y-m-d')) : '' }}">
                             </div>
 
@@ -612,7 +612,7 @@
                     const matchesFamily = activeFamilyFilter === 'all' || card.getAttribute('data-family') ===
                         activeFamilyFilter;
                     const matchesBranch = !isSchoolCompanySelected || activeBranchFilter === 'all' ||
-                        card.getAttribute('data-branch') === activeBranchFilter.replace('branch-', '');
+                        (card.getAttribute('data-branch') || '').split(' ').includes(activeBranchFilter.replace('branch-', ''));
                     const matchesLevel = level === 'all' || card.getAttribute('data-level') === level;
                     const matchesSearch = query === '' || normalizeJobText(card.getAttribute('data-search')).includes(
                         query);

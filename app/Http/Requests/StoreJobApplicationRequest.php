@@ -34,6 +34,7 @@ class StoreJobApplicationRequest extends FormRequest
 
             // Section 2: Job & Institution
             'company_id' => ['required', 'exists:companies,id'],
+            'branch' => ['nullable', 'string', 'max:100'],
             'job_priority_1' => ['required', 'string', 'max:255'],
             'job_priority_2' => ['nullable', 'string', 'max:255'],
             'job_priority_3' => ['nullable', 'string', 'max:255'],
@@ -83,6 +84,7 @@ class StoreJobApplicationRequest extends FormRequest
             'phone' => 'رقم الهاتف',
             'email' => 'البريد الإلكتروني',
             'company_id' => 'المؤسسة',
+            'branch' => 'الفرع',
             'job_priority_1' => 'أولوية الوظيفة الأولى',
             'contract_types' => 'نمط التعاقد',
             'expected_salary' => 'الراتب الشهري المتوقع',
