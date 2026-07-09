@@ -10,6 +10,6 @@ class JobApplicationController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(JobApplication::all());
+        return response()->json(JobApplication::with('company')->get());
     }
 }
