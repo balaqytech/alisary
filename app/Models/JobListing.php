@@ -42,6 +42,7 @@ class JobListing extends Model
             'type' => JobType::class,
             'job_level' => JobLevel::class,
             'location' => ListingLocation::class,
+            'locations' => 'array',
             'published_at' => 'datetime',
             'expires_at' => 'datetime',
             'job_code_year' => 'integer',
@@ -65,6 +66,33 @@ class JobListing extends Model
                 }
             }
         });
+
+        static::saving(function (JobListing $jobListing): void {
+            if (! empty($jobListing->locations)) {
+                $jobListing->location = ListingLocation::from($jobListing->locations[0]);
+            } elseif ($jobListing->location !== null) {
+                $value = $jobListing->location instanceof ListingLocation ? $jobListing->location->value : $jobListing->location;
+                $jobListing->locations = [$value];
+            }
+        });
+    }
+
+    public function locationsLabel(): string
+    {
+        return collect($this->locations ?? [])
+            ->map(fn (string $value): string => ListingLocation::tryFrom($value)?->label() ?? $value)
+            ->implode('، ');
+    }
+
+    public function applicationsCount(): int
+    {
+        $reference = $this->job_code ?? $this->title;
+
+        return JobApplication::query()
+            ->where('job_priority_1', $reference)
+            ->orWhere('job_priority_2', $reference)
+            ->orWhere('job_priority_3', $reference)
+            ->count();
     }
 
     public function company(): BelongsTo

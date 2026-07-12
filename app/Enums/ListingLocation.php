@@ -16,6 +16,19 @@ enum ListingLocation: string
     case Khasab = 'khasab';
     case Duqm = 'duqm';
     case Ibra = 'ibra';
+    case Khairat = 'khairat';
+    case Mawaleh = 'mawaleh';
+    case Amarat = 'amarat';
+    case MabailaSouth = 'mabaila_south';
+    case Barka = 'barka';
+    case Yanqul = 'yanqul';
+    case Bahla = 'bahla';
+    case Suwaiq = 'suwaiq';
+    case Bidbid = 'bidbid';
+    case Bawshar = 'bawshar';
+    case Udhaibah = 'udhaibah';
+    case MabailaEighth = 'mabaila_eighth';
+    case Khoudh = 'khoudh';
 
     public function label(): string
     {
@@ -32,6 +45,19 @@ enum ListingLocation: string
             self::Khasab => 'خصب',
             self::Duqm => 'الدقم',
             self::Ibra => 'إبراء',
+            self::Khairat => 'الخيرات',
+            self::Mawaleh => 'الموالح',
+            self::Amarat => 'العامرات',
+            self::MabailaSouth => 'المعبيلة الجنوبية',
+            self::Barka => 'بركاء',
+            self::Yanqul => 'ينقل',
+            self::Bahla => 'بهلا',
+            self::Suwaiq => 'السويق',
+            self::Bidbid => 'بدبد',
+            self::Bawshar => 'بوشر',
+            self::Udhaibah => 'العذيبة',
+            self::MabailaEighth => 'المعبيلة الثامنة',
+            self::Khoudh => 'الخوض',
         };
     }
 }

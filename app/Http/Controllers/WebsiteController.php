@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ListingLocation;
 use App\Models\Company;
 use App\Models\JobFamily;
 use App\Models\JobListing;
@@ -44,12 +45,12 @@ class WebsiteController extends Controller
             ? collect()
             : $listings
                 ->where('company_id', $schoolCompany->id)
-                ->pluck('location')
+                ->flatMap(fn (JobListing $listing): array => $listing->locations ?? [])
                 ->filter()
-                ->unique(fn ($location): string => $location->value)
-                ->map(fn ($location): array => [
-                    'value' => $location->value,
-                    'label' => $location->label(),
+                ->unique()
+                ->map(fn (string $value): array => [
+                    'value' => $value,
+                    'label' => ListingLocation::tryFrom($value)?->label() ?? $value,
                 ])
                 ->values();
 
@@ -60,7 +61,14 @@ class WebsiteController extends Controller
                 'title' => $job->title,
                 'code' => $job->job_code,
                 'value' => $job->job_code ?? $job->title,
-                'label' => $job->job_code === null ? $job->title : "{$job->title} ({$job->job_code})",
+                'label' => $job->title,
+                'locations' => collect($job->locations ?? [])
+                    ->map(fn (string $value): array => [
+                        'value' => $value,
+                        'label' => ListingLocation::tryFrom($value)?->label() ?? $value,
+                    ])
+                    ->values()
+                    ->all(),
             ])->values());
 
         return view('website.listings.index', [

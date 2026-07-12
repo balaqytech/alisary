@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\JobApplicationStatus;
+use App\Enums\ListingLocation;
 use Database\Factories\JobApplicationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +30,7 @@ class JobApplication extends Model
     {
         return [
             'status' => JobApplicationStatus::class,
+            'branch' => ListingLocation::class,
             'contract_types' => 'array',
             'ready_date' => 'date',
             'previously_worked' => 'boolean',
