@@ -70,6 +70,24 @@ test('jobs index renders search filters and job reference codes', function () {
         ->assertSee('Early Childhood Teacher');
 });
 
+test('jobs index renders social share actions with a drawer link', function () {
+    $company = Company::factory()->create();
+    $jobListing = JobListing::factory()->for($company)->create();
+
+    $this->get(route('jobs.index'))
+        ->assertSuccessful()
+        ->assertSee('data-job-share="job-'.$jobListing->id.'"', false)
+        ->assertSee('data-job-share-menu="job-'.$jobListing->id.'"', false)
+        ->assertSee('onclick="toggleJobShareMenu('.$jobListing->id.')"', false)
+        ->assertSee('data-share-platform="whatsapp"', false)
+        ->assertSee('data-share-platform="facebook"', false)
+        ->assertSee('data-share-platform="x"', false)
+        ->assertSee('data-share-platform="linkedin"', false)
+        ->assertSee('sharedUrl.hash = `job-${jobId}`;', false)
+        ->assertSee('function openSharedJobDrawer()', false)
+        ->assertSee("window.addEventListener('hashchange', openSharedJobDrawer);", false);
+});
+
 test('jobs index scopes branch filter to the school institution', function () {
     $school = Company::factory()->create([
         'name' => 'Al-Qari Al-Abqari School',

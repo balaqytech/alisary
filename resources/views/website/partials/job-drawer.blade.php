@@ -109,6 +109,86 @@
         closeJobDrawer();
         scrollToForm();
     }
+
+    function toggleJobShareMenu(jobId) {
+        const shareMenu = document.getElementById(`job-share-menu-${jobId}`);
+        const shareButton = document.querySelector(`[data-job-share="job-${jobId}"]`);
+
+        if (!shareMenu || !shareButton) {
+            return;
+        }
+
+        const shouldOpen = shareMenu.classList.contains('hidden');
+
+        document.querySelectorAll('[data-job-share-menu]').forEach((menu) => {
+            menu.classList.add('hidden');
+            menu.classList.remove('flex');
+        });
+
+        document.querySelectorAll('[data-job-share]').forEach((button) => {
+            button.setAttribute('aria-expanded', 'false');
+        });
+
+        if (shouldOpen) {
+            shareMenu.classList.remove('hidden');
+            shareMenu.classList.add('flex');
+            shareButton.setAttribute('aria-expanded', 'true');
+        }
+    }
+
+    function closeJobShareMenus() {
+        document.querySelectorAll('[data-job-share-menu]').forEach((menu) => {
+            menu.classList.add('hidden');
+            menu.classList.remove('flex');
+        });
+
+        document.querySelectorAll('[data-job-share]').forEach((button) => {
+            button.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    function jobShareUrl(jobId) {
+        const sharedUrl = new URL(window.location.href);
+        sharedUrl.hash = `job-${jobId}`;
+
+        return sharedUrl.toString();
+    }
+
+    function shareJobTo(platform, jobId) {
+        const jobTitle = document.getElementById(`job-title-${jobId}`)?.innerText ?? '';
+        const sharedUrl = jobShareUrl(jobId);
+        const encodedUrl = encodeURIComponent(sharedUrl);
+        const encodedTitle = encodeURIComponent(jobTitle);
+        const shareUrls = {
+            whatsapp: `https://wa.me/?text=${encodeURIComponent(`${jobTitle}\n${sharedUrl}`)}`,
+            facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+            x: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,
+            linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+        };
+        const shareUrl = shareUrls[platform];
+
+        if (!shareUrl) {
+            return;
+        }
+
+        window.open(shareUrl, '_blank', 'noopener,noreferrer');
+        closeJobShareMenus();
+    }
+
+    function openSharedJobDrawer() {
+        const sharedJobMatch = window.location.hash.match(/^#job-(\d+)$/);
+
+        if (!sharedJobMatch) {
+            return;
+        }
+
+        const jobCard = document.querySelector(`[data-job-id="${sharedJobMatch[1]}"]`);
+        const companyId = jobCard?.getAttribute('data-company-id');
+
+        if (companyId) {
+            openJobDrawer(sharedJobMatch[1], companyId);
+        }
+    }
     
     function quickApply(jobTitle, companyId, jobCode = null) {
         window.currentApplyingJob = jobTitle;
@@ -157,4 +237,7 @@
             window.currentApplyingJobValue = null;
         }
     }
+
+    document.addEventListener('DOMContentLoaded', openSharedJobDrawer);
+    window.addEventListener('hashchange', openSharedJobDrawer);
 </script>

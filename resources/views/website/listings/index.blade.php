@@ -190,6 +190,7 @@
                     @if ($isJob)
                         {{-- New Job Card Format --}}
                         <div class="group flex flex-col justify-between overflow-hidden rounded-2xl border border-alisary-green/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-alisary-green/5"
+                            data-job-id="{{ $listing->id }}" data-company-id="{{ $organization?->id }}"
                             data-company="company-{{ $organization?->id }}"
                             data-company-slug="{{ $organization?->slug }}"
                             data-branch="{{ $listing->location?->value ?? '' }}"
@@ -243,12 +244,44 @@
                                 data-deadline="{{ $deadline ? \App\Support\NumberLocalizer::eastern($deadline->format('Y-m-d')) : '' }}">
                             </div>
 
+                            <div id="job-share-menu-{{ $listing->id }}" data-job-share-menu="job-{{ $listing->id }}"
+                                class="hidden flex-wrap gap-2 border-t border-alisary-green/10 px-4 py-3">
+                                <button type="button" data-share-platform="whatsapp"
+                                    onclick="shareJobTo('whatsapp', {{ $listing->id }})"
+                                    class="min-w-24 flex-1 rounded-lg border border-alisary-green/15 bg-alisary-ivory px-3 py-2 text-xs font-bold text-alisary-deep transition hover:border-alisary-gold hover:bg-white">
+                                    واتساب
+                                </button>
+                                <button type="button" data-share-platform="facebook"
+                                    onclick="shareJobTo('facebook', {{ $listing->id }})"
+                                    class="min-w-24 flex-1 rounded-lg border border-alisary-green/15 bg-alisary-ivory px-3 py-2 text-xs font-bold text-alisary-deep transition hover:border-alisary-gold hover:bg-white">
+                                    فيسبوك
+                                </button>
+                                <button type="button" data-share-platform="x"
+                                    onclick="shareJobTo('x', {{ $listing->id }})"
+                                    class="min-w-24 flex-1 rounded-lg border border-alisary-green/15 bg-alisary-ivory px-3 py-2 text-xs font-bold text-alisary-deep transition hover:border-alisary-gold hover:bg-white">
+                                    X
+                                </button>
+                                <button type="button" data-share-platform="linkedin"
+                                    onclick="shareJobTo('linkedin', {{ $listing->id }})"
+                                    class="min-w-24 flex-1 rounded-lg border border-alisary-green/15 bg-alisary-ivory px-3 py-2 text-xs font-bold text-alisary-deep transition hover:border-alisary-gold hover:bg-white">
+                                    لينكدإن
+                                </button>
+                            </div>
+
                             <div class="flex items-center border-t border-alisary-green/10">
                                 <button type="button"
                                     onclick="openJobDrawer({{ $listing->id }}, {{ $organization?->id }})"
                                     class="flex flex-1 cursor-pointer items-center justify-center gap-2 px-6 py-4 font-bold text-alisary-deep transition hover:bg-alisary-ivory">
                                     <x-icons.remix.file-list class="size-4" />
                                     التفاصيل
+                                </button>
+                                <div class="h-8 w-px bg-alisary-green/10"></div>
+                                <button type="button" data-job-share="job-{{ $listing->id }}"
+                                    aria-controls="job-share-menu-{{ $listing->id }}" aria-expanded="false"
+                                    onclick="toggleJobShareMenu({{ $listing->id }})"
+                                    class="flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-4 font-bold text-alisary-deep transition hover:bg-alisary-ivory">
+                                    <x-icons.remix.share class="size-4" />
+                                    مشاركة
                                 </button>
                                 <div class="h-8 w-px bg-alisary-green/10"></div>
                                 <button type="button"
