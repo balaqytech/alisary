@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\JobApplicationStatus;
 use App\Enums\ListingLocation;
 use Database\Factories\JobApplicationFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -62,5 +63,17 @@ class JobApplication extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function scopeForJobListing(Builder $query, JobListing $jobListing): Builder
+    {
+        $jobReference = $jobListing->job_code ?? $jobListing->title;
+
+        return $query->where(function (Builder $query) use ($jobReference): void {
+            $query
+                ->where('job_priority_1', $jobReference)
+                ->orWhere('job_priority_2', $jobReference)
+                ->orWhere('job_priority_3', $jobReference);
+        });
     }
 }

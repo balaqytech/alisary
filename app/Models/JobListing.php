@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class JobListing extends Model
@@ -86,12 +87,8 @@ class JobListing extends Model
 
     public function applicationsCount(): int
     {
-        $reference = $this->job_code ?? $this->title;
-
         return JobApplication::query()
-            ->where('job_priority_1', $reference)
-            ->orWhere('job_priority_2', $reference)
-            ->orWhere('job_priority_3', $reference)
+            ->forJobListing($this)
             ->count();
     }
 
@@ -103,6 +100,11 @@ class JobListing extends Model
     public function jobFamily(): BelongsTo
     {
         return $this->belongsTo(JobFamily::class);
+    }
+
+    public function primaryJobApplications(): HasMany
+    {
+        return $this->hasMany(JobApplication::class, 'job_priority_1', 'job_code');
     }
 
     public function submissions(): MorphMany

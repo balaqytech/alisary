@@ -6,7 +6,7 @@ use App\Filament\Resources\JobListings\Pages\CreateJobListing;
 use App\Filament\Resources\JobListings\Pages\EditJobListing;
 use App\Filament\Resources\JobListings\Pages\ListJobListings;
 use App\Filament\Resources\JobListings\Pages\ViewJobListing;
-use App\Filament\Resources\JobListings\RelationManagers\SubmissionsRelationManager;
+use App\Filament\Resources\JobListings\RelationManagers\JobApplicationsRelationManager;
 use App\Filament\Resources\JobListings\Schemas\JobListingForm;
 use App\Filament\Resources\JobListings\Tables\JobListingsTable;
 use App\Models\JobListing;
@@ -46,7 +46,7 @@ class JobListingResource extends Resource
     public static function getRelations(): array
     {
         return [
-            SubmissionsRelationManager::class,
+            JobApplicationsRelationManager::class,
         ];
     }
 
