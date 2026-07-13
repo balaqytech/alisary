@@ -71,7 +71,13 @@ test('submission and job application tables expose excel export actions', functi
 
 test('job application excel export contains every application table column', function () {
     $fullAnswer = str_repeat('إجابة تفصيلية ', 10);
+    $firstJobListing = JobListing::factory()->create(['title' => 'الوظيفة الأولى']);
+    $secondJobListing = JobListing::factory()->create(['title' => 'الوظيفة الثانية']);
+    $thirdJobListing = JobListing::factory()->create(['title' => 'الوظيفة الثالثة']);
     $jobApplication = JobApplication::factory()->create([
+        'job_priority_1' => $firstJobListing->job_code,
+        'job_priority_2' => $secondJobListing->job_code,
+        'job_priority_3' => $thirdJobListing->job_code,
         'q_automate' => $fullAnswer,
         'consent_pool' => true,
     ]);
@@ -84,11 +90,19 @@ test('job application excel export contains every application table column', fun
         $component->assertTableColumnExists($column);
     }
 
+    $component
+        ->assertTableColumnFormattedStateSet('job_priority_1', $firstJobListing->title, $jobApplication)
+        ->assertTableColumnFormattedStateSet('job_priority_2', $secondJobListing->title, $jobApplication)
+        ->assertTableColumnFormattedStateSet('job_priority_3', $thirdJobListing->title, $jobApplication);
+
     $exportAction = $component->instance()->getTable()->getAction('export');
     $export = invade($exportAction)->exports->first()->hydrate($component->instance());
-    $mappedApplication = $export->map($jobApplication->fresh());
+    $mappedApplication = $export->map($export->getQuery()->findOrFail($jobApplication->id));
 
     expect(array_keys($export->getColumns()))->toBe($columns)
+        ->and($mappedApplication['job_priority_1'])->toBe($firstJobListing->title)
+        ->and($mappedApplication['job_priority_2'])->toBe($secondJobListing->title)
+        ->and($mappedApplication['job_priority_3'])->toBe($thirdJobListing->title)
         ->and($mappedApplication['q_automate'])->toBe($fullAnswer)
         ->and($mappedApplication['consent_pool'])->toBe('نعم');
 });
@@ -108,6 +122,9 @@ test('job listing relation manager scopes job applications across all priorities
         'job_priority_1' => 'another-job',
         'job_priority_3' => $jobReference,
     ]);
+    $legacyApplication = JobApplication::factory()->create([
+        'job_priority_1' => $jobListing->title,
+    ]);
     $unrelatedApplication = JobApplication::factory()->create([
         'job_priority_1' => 'unrelated-job',
     ]);
@@ -122,8 +139,13 @@ test('job listing relation manager scopes job applications across all priorities
             $primaryApplication,
             $secondaryApplication,
             $tertiaryApplication,
+            $legacyApplication,
         ])
         ->assertCanNotSeeTableRecords([$unrelatedApplication])
+        ->assertTableColumnFormattedStateSet('job_priority_1', $jobListing->title, $primaryApplication)
+        ->assertTableColumnFormattedStateSet('job_priority_2', $jobListing->title, $secondaryApplication)
+        ->assertTableColumnFormattedStateSet('job_priority_3', $jobListing->title, $tertiaryApplication)
+        ->assertTableColumnFormattedStateSet('job_priority_1', $jobListing->title, $legacyApplication)
         ->assertTableActionExists('export')
         ->assertTableBulkActionExists('export');
 
@@ -131,7 +153,8 @@ test('job listing relation manager scopes job applications across all priorities
 
     $exportAction = $component->instance()->getTable()->getAction('export');
     $export = invade($exportAction)->exports->first()->hydrate($component->instance());
-    $exportedIds = $export->getQuery()->pluck('id')->sort()->values()->all();
+    $exportedApplications = $export->getQuery()->get()->keyBy('id');
+    $exportedIds = $exportedApplications->keys()->sort()->values()->all();
 
     expect(JobListingResource::getRelations())->toBe([JobApplicationsRelationManager::class])
         ->and($relationColumns)->toBe(jobApplicationTableColumns())
@@ -139,5 +162,10 @@ test('job listing relation manager scopes job applications across all priorities
             $primaryApplication->id,
             $secondaryApplication->id,
             $tertiaryApplication->id,
-        ])->sort()->values()->all());
+            $legacyApplication->id,
+        ])->sort()->values()->all())
+        ->and($export->map($exportedApplications->get($primaryApplication->id))['job_priority_1'])->toBe($jobListing->title)
+        ->and($export->map($exportedApplications->get($secondaryApplication->id))['job_priority_2'])->toBe($jobListing->title)
+        ->and($export->map($exportedApplications->get($tertiaryApplication->id))['job_priority_3'])->toBe($jobListing->title)
+        ->and($export->map($exportedApplications->get($legacyApplication->id))['job_priority_1'])->toBe($jobListing->title);
 });

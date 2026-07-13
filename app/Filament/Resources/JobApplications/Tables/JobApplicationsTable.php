@@ -4,6 +4,7 @@ namespace App\Filament\Resources\JobApplications\Tables;
 
 use App\Enums\JobApplicationStatus;
 use App\Enums\ListingLocation;
+use App\Models\JobApplication;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -11,6 +12,7 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use pxlrbt\FilamentExcel\Actions\ExportAction;
 use pxlrbt\FilamentExcel\Actions\ExportBulkAction;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
@@ -31,9 +33,18 @@ class JobApplicationsTable
                 TextColumn::make('city')->label('المدينة')->searchable(),
                 TextColumn::make('company.name')->label('المؤسسة')->searchable(),
                 TextColumn::make('branch')->label('الفرع')->badge()->sortable(),
-                TextColumn::make('job_priority_1')->label('الوظيفة (أولوية 1)')->searchable(),
-                TextColumn::make('job_priority_2')->label('الوظيفة (أولوية 2)')->searchable(),
-                TextColumn::make('job_priority_3')->label('الوظيفة (أولوية 3)')->searchable(),
+                TextColumn::make('job_priority_1')
+                    ->label('الوظيفة (أولوية 1)')
+                    ->formatStateUsing(fn (?string $state, JobApplication $record): ?string => $record->firstPriorityJobListing?->title ?? $state)
+                    ->searchable(),
+                TextColumn::make('job_priority_2')
+                    ->label('الوظيفة (أولوية 2)')
+                    ->formatStateUsing(fn (?string $state, JobApplication $record): ?string => $record->secondPriorityJobListing?->title ?? $state)
+                    ->searchable(),
+                TextColumn::make('job_priority_3')
+                    ->label('الوظيفة (أولوية 3)')
+                    ->formatStateUsing(fn (?string $state, JobApplication $record): ?string => $record->thirdPriorityJobListing?->title ?? $state)
+                    ->searchable(),
                 TextColumn::make('contract_types')->label('أنماط التعاقد')->badge(),
                 TextColumn::make('ready_date')->label('تاريخ الجاهزية')->date('Y-m-d')->sortable(),
                 TextColumn::make('expected_salary')->label('الراتب المتوقع'),
@@ -105,6 +116,11 @@ class JobApplicationsTable
                     DeleteBulkAction::make(),
                 ]),
             ])
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with([
+                'firstPriorityJobListing:id,job_code,title',
+                'secondPriorityJobListing:id,job_code,title',
+                'thirdPriorityJobListing:id,job_code,title',
+            ]))
             ->defaultSort('created_at', 'desc');
     }
 }

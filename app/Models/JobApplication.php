@@ -65,15 +65,34 @@ class JobApplication extends Model
         return $this->belongsTo(Company::class);
     }
 
+    public function firstPriorityJobListing(): BelongsTo
+    {
+        return $this->belongsTo(JobListing::class, 'job_priority_1', 'job_code');
+    }
+
+    public function secondPriorityJobListing(): BelongsTo
+    {
+        return $this->belongsTo(JobListing::class, 'job_priority_2', 'job_code');
+    }
+
+    public function thirdPriorityJobListing(): BelongsTo
+    {
+        return $this->belongsTo(JobListing::class, 'job_priority_3', 'job_code');
+    }
+
     public function scopeForJobListing(Builder $query, JobListing $jobListing): Builder
     {
-        $jobReference = $jobListing->job_code ?? $jobListing->title;
+        $jobReferences = collect([$jobListing->job_code, $jobListing->title])
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
 
-        return $query->where(function (Builder $query) use ($jobReference): void {
+        return $query->where(function (Builder $query) use ($jobReferences): void {
             $query
-                ->where('job_priority_1', $jobReference)
-                ->orWhere('job_priority_2', $jobReference)
-                ->orWhere('job_priority_3', $jobReference);
+                ->whereIn('job_priority_1', $jobReferences)
+                ->orWhereIn('job_priority_2', $jobReferences)
+                ->orWhereIn('job_priority_3', $jobReferences);
         });
     }
 }
