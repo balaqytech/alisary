@@ -8,6 +8,9 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use pxlrbt\FilamentExcel\Actions\ExportAction;
+use pxlrbt\FilamentExcel\Actions\ExportBulkAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 class SubmissionsTable
 {
@@ -37,7 +40,21 @@ class SubmissionsTable
                 EditAction::make(),
             ])
             ->toolbarActions([
+                ExportAction::make()
+                    ->exports([
+                        ExcelExport::make('submissions')
+                            ->fromTable()
+                            ->withFilename(fn (): string => 'submissions-'.now()->format('Y-m-d'))
+                            ->rtl(),
+                    ]),
                 BulkActionGroup::make([
+                    ExportBulkAction::make()
+                        ->exports([
+                            ExcelExport::make('submissions')
+                                ->fromTable()
+                                ->withFilename(fn (): string => 'submissions-'.now()->format('Y-m-d'))
+                                ->rtl(),
+                        ]),
                     DeleteBulkAction::make(),
                 ]),
             ]);

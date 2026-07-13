@@ -13,6 +13,9 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use pxlrbt\FilamentExcel\Actions\ExportAction;
+use pxlrbt\FilamentExcel\Actions\ExportBulkAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 class SubmissionsRelationManager extends RelationManager
 {
@@ -64,6 +67,22 @@ class SubmissionsRelationManager extends RelationManager
             ])
             ->recordActions([
                 EditAction::make(),
+            ])
+            ->toolbarActions([
+                ExportAction::make()
+                    ->exports([
+                        ExcelExport::make('submissions')
+                            ->fromTable()
+                            ->withFilename(fn (): string => 'job-submissions-'.now()->format('Y-m-d'))
+                            ->rtl(),
+                    ]),
+                ExportBulkAction::make()
+                    ->exports([
+                        ExcelExport::make('submissions')
+                            ->fromTable()
+                            ->withFilename(fn (): string => 'job-submissions-'.now()->format('Y-m-d'))
+                            ->rtl(),
+                    ]),
             ]);
     }
 }
