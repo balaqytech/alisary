@@ -35,15 +35,15 @@ class JobApplicationsTable
                 TextColumn::make('branch')->label('الفرع')->badge()->sortable(),
                 TextColumn::make('job_priority_1')
                     ->label('الوظيفة (أولوية 1)')
-                    ->formatStateUsing(fn (?string $state, JobApplication $record): ?string => $record->firstPriorityJobListing?->title ?? $state)
+                    ->formatStateUsing(fn (JobApplication $record): ?string => $record->firstPriorityJobTitle())
                     ->searchable(),
                 TextColumn::make('job_priority_2')
                     ->label('الوظيفة (أولوية 2)')
-                    ->formatStateUsing(fn (?string $state, JobApplication $record): ?string => $record->secondPriorityJobListing?->title ?? $state)
+                    ->formatStateUsing(fn (JobApplication $record): ?string => $record->secondPriorityJobTitle())
                     ->searchable(),
                 TextColumn::make('job_priority_3')
                     ->label('الوظيفة (أولوية 3)')
-                    ->formatStateUsing(fn (?string $state, JobApplication $record): ?string => $record->thirdPriorityJobListing?->title ?? $state)
+                    ->formatStateUsing(fn (JobApplication $record): ?string => $record->thirdPriorityJobTitle())
                     ->searchable(),
                 TextColumn::make('contract_types')->label('أنماط التعاقد')->badge(),
                 TextColumn::make('ready_date')->label('تاريخ الجاهزية')->date('Y-m-d')->sortable(),

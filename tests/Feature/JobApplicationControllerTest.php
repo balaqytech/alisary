@@ -4,17 +4,25 @@ use App\Enums\JobApplicationStatus;
 use App\Models\Company;
 use App\Models\JobApplication;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
-
-use function Pest\Laravel\post;
 
 it('stores a job application successfully and redirects back', function () {
     Storage::fake('public');
-    \Illuminate\Support\Facades\Mail::fake();
+    Mail::fake();
 
     $company = Company::factory()->create();
 
-    $response = post(route('jobs.apply.unified'), [
+    $jobsPage = $this->get(route('jobs.index'))
+        ->assertSuccessful()
+        ->assertSee('data-job-application-form', false)
+        ->assertSee('data-job-application-submit', false)
+        ->assertDontSee('aria-disabled="true"', false);
+
+    expect($jobsPage->getContent())
+        ->not->toMatch('/<button\b(?=[^>]*\bdata-job-application-submit\b)(?=[^>]*\sdisabled(?:\s|=|\/?>))[^>]*>/');
+
+    $response = $this->from(route('jobs.index'))->post(route('jobs.apply.unified'), [
         'full_name' => 'John Doe',
         'phone' => '123456789',
         'email' => 'john@example.com',
@@ -42,8 +50,16 @@ it('stores a job application successfully and redirects back', function () {
         'cv' => UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf'),
     ]);
 
-    $response->assertRedirect()
+    $response->assertRedirect(route('jobs.index').'#apply-form')
         ->assertSessionHas('application_success', true);
+
+    $successPage = $this->get(route('jobs.index'))
+        ->assertSuccessful()
+        ->assertSee('aria-disabled="true"', false)
+        ->assertSee('تم إرسال الطلب');
+
+    expect($successPage->getContent())
+        ->toMatch('/<button\b(?=[^>]*\bdata-job-application-submit\b)(?=[^>]*\sdisabled(?:\s|=|\/?>))[^>]*>/');
 
     $application = JobApplication::first();
 
@@ -61,6 +77,6 @@ it('stores a job application successfully and redirects back', function () {
     Storage::disk('public')->assertExists($application->cv_path);
 
     // If Settings returns emails in testing, it will queue.
-    // In tests, the database settings might be empty by default, 
+    // In tests, the database settings might be empty by default,
     // so we can just assert nothing broke, or mock Settings if needed.
 });

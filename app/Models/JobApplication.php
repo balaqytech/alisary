@@ -80,6 +80,21 @@ class JobApplication extends Model
         return $this->belongsTo(JobListing::class, 'job_priority_3', 'job_code');
     }
 
+    public function firstPriorityJobTitle(): ?string
+    {
+        return $this->firstPriorityJobListing?->title ?? $this->job_priority_1;
+    }
+
+    public function secondPriorityJobTitle(): ?string
+    {
+        return $this->secondPriorityJobListing?->title ?? $this->job_priority_2;
+    }
+
+    public function thirdPriorityJobTitle(): ?string
+    {
+        return $this->thirdPriorityJobListing?->title ?? $this->job_priority_3;
+    }
+
     public function scopeForJobListing(Builder $query, JobListing $jobListing): Builder
     {
         $jobReferences = collect([$jobListing->job_code, $jobListing->title])

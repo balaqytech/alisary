@@ -27,7 +27,7 @@
       <button type="button" onclick="clearSelection()" class="text-2xl text-alisary-soft hover:text-alisary-deep" title="إلغاء التحديد">×</button>
     </div>
 
-    <form class="rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-sm sm:p-8" action="{{ route('jobs.apply.unified') }}" method="POST" enctype="multipart/form-data">
+    <form data-job-application-form class="rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-sm sm:p-8" action="{{ route('jobs.apply.unified') }}" method="POST" enctype="multipart/form-data">
         @csrf
         
         <!-- 1 -->
@@ -277,7 +277,9 @@
         </div>
 
         <div class="mt-8 border-t border-alisary-green/10 pt-6">
-            <button type="submit" class="w-full cursor-pointer rounded-xl bg-alisary-green px-6 py-4 text-center font-display text-xl text-white transition hover:bg-alisary-deep sm:w-auto sm:min-w-[200px]">إرسال الطلب</button>
+            <button data-job-application-submit data-submitting-label="جارٍ إرسال الطلب..." @disabled(session('application_success')) @if(session('application_success')) aria-disabled="true" @endif type="submit" class="w-full cursor-pointer rounded-xl bg-alisary-green px-6 py-4 text-center font-display text-xl text-white transition hover:bg-alisary-deep disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[200px]">
+                {{ session('application_success') ? 'تم إرسال الطلب' : 'إرسال الطلب' }}
+            </button>
             <div class="mt-3 text-sm text-alisary-soft sm:text-right">سيتم نقلك لشاشة تأكيد بعد الإرسال.</div>
         </div>
     </form>

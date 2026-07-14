@@ -285,10 +285,35 @@ function initFormWizards() {
     });
 }
 
+function initJobApplicationForm() {
+    const form = document.querySelector('[data-job-application-form]');
+    const submitButton = form?.querySelector('[data-job-application-submit]');
+
+    if (! form || ! submitButton) {
+        return;
+    }
+
+    let isSubmitting = submitButton.disabled;
+
+    form.addEventListener('submit', (event) => {
+        if (isSubmitting) {
+            event.preventDefault();
+
+            return;
+        }
+
+        isSubmitting = true;
+        submitButton.disabled = true;
+        submitButton.setAttribute('aria-disabled', 'true');
+        submitButton.textContent = submitButton.dataset.submittingLabel;
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initHeader();
     initMobileNavigation();
     initHeroSlider();
     initScrollReveals();
     initFormWizards();
+    initJobApplicationForm();
 });
