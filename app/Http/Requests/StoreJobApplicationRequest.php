@@ -46,7 +46,7 @@ class StoreJobApplicationRequest extends FormRequest
             // Section 3: Experience & Tools
             'years_experience' => ['nullable', 'integer', 'min:0', 'max:60'],
             'previously_worked' => ['nullable', 'boolean'],
-            'previously_worked_where' => ['nullable', 'string', 'max:500'],
+            'previously_worked_where' => ['nullable', 'string', 'max:5000'],
             'tools_and_ai' => ['nullable', 'string'],
             'cv_link' => ['nullable', 'url', 'max:500'],
             'cv' => ['nullable', File::types(['pdf', 'doc', 'docx'])->max(3072)],

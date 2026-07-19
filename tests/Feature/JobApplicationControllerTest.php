@@ -80,3 +80,26 @@ it('stores a job application successfully and redirects back', function () {
     // In tests, the database settings might be empty by default,
     // so we can just assert nothing broke, or mock Settings if needed.
 });
+
+it('stores a long previous work history without truncating it', function () {
+    Mail::fake();
+
+    $company = Company::factory()->create();
+    $previousWorkHistory = str_repeat('Worked on educational and administrative projects. ', 80);
+
+    $this->from(route('jobs.index'))->post(route('jobs.apply.unified'), [
+        'full_name' => 'John Doe',
+        'phone' => '123456789',
+        'email' => 'john@example.com',
+        'company_id' => $company->id,
+        'job_priority_1' => 'Software Engineer',
+        'contract_types' => ['Full time'],
+        'expected_salary' => '1000 OMR',
+        'previously_worked_where' => $previousWorkHistory,
+        'consent_accurate' => 1,
+        'consent_ai' => 1,
+    ])->assertRedirect(route('jobs.index').'#apply-form');
+
+    expect(JobApplication::query()->firstOrFail()->previously_worked_where)
+        ->toBe(rtrim($previousWorkHistory));
+});
