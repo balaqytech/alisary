@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\File;
 
 class StoreJobApplicationRequest extends FormRequest
 {
@@ -18,6 +17,10 @@ class StoreJobApplicationRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * Honeypot + submitted-at fields are handled separately, before this
+     * request's rules run (see StoreJobApplicationRequest::withValidator
+     * usage is intentionally avoided here to keep spam checks silent).
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -36,8 +39,6 @@ class StoreJobApplicationRequest extends FormRequest
             'company_id' => ['required', 'exists:companies,id'],
             'branch' => ['nullable', 'string', 'max:100'],
             'job_priority_1' => ['required', 'string', 'max:255'],
-            'job_priority_2' => ['nullable', 'string', 'max:255'],
-            'job_priority_3' => ['nullable', 'string', 'max:255'],
             'contract_types' => ['required', 'array', 'min:1'],
             'contract_types.*' => ['string'],
             'ready_date' => ['nullable', 'date'],
@@ -46,31 +47,20 @@ class StoreJobApplicationRequest extends FormRequest
             // Section 3: Experience & Tools
             'years_experience' => ['nullable', 'integer', 'min:0', 'max:60'],
             'previously_worked' => ['nullable', 'boolean'],
-            'previously_worked_where' => ['nullable', 'string', 'max:5000'],
+            'previous_institution' => ['nullable', 'string', 'max:255'],
+            'previous_role' => ['nullable', 'string', 'max:255'],
+            'previous_period' => ['nullable', 'string', 'max:255'],
             'tools_and_ai' => ['nullable', 'string'],
             'cv_link' => ['nullable', 'url', 'max:500'],
-            'cv' => ['nullable', File::types(['pdf', 'doc', 'docx'])->max(3072)],
 
-            // Section 4: Competency
-            'q_automate' => ['nullable', 'string'],
-            'q_learn' => ['nullable', 'string'],
-            'q_own' => ['nullable', 'string'],
-
-            // Section 5: Situational
-            'q_brand' => ['nullable', 'string'],
-            'q_ethics' => ['nullable', 'string'],
-            'q_mission' => ['nullable', 'string'],
-
-            // Section 6: Future
-            'future_aspirations' => ['nullable', 'string'],
-            'q_build' => ['nullable', 'string'],
-            'extra_notes' => ['nullable', 'string'],
-
-            // Section 7: Consents
+            // Section 4: Consents
             'consent_accurate' => ['required', 'accepted'],
             'consent_ai' => ['required', 'accepted'],
             'consent_pool' => ['nullable', 'boolean'],
-            'consent_transfer' => ['nullable', 'boolean'],
+
+            // Anti-spam: honeypot field must stay empty, must not be filled too fast.
+            'website' => ['prohibited'],
+            'form_rendered_at' => ['nullable', 'integer'],
         ];
     }
 

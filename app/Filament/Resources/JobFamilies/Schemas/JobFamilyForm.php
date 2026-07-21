@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\JobFamilies\Schemas;
 
+use App\Enums\JobTrack;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -23,6 +24,10 @@ class JobFamilyForm
                     ->maxLength(16)
                     ->unique(ignoreRecord: true)
                     ->dehydrateStateUsing(fn (?string $state): ?string => $state === null ? null : Str::upper($state)),
+                Select::make('track')
+                    ->label('مسار الوظيفة')
+                    ->helperText('يُستخدم لاشتقاق مسار الوظيفة تلقائيًا في نموذج التقديم عند اختيار المتقدّم لهذه العائلة الوظيفية.')
+                    ->options(collect(JobTrack::cases())->mapWithKeys(fn (JobTrack $track): array => [$track->value => $track->label()])),
                 Select::make('status')
                     ->label('Status')
                     ->options([

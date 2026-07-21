@@ -27,9 +27,16 @@
       <button type="button" onclick="clearSelection()" class="text-2xl text-alisary-soft hover:text-alisary-deep" title="إلغاء التحديد">×</button>
     </div>
 
-    <form data-job-application-form class="rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-sm sm:p-8" action="{{ route('jobs.apply.unified') }}" method="POST" enctype="multipart/form-data">
+    <form data-job-application-form class="rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-sm sm:p-8" action="{{ route('jobs.apply.unified') }}" method="POST">
         @csrf
-        
+
+        {{-- Honeypot: hidden from humans via CSS, bots tend to fill every field they see --}}
+        <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true" tabindex="-1">
+            <label for="website">اتركي هذا الحقل فارغًا</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+        <input type="hidden" name="form_rendered_at" id="formRenderedAt" value="{{ now()->timestamp }}">
+
         <!-- 1 -->
         <div class="mb-8">
             <div class="mb-1 flex items-center gap-3 font-display text-lg text-alisary-deep">
@@ -104,23 +111,11 @@
                     </select>
                     @error('branch')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
                 </div>
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-alisary-deep">أولوية الوظيفة (2)</label>
-                    <select name="job_priority_2" id="priority2Select" disabled class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20 disabled:cursor-not-allowed disabled:opacity-60">
-                        <option value="">-- اختر وظيفة --</option>
-                    </select>
-                </div>
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-alisary-deep">أولوية الوظيفة (3)</label>
-                    <select name="job_priority_3" id="priority3Select" disabled class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20 disabled:cursor-not-allowed disabled:opacity-60">
-                        <option value="">-- اختر وظيفة --</option>
-                    </select>
-                </div>
-                
+
                 <div class="flex flex-col gap-1.5 sm:col-span-2">
                     <label class="text-sm font-medium text-alisary-deep">أنماط التعاقد التي تناسبك <span class="text-red-600">*</span></label>
                     <div class="flex flex-wrap gap-2">
-                        @foreach(['دوام كامل', 'دوام جزئي', 'عمل حرّ مستقل (Freelance)', 'تطوّع'] as $type)
+                        @foreach(['دوام كامل', 'دوام جزئي', 'بالمشروع', 'عن بُعد', 'عبر جهة مزوّدة'] as $type)
                         <label class="flex cursor-pointer select-none items-center gap-2 rounded-full border border-alisary-green/20 bg-alisary-ivory px-4 py-2 text-sm text-alisary-deep hover:border-alisary-gold has-[:checked]:border-alisary-green has-[:checked]:bg-alisary-green/10 has-[:checked]:font-bold">
                             <input type="checkbox" name="contract_types[]" value="{{ $type }}" class="text-alisary-green focus:ring-alisary-green" {{ in_array($type, old('contract_types', [])) ? 'checked' : '' }}>
                             {{ $type }}
@@ -150,32 +145,42 @@
             </div>
             
             <div class="mt-4 grid gap-4 sm:grid-cols-2">
-                <div class="flex flex-col gap-1.5 sm:col-span-2">
-                    <label class="text-sm font-medium text-alisary-deep">أرفق سيرتك الذاتية (PDF, DOC)</label>
-                    <input name="cv" type="file" accept=".pdf,.doc,.docx" class="block w-full rounded-xl border border-dashed border-alisary-green/30 bg-alisary-ivory p-4 text-sm text-alisary-deep file:mr-4 file:rounded-full file:border-0 file:bg-alisary-green/10 file:px-4 file:py-2 file:text-sm file:font-bold file:text-alisary-green hover:file:bg-alisary-green/20">
-                    @error('cv')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
-                </div>
-                
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-medium text-alisary-deep">سنوات الخبرة الإجمالية</label>
                     <input name="years_experience" type="number" min="0" value="{{ old('years_experience') }}" class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                 </div>
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-alisary-deep">رابط لمعرض أعمالك / حسابك (إن وجد)</label>
+                    <label class="text-sm font-medium text-alisary-deep">رابط سيرتك الذاتية أو معرض أعمالك</label>
                     <input name="cv_link" type="url" value="{{ old('cv_link') }}" placeholder="https://..." class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 text-left font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                    @error('cv_link')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
                 </div>
-                
+
                 <div class="flex flex-col gap-1.5 sm:col-span-2">
                     <label class="text-sm font-medium text-alisary-deep">ما الأدوات والبرمجيات (ومنها الذكاء الاصطناعي) التي تُتقن استخدامها لتسريع عملك؟</label>
                     <textarea name="tools_and_ai" placeholder="مثال: أستخدم ChatGPT في كذا، وأداة كذا في..." rows="3" class="w-full min-h-[78px] rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">{{ old('tools_and_ai') }}</textarea>
                 </div>
-                
-                <div class="flex flex-col gap-1.5 sm:col-span-2">
-                    <label class="flex items-center gap-3 text-sm font-medium text-alisary-deep">
-                        <input type="checkbox" name="previously_worked" value="1" class="text-alisary-green focus:ring-alisary-green" {{ old('previously_worked') ? 'checked' : '' }}>
-                        هل سبق لك العمل في إحدى مؤسساتنا؟
-                    </label>
-                    <input name="previously_worked_where" value="{{ old('previously_worked_where') }}" placeholder="إذا نعم، أين ومتى؟" class="mt-2 w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-sm font-medium text-alisary-deep">هل سبق أن عملت في إحدى مؤسسات المجموعة؟</label>
+                    <select name="previously_worked" id="previouslyWorkedSelect" class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                        <option value="0" @selected(! old('previously_worked'))>لا</option>
+                        <option value="1" @selected(old('previously_worked'))>نعم</option>
+                    </select>
+                </div>
+
+                <div class="grid gap-4 sm:col-span-2 sm:grid-cols-3" id="previousWorkWrapper" style="display:none;">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-medium text-alisary-deep">أيّ مؤسسة؟</label>
+                        <input name="previous_institution" value="{{ old('previous_institution') }}" class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-medium text-alisary-deep">ما الدور؟</label>
+                        <input name="previous_role" value="{{ old('previous_role') }}" class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-sm font-medium text-alisary-deep">في أيّ فترة؟</label>
+                        <input name="previous_period" value="{{ old('previous_period') }}" placeholder="مثال: 2018–2021" class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                    </div>
                 </div>
             </div>
         </div>
@@ -183,95 +188,22 @@
         <!-- 4 -->
         <div class="mb-8 border-t border-alisary-green/10 pt-8">
             <div class="mb-1 flex items-center gap-3 font-display text-lg text-alisary-deep">
-                <span class="flex size-7 flex-none items-center justify-center rounded bg-alisary-green text-sm text-white">٤</span> 
-                الكفاءة والإنجاز
-            </div>
-            
-            <div class="mt-4 grid gap-4">
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-alisary-deep">اذكر مهمةً متكررةً كنت تقوم بها ثم نجحتَ في أتمتتها أو تقليل وقتها بنسبة كبيرة. كيف فعلت ذلك؟</label>
-                    <textarea name="q_automate" rows="3" class="min-h-[78px] rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">{{ old('q_automate') }}</textarea>
-                </div>
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-alisary-deep">ما هي آخر مهارة مهنية مهمّة تعلّمتها بمجهودك الشخصي؟ وكيف تطبّقها الآن؟</label>
-                    <textarea name="q_learn" rows="3" class="min-h-[78px] rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">{{ old('q_learn') }}</textarea>
-                </div>
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-alisary-deep">حدّثنا عن مشروع أو مهمة تملّكتها من البداية حتى النهاية، وما هي النتائج بالأرقام أو الشواهد الملموسة؟</label>
-                    <textarea name="q_own" rows="3" class="min-h-[78px] rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">{{ old('q_own') }}</textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- 5 -->
-        <div class="mb-8 border-t border-alisary-green/10 pt-8">
-            <div class="mb-1 flex items-center gap-3 font-display text-lg text-alisary-deep">
-                <span class="flex size-7 flex-none items-center justify-center rounded bg-alisary-green text-sm text-white">٥</span> 
-                مواقف
-            </div>
-            
-            <div class="mt-4 grid gap-4">
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-alisary-deep">لو طُلب منك تسليم منتجٍ يحمل اسم المؤسسة لكنه لا يرقى لمعاييرها لأن العميل مستعجل، كيف تتصرّف؟</label>
-                    <textarea name="q_brand" rows="3" class="min-h-[78px] rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">{{ old('q_brand') }}</textarea>
-                </div>
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-alisary-deep">تخيّل موقفًا خُيِّرت فيه بين مكسبٍ ماليٍّ كبيرٍ للمؤسسة وبين الحفاظ على مبدأ أخلاقي.. ماذا تفعل؟</label>
-                    <textarea name="q_ethics" rows="3" class="min-h-[78px] rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">{{ old('q_ethics') }}</textarea>
-                </div>
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-alisary-deep">ماذا تعني لك عبارة: "نُعِدّهم لحياةٍ طيّبة" في سياق عملك اليومي؟</label>
-                    <textarea name="q_mission" rows="3" class="min-h-[78px] rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">{{ old('q_mission') }}</textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- 6 -->
-        <div class="mb-8 border-t border-alisary-green/10 pt-8">
-            <div class="mb-1 flex items-center gap-3 font-display text-lg text-alisary-deep">
-                <span class="flex size-7 flex-none items-center justify-center rounded bg-alisary-green text-sm text-white">٦</span> 
-                آفاق مستقبلية
-            </div>
-            
-            <div class="mt-4 grid gap-4">
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-alisary-deep">ما هي الأدوار أو التحديات التي ترى أنها تناسبك أكثر في المستقبل؟</label>
-                    <textarea name="future_aspirations" rows="3" class="min-h-[78px] rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">{{ old('future_aspirations') }}</textarea>
-                </div>
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-alisary-deep">لو أُعطيت حريةً كاملةً وميزانية، ما هو المنتج أو الخدمة التي ستبنيها لخدمة الطفل؟</label>
-                    <textarea name="q_build" rows="3" class="min-h-[78px] rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">{{ old('q_build') }}</textarea>
-                </div>
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-alisary-deep">ملاحظات أو إضافات أخرى ترغب بمشاركتها معنا (اختياري)</label>
-                    <textarea name="extra_notes" rows="3" class="min-h-[78px] rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">{{ old('extra_notes') }}</textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- 7 -->
-        <div class="mb-8 border-t border-alisary-green/10 pt-8">
-            <div class="mb-1 flex items-center gap-3 font-display text-lg text-alisary-deep">
-                <span class="flex size-7 flex-none items-center justify-center rounded bg-alisary-green text-sm text-white">٧</span> 
+                <span class="flex size-7 flex-none items-center justify-center rounded bg-alisary-green text-sm text-white">٤</span>
                 الإقرارات
             </div>
-            
+
             <div class="mt-4 grid gap-3">
                 <label class="flex items-start gap-3 text-sm text-alisary-ink">
                     <input type="checkbox" name="consent_accurate" value="1" required class="mt-1 flex-none text-alisary-green focus:ring-alisary-green" {{ old('consent_accurate') ? 'checked' : '' }}>
-                    <span>أُقرّ بأنّ جميع البيانات المُدخلة، وما أرفقته من وثائق وملفات، صحيحةٌ ودقيقةٌ وتُمثّل قدراتي ومؤهلاتي الفعلية.<span class="text-red-600">*</span></span>
+                    <span>أُقرّ بأنّ جميع البيانات المُدخلة صحيحةٌ ودقيقةٌ وتُمثّل قدراتي ومؤهلاتي الفعلية.<span class="text-red-600">*</span></span>
                 </label>
                 <label class="flex items-start gap-3 text-sm text-alisary-ink">
                     <input type="checkbox" name="consent_ai" value="1" required class="mt-1 flex-none text-alisary-green focus:ring-alisary-green" {{ old('consent_ai') ? 'checked' : '' }}>
-                    <span>أوافق على قيام المجموعة باستخدام أدوات المعالجة الآلية والذكاء الاصطناعي لتحليل سيرتي الذاتية وإجاباتي لفرزها وتقييم ملاءمتي.<span class="text-red-600">*</span></span>
+                    <span>أوافق على قيام المجموعة باستخدام أدوات المعالجة الآلية والذكاء الاصطناعي لتحليل إجاباتي لفرزها وتقييم ملاءمتي.<span class="text-red-600">*</span></span>
                 </label>
                 <label class="flex items-start gap-3 text-sm text-alisary-ink">
                     <input type="checkbox" name="consent_pool" value="1" class="mt-1 flex-none text-alisary-green focus:ring-alisary-green" {{ old('consent_pool') ? 'checked' : '' }}>
                     <span>أوافق على الاحتفاظ ببياناتي ضمن «بركة المواهب» (Talent Pool) للتواصل معي متى ما توفّر شاغرٌ مناسبٌ مستقبلًا (اختياري).</span>
-                </label>
-                <label class="flex items-start gap-3 text-sm text-alisary-ink">
-                    <input type="checkbox" name="consent_transfer" value="1" class="mt-1 flex-none text-alisary-green focus:ring-alisary-green" {{ old('consent_transfer') ? 'checked' : '' }}>
-                    <span>أوافق على إتاحة ملفي لإدارات المؤسسات التابعة والمشاريع الشقيقة لمجموعة العيسري لأغراض التوظيف (اختياري).</span>
                 </label>
             </div>
         </div>
@@ -289,23 +221,15 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const companySelect = document.getElementById('companySelect');
-        const prioritySelects = [
-            document.getElementById('priority1Select'),
-            document.getElementById('priority2Select'),
-            document.getElementById('priority3Select')
-        ];
-        
+        const priority1Select = document.getElementById('priority1Select');
+
         const jobTitles = @json($jobTitles ?? new stdClass());
         const branchWrapper = document.getElementById('branchWrapper');
         const branchSelect = document.getElementById('branchSelect');
-        const priority1Select = prioritySelects[0];
 
         // Restore old values from flashed session
         const oldP1 = @json(old('job_priority_1'));
-        const oldP2 = @json(old('job_priority_2'));
-        const oldP3 = @json(old('job_priority_3'));
         const oldBranch = @json(old('branch'));
-        const oldValues = [oldP1, oldP2, oldP3];
 
         function findSelectedJob() {
             const companyId = companySelect.value;
@@ -355,36 +279,31 @@
             const companyId = companySelect.value;
             const availableJobs = jobTitles[companyId] || [];
 
-            prioritySelects.forEach((select, index) => {
-                select.innerHTML = '<option value="">-- اختر وظيفة --</option>';
+            priority1Select.innerHTML = '<option value="">-- اختر وظيفة --</option>';
 
-                // Only enable the select if there are enough jobs to fill this priority
-                // E.g. if a company has 1 job, only priority 1 is enabled
-                // If a company has 2 jobs, priority 1 and 2 are enabled
-                if (companyId && availableJobs.length > index) {
-                    select.disabled = false;
+            if (companyId && availableJobs.length > 0) {
+                priority1Select.disabled = false;
 
-                    availableJobs.forEach(job => {
-                        const jobOption = typeof job === 'string'
-                            ? { title: job, value: job, label: job }
-                            : job;
-                        const option = document.createElement('option');
-                        option.value = jobOption.value || jobOption.code || jobOption.title;
-                        option.textContent = jobOption.label || jobOption.title || option.value;
-                        // Select old value if it exists
-                        if (
-                            oldValues[index] === option.value ||
-                            oldValues[index] === jobOption.title ||
-                            (index === 0 && (window.currentApplyingJobValue === option.value || window.currentApplyingJob === jobOption.title))
-                        ) {
-                            option.selected = true;
-                        }
-                        select.appendChild(option);
-                    });
-                } else {
-                    select.disabled = true;
-                }
-            });
+                availableJobs.forEach(job => {
+                    const jobOption = typeof job === 'string'
+                        ? { title: job, value: job, label: job }
+                        : job;
+                    const option = document.createElement('option');
+                    option.value = jobOption.value || jobOption.code || jobOption.title;
+                    option.textContent = jobOption.label || jobOption.title || option.value;
+                    if (
+                        oldP1 === option.value ||
+                        oldP1 === jobOption.title ||
+                        window.currentApplyingJobValue === option.value ||
+                        window.currentApplyingJob === jobOption.title
+                    ) {
+                        option.selected = true;
+                    }
+                    priority1Select.appendChild(option);
+                });
+            } else {
+                priority1Select.disabled = true;
+            }
 
             updateBranches();
         }
@@ -408,5 +327,17 @@
                 companySelect.dispatchEvent(new Event('change'));
             }
         };
+
+        const previouslyWorkedSelect = document.getElementById('previouslyWorkedSelect');
+        const previousWorkWrapper = document.getElementById('previousWorkWrapper');
+
+        function updatePreviousWorkVisibility() {
+            previousWorkWrapper.style.display = previouslyWorkedSelect.value === '1' ? '' : 'none';
+        }
+
+        if (previouslyWorkedSelect && previousWorkWrapper) {
+            previouslyWorkedSelect.addEventListener('change', updatePreviousWorkVisibility);
+            updatePreviousWorkVisibility();
+        }
     });
 </script>
