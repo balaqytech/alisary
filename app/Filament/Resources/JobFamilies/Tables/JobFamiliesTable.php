@@ -18,6 +18,7 @@ class JobFamiliesTable
                 TextColumn::make('sort_order')->label('Sort')->sortable(),
                 TextColumn::make('name')->label('Name')->searchable()->sortable(),
                 TextColumn::make('code')->label('Code')->searchable()->sortable(),
+                TextColumn::make('track')->label('مسار الوظيفة')->badge()->formatStateUsing(fn (?\App\Enums\JobTrack $state): ?string => $state?->label()),
                 TextColumn::make('status')->label('Status')->badge(),
                 TextColumn::make('updated_at')->label('Updated')->dateTime()->sortable(),
             ])

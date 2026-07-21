@@ -2,25 +2,47 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ListingLocation;
 use App\Http\Requests\StoreJobApplicationRequest;
 use App\Models\JobApplication;
+use App\Models\JobListing;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Arr;
 
 class JobApplicationController extends Controller
 {
+    private const MIN_FILL_SECONDS = 3;
+
     public function store(StoreJobApplicationRequest $request, \App\Settings\GeneralSettings $settings): RedirectResponse
     {
-        $validated = $request->validated();
+        $validated = Arr::except($request->validated(), ['website', 'form_rendered_at']);
 
-        $cvPath = $request->file('cv')?->store('job-applications/cv', 'public');
+        if ($this->submittedTooFast($request)) {
+            // Silently pretend success so bots don't learn their submission was rejected.
+            return back()->withFragment('apply-form')->with('application_success', true);
+        }
+
+        $jobListing = JobListing::query()
+            ->where('job_code', $validated['job_priority_1'] ?? null)
+            ->with('jobFamily')
+            ->first();
+
+        // The branch is only meaningful for job listings with several
+        // real sub-branches (currently the school); everyone else has a
+        // single location that already stands in for their governorate.
+        $locationValue = $validated['branch'] ?? $jobListing?->location?->value;
+        $governorate = ListingLocation::tryFrom($locationValue ?? '')?->governorate()?->value;
 
         $application = JobApplication::create([
-            ...\Illuminate\Support\Arr::except($validated, ['cv']),
-            'cv_path' => $cvPath,
+            ...$validated,
+            'form_version' => 'v2',
+            'governorate' => $governorate,
+            'track' => $jobListing?->jobFamily?->track?->value,
             'previously_worked' => (bool) ($validated['previously_worked'] ?? false),
             'consent_pool' => (bool) ($validated['consent_pool'] ?? false),
-            'consent_transfer' => (bool) ($validated['consent_transfer'] ?? false),
         ]);
+
+        $this->notifyOnPossibleDuplicate($application, $settings);
 
         $emails = $settings->jobSubmissionRecipientEmails();
         if (! empty($emails)) {
@@ -30,5 +52,40 @@ class JobApplicationController extends Controller
         return back()
             ->withFragment('apply-form')
             ->with('application_success', true);
+    }
+
+    private function submittedTooFast(StoreJobApplicationRequest $request): bool
+    {
+        $renderedAt = $request->integer('form_rendered_at');
+
+        if ($renderedAt <= 0) {
+            return false;
+        }
+
+        return (time() - $renderedAt) < self::MIN_FILL_SECONDS;
+    }
+
+    private function notifyOnPossibleDuplicate(JobApplication $application, \App\Settings\GeneralSettings $settings): void
+    {
+        $duplicate = JobApplication::query()
+            ->where('id', '!=', $application->id)
+            ->where(function ($query) use ($application): void {
+                $query->where('email', $application->email)
+                    ->orWhere('phone', $application->phone);
+            })
+            ->first();
+
+        if ($duplicate === null) {
+            return;
+        }
+
+        $emails = $settings->jobSubmissionRecipientEmails();
+        if (empty($emails)) {
+            return;
+        }
+
+        \Illuminate\Support\Facades\Mail::to($emails)->queue(
+            new \App\Mail\DuplicateJobApplicationDetected($application, $duplicate)
+        );
     }
 }
