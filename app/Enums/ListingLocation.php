@@ -60,4 +60,30 @@ enum ListingLocation: string
             self::Khoudh => 'الخوض',
         };
     }
+
+    /**
+     * Real-world Omani governorate each branch/town belongs to.
+     *
+     * NOTE: "Khairat" has no confirmed match in the standard wilayat list;
+     * mapped to Muscat as a best guess — verify with an admin before relying on it.
+     */
+    public function governorate(): ?Governorate
+    {
+        return match ($this) {
+            self::Remote => null,
+            self::Muscat, self::Mawaleh, self::Amarat, self::MabailaSouth,
+            self::MabailaEighth, self::Bawshar, self::Udhaibah, self::Khoudh,
+            self::Khairat => Governorate::Muscat,
+            self::Salalah => Governorate::Dhofar,
+            self::Sohar => Governorate::NorthBatinah,
+            self::Rustaq, self::Suwaiq, self::Barka => Governorate::SouthBatinah,
+            self::Nizwa, self::Bahla, self::Bidbid => Governorate::Dakhiliyah,
+            self::Ibri, self::Yanqul => Governorate::Dhahirah,
+            self::Buraimi => Governorate::Buraimi,
+            self::Khasab => Governorate::Musandam,
+            self::Duqm => Governorate::Wusta,
+            self::Ibra => Governorate::NorthSharqiyah,
+            self::Sur => Governorate::SouthSharqiyah,
+        };
+    }
 }

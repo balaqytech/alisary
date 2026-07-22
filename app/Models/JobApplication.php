@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\Governorate;
 use App\Enums\JobApplicationStatus;
+use App\Enums\JobTrack;
 use App\Enums\ListingLocation;
 use Database\Factories\JobApplicationFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,6 +34,8 @@ class JobApplication extends Model
         return [
             'status' => JobApplicationStatus::class,
             'branch' => ListingLocation::class,
+            'governorate' => Governorate::class,
+            'track' => JobTrack::class,
             'contract_types' => 'array',
             'ready_date' => 'date',
             'previously_worked' => 'boolean',

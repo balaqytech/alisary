@@ -32,19 +32,13 @@ class JobApplicationsTable
                 TextColumn::make('country')->label('الدولة')->searchable(),
                 TextColumn::make('city')->label('المدينة')->searchable(),
                 TextColumn::make('company.name')->label('المؤسسة')->searchable(),
+                TextColumn::make('governorate')->label('المحافظة')->badge()->sortable(),
                 TextColumn::make('branch')->label('الفرع')->badge()->sortable(),
                 TextColumn::make('job_priority_1')
-                    ->label('الوظيفة (أولوية 1)')
+                    ->label('الوظيفة')
                     ->formatStateUsing(fn (JobApplication $record): ?string => $record->firstPriorityJobTitle())
                     ->searchable(),
-                TextColumn::make('job_priority_2')
-                    ->label('الوظيفة (أولوية 2)')
-                    ->formatStateUsing(fn (JobApplication $record): ?string => $record->secondPriorityJobTitle())
-                    ->searchable(),
-                TextColumn::make('job_priority_3')
-                    ->label('الوظيفة (أولوية 3)')
-                    ->formatStateUsing(fn (JobApplication $record): ?string => $record->thirdPriorityJobTitle())
-                    ->searchable(),
+                TextColumn::make('track')->label('مسار الوظيفة')->badge()->sortable(),
                 TextColumn::make('contract_types')->label('أنماط التعاقد')->badge(),
                 TextColumn::make('ready_date')->label('تاريخ الجاهزية')->date('Y-m-d')->sortable(),
                 TextColumn::make('expected_salary')->label('الراتب المتوقع'),
@@ -52,19 +46,15 @@ class JobApplicationsTable
                 TextColumn::make('previously_worked')
                     ->label('سبق العمل في المجموعة؟')
                     ->formatStateUsing(fn (mixed $state): string => $state ? 'نعم' : 'لا'),
-                TextColumn::make('previously_worked_where')->label('أين ومتى؟'),
+                TextColumn::make('previous_institution')->label('المؤسسة السابقة'),
+                TextColumn::make('previous_role')->label('الدور السابق'),
+                TextColumn::make('previous_period')->label('الفترة السابقة'),
                 TextColumn::make('tools_and_ai')->label('الأدوات والذكاء الاصطناعي')->limit(50)->wrap(),
                 TextColumn::make('cv_link')->label('رابط السيرة الذاتية')->limit(50)->wrap(),
-                TextColumn::make('cv_path')->label('ملف السيرة الذاتية')->limit(50)->wrap(),
-                TextColumn::make('q_automate')->label('مهمة متكررة تم أتمتتها')->limit(50)->wrap(),
-                TextColumn::make('q_learn')->label('آخر مهارة تعلمتها')->limit(50)->wrap(),
-                TextColumn::make('q_own')->label('مشروع تملكته بالكامل')->limit(50)->wrap(),
-                TextColumn::make('q_brand')->label('موقف جودة المنتج')->limit(50)->wrap(),
-                TextColumn::make('q_ethics')->label('موقف المكسب والصواب')->limit(50)->wrap(),
-                TextColumn::make('q_mission')->label('التوافق مع رسالة المجموعة')->limit(50)->wrap(),
-                TextColumn::make('future_aspirations')->label('الطموحات المستقبلية')->limit(50)->wrap(),
-                TextColumn::make('q_build')->label('ما الذي ستبنيه؟')->limit(50)->wrap(),
-                TextColumn::make('extra_notes')->label('إضافات أخرى')->limit(50)->wrap(),
+                TextColumn::make('q_achievement')->label('إنجاز واحد قابل للتحقّق')->limit(50)->wrap(),
+                TextColumn::make('q_sample_teaching')->label('عيّنة عمل — تدريس')->limit(50)->wrap(),
+                TextColumn::make('q_sample_operations')->label('عيّنة عمل — تنسيق وعمليات')->limit(50)->wrap(),
+                TextColumn::make('q_sample_leadership')->label('عيّنة عمل — قيادة')->limit(50)->wrap(),
                 TextColumn::make('consent_accurate')
                     ->label('إقرار صحة البيانات')
                     ->formatStateUsing(fn (mixed $state): string => $state ? 'نعم' : 'لا'),
@@ -74,11 +64,34 @@ class JobApplicationsTable
                 TextColumn::make('consent_pool')
                     ->label('موافقة بركة المواهب')
                     ->formatStateUsing(fn (mixed $state): string => $state ? 'نعم' : 'لا'),
-                TextColumn::make('consent_transfer')
-                    ->label('موافقة نقل البيانات')
-                    ->formatStateUsing(fn (mixed $state): string => $state ? 'نعم' : 'لا'),
                 TextColumn::make('internal_notes')->label('ملاحظات داخلية')->limit(50)->wrap(),
                 TextColumn::make('created_at')->label('تاريخ التقديم')->dateTime('Y-m-d H:i:s')->sortable(),
+
+                // — أعمدة النموذج القديم (v1)، مخفية افتراضيًا لكن متاحة للعرض والتصدير —
+                TextColumn::make('job_priority_2')
+                    ->label('الوظيفة (أولوية 2 — نموذج قديم)')
+                    ->formatStateUsing(fn (JobApplication $record): ?string => $record->secondPriorityJobTitle())
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('job_priority_3')
+                    ->label('الوظيفة (أولوية 3 — نموذج قديم)')
+                    ->formatStateUsing(fn (JobApplication $record): ?string => $record->thirdPriorityJobTitle())
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('previously_worked_where')->label('أين ومتى؟ (نموذج قديم)')->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('cv_path')->label('ملف السيرة الذاتية (نموذج قديم)')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('q_automate')->label('مهمة متكررة تم أتمتتها (قديم)')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('q_learn')->label('آخر مهارة تعلمتها (قديم)')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('q_own')->label('مشروع تملكته بالكامل (قديم)')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('q_brand')->label('موقف جودة المنتج (قديم)')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('q_ethics')->label('موقف المكسب والصواب (قديم)')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('q_mission')->label('التوافق مع رسالة المجموعة (قديم)')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('future_aspirations')->label('الطموحات المستقبلية (قديم)')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('q_build')->label('ما الذي ستبنيه؟ (قديم)')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('extra_notes')->label('إضافات أخرى (قديم)')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('consent_transfer')
+                    ->label('موافقة نقل البيانات (قديم)')
+                    ->formatStateUsing(fn (mixed $state): string => $state ? 'نعم' : 'لا')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('form_version')->label('إصدار النموذج')->badge()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('status')

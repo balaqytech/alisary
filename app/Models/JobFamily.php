@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\JobTrack;
 use Database\Factories\JobFamilyFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,6 +20,13 @@ class JobFamily extends Model
         'status' => 'active',
         'sort_order' => 0,
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'track' => JobTrack::class,
+        ];
+    }
 
     public function scopeActive(Builder $query): Builder
     {
