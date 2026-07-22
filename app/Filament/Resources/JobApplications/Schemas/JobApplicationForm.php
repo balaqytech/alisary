@@ -72,7 +72,15 @@ class JobApplicationForm
                     ])
                     ->columns(2),
 
-                Section::make('4. الكفاءة والإنجاز (نموذج قديم)')
+                Section::make('4. الأسئلة المِفصليّة')
+                    ->schema([
+                        Textarea::make('q_achievement')->label('إنجاز واحد قابل للتحقّق')->disabled()->columnSpanFull(),
+                        Textarea::make('q_sample_teaching')->label('عيّنة عمل — مسار التدريس')->disabled()->columnSpanFull(),
+                        Textarea::make('q_sample_operations')->label('عيّنة عمل — مسار التنسيق والعمليات')->disabled()->columnSpanFull(),
+                        Textarea::make('q_sample_leadership')->label('عيّنة عمل — مسار القيادة')->disabled()->columnSpanFull(),
+                    ]),
+
+                Section::make('5. الكفاءة والإنجاز (نموذج قديم)')
                     ->schema([
                         Textarea::make('q_automate')->label('مهمة متكررة تم أتمتتها')->disabled()->columnSpanFull(),
                         Textarea::make('q_learn')->label('آخر مهارة تعلمتها')->disabled()->columnSpanFull(),
@@ -82,7 +90,7 @@ class JobApplicationForm
                     ->collapsed()
                     ->visible(fn (?\App\Models\JobApplication $record): bool => filled($record?->q_automate) || filled($record?->q_learn) || filled($record?->q_own)),
 
-                Section::make('5. مواقف (نموذج قديم)')
+                Section::make('6. مواقف (نموذج قديم)')
                     ->schema([
                         Textarea::make('q_brand')->label('منتج يحمل الاسم بجودة أدنى')->disabled()->columnSpanFull(),
                         Textarea::make('q_ethics')->label('موقف خيّرك بين المكسب والصواب')->disabled()->columnSpanFull(),
@@ -92,7 +100,7 @@ class JobApplicationForm
                     ->collapsed()
                     ->visible(fn (?\App\Models\JobApplication $record): bool => filled($record?->q_brand) || filled($record?->q_ethics) || filled($record?->q_mission)),
 
-                Section::make('6. آفاق مستقبلية (نموذج قديم)')
+                Section::make('7. آفاق مستقبلية (نموذج قديم)')
                     ->schema([
                         Textarea::make('future_aspirations')->label('أدوار تناسبك مستقبلاً')->disabled()->columnSpanFull(),
                         Textarea::make('q_build')->label('لو أعطيت حرية، ماذا ستبني؟')->disabled()->columnSpanFull(),
@@ -102,7 +110,7 @@ class JobApplicationForm
                     ->collapsed()
                     ->visible(fn (?\App\Models\JobApplication $record): bool => filled($record?->future_aspirations) || filled($record?->q_build) || filled($record?->extra_notes)),
 
-                Section::make('7. الإقرارات')
+                Section::make('8. الإقرارات')
                     ->schema([
                         Checkbox::make('consent_accurate')->label('البيانات صحيحة')->disabled(),
                         Checkbox::make('consent_ai')->label('موافقة الذكاء الاصطناعي')->disabled(),

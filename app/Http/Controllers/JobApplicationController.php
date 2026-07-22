@@ -27,11 +27,12 @@ class JobApplicationController extends Controller
             ->with('jobFamily')
             ->first();
 
-        // The branch is only meaningful for job listings with several
-        // real sub-branches (currently the school); everyone else has a
-        // single location that already stands in for their governorate.
+        // The governorate select is only shown (and submitted) when a job
+        // spans more than one governorate. Otherwise fall back to deriving
+        // it from the chosen branch, or the job listing's single location.
         $locationValue = $validated['branch'] ?? $jobListing?->location?->value;
-        $governorate = ListingLocation::tryFrom($locationValue ?? '')?->governorate()?->value;
+        $governorate = $validated['governorate']
+            ?: ListingLocation::tryFrom($locationValue ?? '')?->governorate()?->value;
 
         $application = JobApplication::create([
             ...$validated,
