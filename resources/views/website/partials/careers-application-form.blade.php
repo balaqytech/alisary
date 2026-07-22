@@ -56,7 +56,7 @@
                     <input name="phone" type="tel" value="{{ old('phone') }}" required class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                     @error('phone')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
                 </div>
-                <div class="flex flex-col gap-1.5">
+                <div class="flex flex-col gap-1.5 sm:col-span-2">
                     <label class="text-sm font-medium text-alisary-deep">البريد الإلكتروني <span class="text-red-600">*</span></label>
                     <input name="email" type="email" value="{{ old('email') }}" required class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                     @error('email')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
