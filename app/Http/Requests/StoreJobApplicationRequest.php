@@ -37,6 +37,7 @@ class StoreJobApplicationRequest extends FormRequest
 
             // Section 2: Job & Institution
             'company_id' => ['required', 'exists:companies,id'],
+            'governorate' => ['nullable', 'string', 'max:100'],
             'branch' => ['nullable', 'string', 'max:100'],
             'job_priority_1' => ['required', 'string', 'max:255'],
             'contract_types' => ['required', 'array', 'min:1'],
@@ -53,7 +54,17 @@ class StoreJobApplicationRequest extends FormRequest
             'tools_and_ai' => ['nullable', 'string'],
             'cv_link' => ['nullable', 'url', 'max:500'],
 
-            // Section 4: Consents
+            // Section 4: Pivotal questions
+            'q_achievement' => ['required', 'string', 'max:1200'],
+            // Only one of the three is actually enabled client-side, based on the
+            // applicant's job track — the others are disabled and never submitted.
+            // Not marked required here since a track without a matching question
+            // (currently "support") must still be able to submit.
+            'q_sample_teaching' => ['nullable', 'string', 'max:1200'],
+            'q_sample_operations' => ['nullable', 'string', 'max:1200'],
+            'q_sample_leadership' => ['nullable', 'string', 'max:1200'],
+
+            // Section 5: Consents
             'consent_accurate' => ['required', 'accepted'],
             'consent_ai' => ['required', 'accepted'],
             'consent_pool' => ['nullable', 'boolean'],

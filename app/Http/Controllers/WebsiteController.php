@@ -62,11 +62,19 @@ class WebsiteController extends Controller
                 'code' => $job->job_code,
                 'value' => $job->job_code ?? $job->title,
                 'label' => $job->title,
+                'track' => $job->jobFamily?->track?->value,
                 'locations' => collect($job->locations ?? [])
-                    ->map(fn (string $value): array => [
-                        'value' => $value,
-                        'label' => ListingLocation::tryFrom($value)?->label() ?? $value,
-                    ])
+                    ->map(function (string $value): array {
+                        $location = ListingLocation::tryFrom($value);
+                        $governorate = $location?->governorate();
+
+                        return [
+                            'value' => $value,
+                            'label' => $location?->label() ?? $value,
+                            'governorate_value' => $governorate?->value,
+                            'governorate_label' => $governorate?->label(),
+                        ];
+                    })
                     ->values()
                     ->all(),
             ])->values());

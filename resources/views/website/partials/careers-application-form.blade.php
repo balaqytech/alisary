@@ -104,6 +104,13 @@
                     </select>
                     @error('job_priority_1')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
                 </div>
+                <div class="flex flex-col gap-1.5" id="governorateWrapper" style="display:none;">
+                    <label class="text-sm font-medium text-alisary-deep">المحافظة <span class="text-red-600">*</span></label>
+                    <select name="governorate" id="governorateSelect" class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                        <option value="">-- اختر المحافظة --</option>
+                    </select>
+                    @error('governorate')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
+                </div>
                 <div class="flex flex-col gap-1.5" id="branchWrapper" style="display:none;">
                     <label class="text-sm font-medium text-alisary-deep">اختر الفرع <span class="text-red-600">*</span></label>
                     <select name="branch" id="branchSelect" class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
@@ -189,6 +196,60 @@
         <div class="mb-8 border-t border-alisary-green/10 pt-8">
             <div class="mb-1 flex items-center gap-3 font-display text-lg text-alisary-deep">
                 <span class="flex size-7 flex-none items-center justify-center rounded bg-alisary-green text-sm text-white">٤</span>
+                الأسئلة المِفصليّة
+            </div>
+
+            <div class="mt-4 grid gap-6">
+                <div class="rounded-xl border border-alisary-green/15 bg-alisary-ivory p-4">
+                    <div class="mb-2 text-sm font-medium text-alisary-deep">اختر إنجازًا واحدًا حقيقيًّا تفخر به من عملك خلال آخر ثلاث سنوات، واكتبه في حدود ستة أسطر، على أن تُجيب إجابتك عن هذه النقاط الخمس: <span class="text-red-600">*</span></div>
+                    <ol class="mb-3 list-decimal pr-5 text-xs text-alisary-soft space-y-1">
+                        <li>ما المشكلة التي واجهتك أو الهدف الذي سعيت إليه؟</li>
+                        <li>ماذا فعلت أنت بنفسك — لا ما فعله فريقك؟</li>
+                        <li>الرقم قبل عملك والرقم بعده (وقت أو عدد أو نسبة أو تكلفة).</li>
+                        <li>اسم الأداة أو الطريقة التي استخدمتها.</li>
+                        <li>رابط أو دليل يمكن الرجوع إليه، إن وُجد.</li>
+                    </ol>
+                    <textarea name="q_achievement" id="q_achievement" rows="6" maxlength="1200" required
+                        placeholder="١) المشكلة أو الهدف: …&#10;٢) ما فعلتُه بنفسي: …&#10;٣) الرقم قبل وبعد: …&#10;٤) الأداة أو الطريقة: …&#10;٥) الرابط أو الدليل: …"
+                        class="w-full min-h-[150px] rounded-xl border border-alisary-green/20 bg-white p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:ring-4 focus:ring-alisary-gold/20">{{ old('q_achievement') }}</textarea>
+                    @error('q_achievement')<div class="mt-1 text-xs text-red-600">{{ $message }}</div>@enderror
+                    <div class="mt-2 rounded-lg border border-alisary-gold/30 bg-alisary-gold/10 p-2 text-xs text-alisary-deep">سنعود إلى هذا المثال نفسه بالتفصيل في المقابلة.</div>
+                </div>
+
+                <div id="workSampleQuestion" class="rounded-xl border border-alisary-green/15 bg-alisary-ivory p-4">
+                    <p class="mb-2 text-xs text-alisary-soft">اختر الوظيفة أولًا ليظهر السؤال المناسب لمسارها.</p>
+
+                    <div class="ws hidden" data-track="التدريس">
+                        <div class="mb-2 text-sm font-medium text-alisary-deep">في صفّك الأول طالبٌ يقرأ ببطءٍ شديد، ويفقد تركيزه بعد خمس دقائق من بداية الحصّة. اكتب: (١) ثلاث خطواتٍ عملية ستنفّذها معه في الحصّة الأولى، مرتّبةً بالتسلسل، (٢) العلامة التي ستدلّك بعد أسبوعين على أنّ ما فعلته نجح. <span class="text-red-600">*</span></div>
+                        <textarea name="q_sample_teaching" rows="5" maxlength="1200" disabled
+                            placeholder="الخطوة الأولى: …&#10;الخطوة الثانية: …&#10;الخطوة الثالثة: …&#10;كيف سأعرف أنّني نجحت: …"
+                            class="w-full min-h-[120px] rounded-xl border border-alisary-green/20 bg-white p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:ring-4 focus:ring-alisary-gold/20">{{ old('q_sample_teaching') }}</textarea>
+                        @error('q_sample_teaching')<div class="mt-1 text-xs text-red-600">{{ $message }}</div>@enderror
+                    </div>
+
+                    <div class="ws hidden" data-track="التنسيق والعمليات">
+                        <div class="mb-2 text-sm font-medium text-alisary-deep">في السابعة صباحًا وصلك اعتذار معلّمين عن الحضور اليوم في فرعك، فبقي صفّان بلا معلّم، والدوام يبدأ بعد ساعة. اكتب: (١) ثلاث خطواتٍ ستنفّذها خلال هذه الساعة، مرتّبةً بالتسلسل، (٢) مَن ستتّصل به في كلّ خطوة، وبماذا ستبلغه. <span class="text-red-600">*</span></div>
+                        <textarea name="q_sample_operations" rows="5" maxlength="1200" disabled
+                            placeholder="الخطوة الأولى: … / سأتّصل بـ: …&#10;الخطوة الثانية: … / سأتّصل بـ: …&#10;الخطوة الثالثة: … / سأتّصل بـ: …"
+                            class="w-full min-h-[120px] rounded-xl border border-alisary-green/20 bg-white p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:ring-4 focus:ring-alisary-gold/20">{{ old('q_sample_operations') }}</textarea>
+                        @error('q_sample_operations')<div class="mt-1 text-xs text-red-600">{{ $message }}</div>@enderror
+                    </div>
+
+                    <div class="ws hidden" data-track="القيادة">
+                        <div class="mb-2 text-sm font-medium text-alisary-deep">توليت قيادة مؤسسةٍ تأتيها تسعون بالمئة من إيراداتها من جهةٍ واحدة داخل المجموعة؛ فإن توقّف تعاملها معها توقّف دخلها كلّه. اكتب: (١) قراران اثنان ستتّخذهما في أوّل ثلاثين يومًا لتقليل هذا الاعتماد، (٢) ما الذي ستقيسه لتعرف أنّ القرارين أثمرا. <span class="text-red-600">*</span></div>
+                        <textarea name="q_sample_leadership" rows="5" maxlength="1200" disabled
+                            placeholder="القرار الأول: …&#10;القرار الثاني: …&#10;ما سأقيسه: …"
+                            class="w-full min-h-[120px] rounded-xl border border-alisary-green/20 bg-white p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:ring-4 focus:ring-alisary-gold/20">{{ old('q_sample_leadership') }}</textarea>
+                        @error('q_sample_leadership')<div class="mt-1 text-xs text-red-600">{{ $message }}</div>@enderror
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="mb-8 border-t border-alisary-green/10 pt-8">
+            <div class="mb-1 flex items-center gap-3 font-display text-lg text-alisary-deep">
+                <span class="flex size-7 flex-none items-center justify-center rounded bg-alisary-green text-sm text-white">٥</span>
                 الإقرارات
             </div>
 
@@ -224,11 +285,14 @@
         const priority1Select = document.getElementById('priority1Select');
 
         const jobTitles = @json($jobTitles ?? new stdClass());
+        const governorateWrapper = document.getElementById('governorateWrapper');
+        const governorateSelect = document.getElementById('governorateSelect');
         const branchWrapper = document.getElementById('branchWrapper');
         const branchSelect = document.getElementById('branchSelect');
 
         // Restore old values from flashed session
         const oldP1 = @json(old('job_priority_1'));
+        const oldGovernorate = @json(old('governorate'));
         const oldBranch = @json(old('branch'));
 
         function findSelectedJob() {
@@ -243,9 +307,13 @@
             });
         }
 
-        function updateBranches() {
+        function updateBranches(governorateFilter) {
             const job = findSelectedJob();
-            const locations = (job && job.locations) ? job.locations : [];
+            let locations = (job && job.locations) ? job.locations : [];
+
+            if (governorateFilter) {
+                locations = locations.filter(loc => loc.governorate_value === governorateFilter);
+            }
 
             branchSelect.innerHTML = '<option value="">-- اختر الفرع --</option>';
 
@@ -272,6 +340,74 @@
             } else {
                 branchWrapper.style.display = 'none';
                 branchSelect.required = false;
+            }
+        }
+
+        // A job may span several branches across several governorates (e.g. the
+        // school's "تعليم مبكر" cluster). Governorate is only shown as a choice
+        // when the selected job actually spans more than one; otherwise it's
+        // implied by the single governorate the job's branches belong to.
+        function updateGovernorates() {
+            const job = findSelectedJob();
+            const locations = (job && job.locations) ? job.locations : [];
+
+            const governoratesMap = new Map();
+            locations.forEach(loc => {
+                if (loc.governorate_value) {
+                    governoratesMap.set(loc.governorate_value, loc.governorate_label);
+                }
+            });
+            const governorates = Array.from(governoratesMap, ([value, label]) => ({ value, label }));
+
+            governorateSelect.innerHTML = '<option value="">-- اختر المحافظة --</option>';
+
+            if (governorates.length > 1) {
+                governorateWrapper.style.display = '';
+                governorateSelect.required = true;
+                governorates.forEach(gov => {
+                    const option = document.createElement('option');
+                    option.value = gov.value;
+                    option.textContent = gov.label;
+                    if (oldGovernorate === gov.value) {
+                        option.selected = true;
+                    }
+                    governorateSelect.appendChild(option);
+                });
+                updateBranches(governorateSelect.value || null);
+            } else {
+                governorateWrapper.style.display = 'none';
+                governorateSelect.required = false;
+                updateBranches(governorates[0]?.value || null);
+            }
+        }
+
+        // Track values (from JobFamily->track) map to the exact Arabic
+        // data-track strings the pivotal question cards were authored with.
+        const TRACK_TO_WORK_SAMPLE = {
+            teach: 'التدريس',
+            ops: 'التنسيق والعمليات',
+            lead: 'القيادة',
+            // "support" has no matching question yet — falls through to the
+            // no-match branch below, which leaves all cards hidden and optional.
+        };
+
+        function updateWorkSampleQuestion() {
+            const job = findSelectedJob();
+            const track = job ? job.track : null;
+            const targetDataTrack = TRACK_TO_WORK_SAMPLE[track] || null;
+            const cards = document.querySelectorAll('#workSampleQuestion .ws');
+            const hint = document.querySelector('#workSampleQuestion > p');
+
+            cards.forEach(card => {
+                const on = targetDataTrack !== null && card.dataset.track === targetDataTrack;
+                card.classList.toggle('hidden', !on);
+                const textarea = card.querySelector('textarea');
+                textarea.disabled = !on;
+                textarea.required = on;
+            });
+
+            if (hint) {
+                hint.style.display = targetDataTrack !== null ? 'none' : '';
             }
         }
 
@@ -305,7 +441,8 @@
                 priority1Select.disabled = true;
             }
 
-            updateBranches();
+            updateGovernorates();
+            updateWorkSampleQuestion();
         }
 
         if (companySelect) {
@@ -317,7 +454,14 @@
         }
 
         if (priority1Select) {
-            priority1Select.addEventListener('change', updateBranches);
+            priority1Select.addEventListener('change', function () {
+                updateGovernorates();
+                updateWorkSampleQuestion();
+            });
+        }
+
+        if (governorateSelect) {
+            governorateSelect.addEventListener('change', () => updateBranches(governorateSelect.value || null));
         }
 
         // Expose function globally so the drawer can call it

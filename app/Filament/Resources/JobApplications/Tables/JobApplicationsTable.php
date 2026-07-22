@@ -51,6 +51,10 @@ class JobApplicationsTable
                 TextColumn::make('previous_period')->label('الفترة السابقة'),
                 TextColumn::make('tools_and_ai')->label('الأدوات والذكاء الاصطناعي')->limit(50)->wrap(),
                 TextColumn::make('cv_link')->label('رابط السيرة الذاتية')->limit(50)->wrap(),
+                TextColumn::make('q_achievement')->label('إنجاز واحد قابل للتحقّق')->limit(50)->wrap(),
+                TextColumn::make('q_sample_teaching')->label('عيّنة عمل — تدريس')->limit(50)->wrap(),
+                TextColumn::make('q_sample_operations')->label('عيّنة عمل — تنسيق وعمليات')->limit(50)->wrap(),
+                TextColumn::make('q_sample_leadership')->label('عيّنة عمل — قيادة')->limit(50)->wrap(),
                 TextColumn::make('consent_accurate')
                     ->label('إقرار صحة البيانات')
                     ->formatStateUsing(fn (mixed $state): string => $state ? 'نعم' : 'لا'),
