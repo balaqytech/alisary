@@ -3,7 +3,10 @@
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class StoreJobApplicationRequest extends FormRequest
 {
@@ -30,7 +33,13 @@ class StoreJobApplicationRequest extends FormRequest
             // Section 1: Basic Info
             'full_name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:50'],
-            'email' => ['required', 'email', 'max:255'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('job_applications', 'email')
+                    ->where(fn ($query) => $query->where('job_priority_1', $this->input('job_priority_1'))),
+            ],
             'nationality' => ['nullable', 'string', 'max:100'],
             'country' => ['nullable', 'string', 'max:100'],
             'city' => ['nullable', 'string', 'max:100'],
@@ -72,6 +81,30 @@ class StoreJobApplicationRequest extends FormRequest
             // Anti-spam: honeypot field must stay empty, must not be filled too fast.
             'website' => ['prohibited'],
             'form_rendered_at' => ['nullable', 'integer'],
+        ];
+    }
+
+    /**
+     * On failure, redirect back to the form's anchor instead of the page top,
+     * so the applicant actually sees their errors and old input.
+     */
+    protected function failedValidation(Validator $validator): void
+    {
+        throw new HttpResponseException(
+            back()
+                ->withFragment('apply-form')
+                ->withErrors($validator)
+                ->withInput()
+        );
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.unique' => 'لقد سبق أن تقدّمت بطلبٍ لهذه الوظيفة بهذا البريد الإلكتروني.',
         ];
     }
 
