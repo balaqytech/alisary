@@ -98,7 +98,7 @@
                     @error('company_id')<div class="text-xs text-red-600">{{ $message }}</div>@enderror
                 </div>
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-sm font-medium text-alisary-deep">أولوية الوظيفة (1) <span class="text-red-600">*</span></label>
+                    <label class="text-sm font-medium text-alisary-deep">المسمّى الوظيفي المطلوب <span class="text-red-600">*</span></label>
                     <select name="job_priority_1" id="priority1Select" required disabled class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20 disabled:cursor-not-allowed disabled:opacity-60">
                         <option value="">-- اختر وظيفة --</option>
                     </select>

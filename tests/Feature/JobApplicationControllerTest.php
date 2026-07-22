@@ -3,12 +3,9 @@
 use App\Enums\JobApplicationStatus;
 use App\Models\Company;
 use App\Models\JobApplication;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 
 it('stores a job application successfully and redirects back', function () {
-    Storage::fake('public');
     Mail::fake();
 
     $company = Company::factory()->create();
@@ -37,17 +34,13 @@ it('stores a job application successfully and redirects back', function () {
         'expected_salary' => '1000 OMR',
         'years_experience' => 5,
         'previously_worked' => 1,
-        'previously_worked_where' => 'Al Aisary',
-        'q_automate' => 'Automated deployment',
-        'q_learn' => 'Learned Laravel',
-        'q_own' => 'Built a CRM',
-        'q_brand' => 'I would refuse',
-        'q_ethics' => 'I would choose ethics',
-        'q_mission' => 'Preparing for a good life',
+        'previous_institution' => 'Al Aisary',
+        'q_achievement' => 'Automated a manual reporting process, cutting turnaround from days to minutes.',
+        'governorate' => '',
         'consent_accurate' => 1,
         'consent_ai' => 1,
         'consent_pool' => 1,
-        'cv' => UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf'),
+        'cv_link' => 'https://example.com/resume.pdf',
     ]);
 
     $response->assertRedirect(route('jobs.index').'#apply-form')
@@ -70,22 +63,79 @@ it('stores a job application successfully and redirects back', function () {
         ->status->toBe(JobApplicationStatus::New)
         ->previously_worked->toBeTrue()
         ->consent_pool->toBeTrue()
-        ->cv_path->not->toBeNull()
+        ->cv_link->toBe('https://example.com/resume.pdf')
         ->reference_number->not->toBeNull()
         ->contract_types->toBe(['دوام كامل', 'عمل حرّ مستقل (Freelance)']);
-
-    Storage::disk('public')->assertExists($application->cv_path);
 
     // If Settings returns emails in testing, it will queue.
     // In tests, the database settings might be empty by default,
     // so we can just assert nothing broke, or mock Settings if needed.
 });
 
-it('stores a long previous work history without truncating it', function () {
+it('rejects a second application to the same job with the same email', function () {
     Mail::fake();
 
     $company = Company::factory()->create();
-    $previousWorkHistory = str_repeat('Worked on educational and administrative projects. ', 80);
+
+    $payload = [
+        'full_name' => 'John Doe',
+        'phone' => '123456789',
+        'email' => 'john@example.com',
+        'company_id' => $company->id,
+        'job_priority_1' => 'Software Engineer',
+        'contract_types' => ['Full time'],
+        'expected_salary' => '1000 OMR',
+        'q_achievement' => 'Automated a manual reporting process, cutting turnaround from days to minutes.',
+        'governorate' => '',
+        'consent_accurate' => 1,
+        'consent_ai' => 1,
+    ];
+
+    $this->from(route('jobs.index'))->post(route('jobs.apply.unified'), $payload)
+        ->assertRedirect(route('jobs.index').'#apply-form');
+
+    expect(JobApplication::query()->count())->toBe(1);
+
+    $this->from(route('jobs.index'))->post(route('jobs.apply.unified'), $payload)
+        ->assertSessionHasErrors('email');
+
+    expect(JobApplication::query()->count())->toBe(1);
+});
+
+it('allows the same email to apply to a different job', function () {
+    Mail::fake();
+
+    $company = Company::factory()->create();
+
+    $basePayload = [
+        'full_name' => 'John Doe',
+        'phone' => '123456789',
+        'email' => 'john@example.com',
+        'company_id' => $company->id,
+        'contract_types' => ['Full time'],
+        'expected_salary' => '1000 OMR',
+        'q_achievement' => 'Automated a manual reporting process, cutting turnaround from days to minutes.',
+        'governorate' => '',
+        'consent_accurate' => 1,
+        'consent_ai' => 1,
+    ];
+
+    $this->from(route('jobs.index'))
+        ->post(route('jobs.apply.unified'), [...$basePayload, 'job_priority_1' => 'Software Engineer'])
+        ->assertRedirect(route('jobs.index').'#apply-form');
+
+    $this->from(route('jobs.index'))
+        ->post(route('jobs.apply.unified'), [...$basePayload, 'job_priority_1' => 'Product Manager'])
+        ->assertRedirect(route('jobs.index').'#apply-form');
+
+    expect(JobApplication::query()->count())->toBe(2);
+});
+
+it('stores a long tools_and_ai answer without truncating it', function () {
+    Mail::fake();
+
+    $company = Company::factory()->create();
+    $toolsAndAi = str_repeat('Worked on educational and administrative projects. ', 80);
 
     $this->from(route('jobs.index'))->post(route('jobs.apply.unified'), [
         'full_name' => 'John Doe',
@@ -95,11 +145,13 @@ it('stores a long previous work history without truncating it', function () {
         'job_priority_1' => 'Software Engineer',
         'contract_types' => ['Full time'],
         'expected_salary' => '1000 OMR',
-        'previously_worked_where' => $previousWorkHistory,
+        'q_achievement' => 'Automated a manual reporting process, cutting turnaround from days to minutes.',
+        'governorate' => '',
+        'tools_and_ai' => $toolsAndAi,
         'consent_accurate' => 1,
         'consent_ai' => 1,
     ])->assertRedirect(route('jobs.index').'#apply-form');
 
-    expect(JobApplication::query()->firstOrFail()->previously_worked_where)
-        ->toBe(rtrim($previousWorkHistory));
+    expect(JobApplication::query()->firstOrFail()->tools_and_ai)
+        ->toBe(rtrim($toolsAndAi));
 });
