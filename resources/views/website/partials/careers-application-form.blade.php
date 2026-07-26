@@ -223,8 +223,8 @@
                     <div class="flex flex-col gap-1.5">
                         <label class="text-sm font-medium text-alisary-deep">الراتب الشهري المتوقّع <span
                                 class="text-red-600">*</span></label>
-                        <input name="expected_salary" type="number" inputmode="decimal" min="0" step="any"
-                            value="{{ old('expected_salary') }}" required placeholder="مثال: 1000"
+                        <input name="expected_salary" type="number" inputmode="decimal" min="0"
+                            step="any" value="{{ old('expected_salary') }}" required placeholder="مثال: 1000"
                             class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                         @error('expected_salary')
                             <div class="text-xs text-red-600">{{ $message }}</div>
@@ -244,10 +244,11 @@
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
                     <div class="flex flex-col gap-1.5">
                         <label class="text-sm font-medium text-alisary-deep">سنوات الخبرة في نفس مجال الوظيفة</label>
-                        <input name="years_experience" type="number" inputmode="numeric" min="0" max="60" step="1"
-                            value="{{ old('years_experience') }}"
+                        <input name="years_experience" type="number" inputmode="numeric" min="0"
+                            max="60" step="1" value="{{ old('years_experience') }}"
                             class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
-                        <p class="text-xs text-alisary-soft">أدخل سنوات خبرتك في المجال نفسه الذي تنتمي إليه الوظيفة.</p>
+                        <p class="text-xs text-alisary-soft">أدخل سنوات خبرتك في المجال نفسه الذي تنتمي إليه الوظيفة.
+                        </p>
                         @error('years_experience')
                             <div class="text-xs text-red-600">{{ $message }}</div>
                         @enderror
@@ -312,7 +313,8 @@
                     <div class="rounded-xl border border-alisary-green/15 bg-alisary-ivory p-4">
                         <div class="mb-2 text-sm font-medium text-alisary-deep">اختر إنجازًا واحدًا حقيقيًّا تفخر به من
                             عملك خلال آخر ثلاث سنوات، واكتبه في حدود ستة أسطر، على أن تُجيب إجابتك عن هذه النقاط الخمس:
-                            <span class="text-red-600">*</span></div>
+                            <span class="text-red-600">*</span>
+                        </div>
                         <ol class="mb-3 list-decimal pr-5 text-xs text-alisary-soft space-y-1">
                             <li>ما المشكلة التي واجهتك أو الهدف الذي سعيت إليه؟</li>
                             <li>ماذا فعلت أنت بنفسك — لا ما فعله فريقك؟</li>
@@ -456,8 +458,7 @@
             const availableJobs = jobTitles[companyId] || [];
             const selectedValue = priority1Select.value;
             return availableJobs.find(job => {
-                const jobOption = typeof job === 'string' ?
-                    {
+                const jobOption = typeof job === 'string' ? {
                         title: job,
                         value: job,
                         label: job
@@ -584,8 +585,7 @@
                 priority1Select.disabled = false;
 
                 availableJobs.forEach(job => {
-                    const jobOption = typeof job === 'string' ?
-                        {
+                    const jobOption = typeof job === 'string' ? {
                             title: job,
                             value: job,
                             label: job

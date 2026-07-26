@@ -6,9 +6,11 @@ use App\Enums\JobTrack;
 use App\Models\JobListing;
 use App\Support\CountryDialCodes;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreJobApplicationRequest extends FormRequest
 {
@@ -43,7 +45,13 @@ class StoreJobApplicationRequest extends FormRequest
             'full_name' => ['required', 'string', 'max:255'],
             'phone_country_code' => ['required', Rule::in(CountryDialCodes::allowedCodes())],
             'phone' => ['required', 'string', 'regex:/^[0-9]{6,15}$/'],
-            'email' => ['required', 'email:rfc', 'max:255'],
+            'email' => [
+                'required',
+                'email:rfc',
+                'max:255',
+                Rule::unique('job_applications', 'email')
+                    ->where(fn($query) => $query->where('job_priority_1', $this->input('job_priority_1'))),
+            ],
             'gender' => ['required', Rule::in(['male', 'female'])],
             'nationality' => ['nullable', 'string', 'max:100'],
             'country' => ['nullable', 'string', 'max:100'],
@@ -97,6 +105,30 @@ class StoreJobApplicationRequest extends FormRequest
             'phone_country_code' => $this->input('phone_country_code', CountryDialCodes::DEFAULT),
             'submission_token' => $this->input('submission_token', (string) Str::uuid()),
         ]);
+    }
+
+    /**
+     * On failure, redirect back to the form's anchor instead of the page top,
+     * so the applicant actually sees their errors and old input.
+     */
+    protected function failedValidation(Validator $validator): void
+    {
+        throw new HttpResponseException(
+            back()
+                ->withFragment('apply-form')
+                ->withErrors($validator)
+                ->withInput()
+        );
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.unique' => 'لقد سبق أن تقدّمت بطلبٍ لهذه الوظيفة بهذا البريد الإلكتروني.',
+        ];
     }
 
     /**
