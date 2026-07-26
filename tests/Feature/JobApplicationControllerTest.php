@@ -74,7 +74,7 @@ it('stores a job application, shows its reference number, and locks the submit b
 
     $application = JobApplication::query()->firstOrFail();
 
-    $response->assertRedirect(route('jobs.index') . '#apply-form')
+    $response->assertRedirect(route('jobs.index').'#apply-form')
         ->assertSessionHas('application_success', true)
         ->assertSessionHas('application_reference_number', $application->reference_number);
 
@@ -105,27 +105,18 @@ it('rejects a second application to the same job with the same email', function 
     Mail::fake();
 
     $company = Company::factory()->create();
-
-    $payload = [
-        'full_name' => 'John Doe',
-        'phone' => '123456789',
-        'email' => 'john@example.com',
-        'company_id' => $company->id,
-        'job_priority_1' => 'Software Engineer',
-        'contract_types' => ['Full time'],
-        'expected_salary' => '1000 OMR',
-        'q_achievement' => 'Automated a manual reporting process, cutting turnaround from days to minutes.',
-        'governorate' => '',
-        'consent_accurate' => 1,
-        'consent_ai' => 1,
-    ];
+    $jobListing = jobApplicationListing($company);
+    $payload = validJobApplicationPayload($company, $jobListing);
 
     $this->from(route('jobs.index'))->post(route('jobs.apply.unified'), $payload)
-        ->assertRedirect(route('jobs.index') . '#apply-form');
+        ->assertRedirect(route('jobs.index').'#apply-form');
 
     expect(JobApplication::query()->count())->toBe(1);
 
-    $this->from(route('jobs.index'))->post(route('jobs.apply.unified'), $payload)
+    $this->from(route('jobs.index'))->post(route('jobs.apply.unified'), [
+        ...$payload,
+        'submission_token' => (string) Str::uuid(),
+    ])
         ->assertSessionHasErrors('email');
 
     expect(JobApplication::query()->count())->toBe(1);
@@ -135,27 +126,16 @@ it('allows the same email to apply to a different job', function () {
     Mail::fake();
 
     $company = Company::factory()->create();
-
-    $basePayload = [
-        'full_name' => 'John Doe',
-        'phone' => '123456789',
-        'email' => 'john@example.com',
-        'company_id' => $company->id,
-        'contract_types' => ['Full time'],
-        'expected_salary' => '1000 OMR',
-        'q_achievement' => 'Automated a manual reporting process, cutting turnaround from days to minutes.',
-        'governorate' => '',
-        'consent_accurate' => 1,
-        'consent_ai' => 1,
-    ];
+    $firstJobListing = jobApplicationListing($company);
+    $secondJobListing = jobApplicationListing($company);
 
     $this->from(route('jobs.index'))
-        ->post(route('jobs.apply.unified'), [...$basePayload, 'job_priority_1' => 'Software Engineer'])
-        ->assertRedirect(route('jobs.index') . '#apply-form');
+        ->post(route('jobs.apply.unified'), validJobApplicationPayload($company, $firstJobListing))
+        ->assertRedirect(route('jobs.index').'#apply-form');
 
     $this->from(route('jobs.index'))
-        ->post(route('jobs.apply.unified'), [...$basePayload, 'job_priority_1' => 'Product Manager'])
-        ->assertRedirect(route('jobs.index') . '#apply-form');
+        ->post(route('jobs.apply.unified'), validJobApplicationPayload($company, $secondJobListing))
+        ->assertRedirect(route('jobs.index').'#apply-form');
 
     expect(JobApplication::query()->count())->toBe(2);
 });
@@ -165,13 +145,13 @@ it('stores a long tools_and_ai answer without truncating it', function () {
 
     $company = Company::factory()->create();
     $jobListing = jobApplicationListing($company);
-    $previousWorkHistory = str_repeat('Worked on educational and administrative projects. ', 80);
+    $toolsAndAi = str_repeat('Worked with automation and artificial intelligence tools. ', 80);
 
     $this->from(route('jobs.index'))->post(route('jobs.apply.unified'), validJobApplicationPayload(
         $company,
         $jobListing,
-        ['previously_worked_where' => $previousWorkHistory],
-    ))->assertRedirect(route('jobs.index') . '#apply-form');
+        ['tools_and_ai' => $toolsAndAi],
+    ))->assertRedirect(route('jobs.index').'#apply-form');
 
     expect(JobApplication::query()->firstOrFail()->tools_and_ai)
         ->toBe(rtrim($toolsAndAi));
@@ -187,7 +167,7 @@ it('validates contact, numeric, gender, and pivotal question fields', function (
         ->post(route('jobs.apply.unified'), validJobApplicationPayload($company, $jobListing, [
             $field => $invalidValue,
         ]))
-        ->assertRedirect(route('jobs.index'))
+        ->assertRedirect(route('jobs.index').'#apply-form')
         ->assertSessionHasErrors($field);
 
     expect(JobApplication::query()->count())->toBe(0);
@@ -200,6 +180,38 @@ it('validates contact, numeric, gender, and pivotal question fields', function (
     'missing track-specific answer' => ['q_sample_teaching', null],
     'missing compelling reason' => ['q_compelling_reason', null],
 ]);
+
+it('renders a validation summary and messages beside every invalid field', function () {
+    Mail::fake();
+
+    $company = Company::factory()->create();
+    $jobListing = jobApplicationListing($company);
+
+    $response = $this->from(route('jobs.index'))->post(
+        route('jobs.apply.unified'),
+        validJobApplicationPayload($company, $jobListing, [
+            'country' => str_repeat('a', 101),
+            'ready_date' => 'not-a-date',
+            'previous_role' => str_repeat('a', 256),
+            'consent_accurate' => null,
+            'consent_ai' => null,
+        ]),
+    );
+
+    $response->assertRedirect(route('jobs.index').'#apply-form');
+
+    $page = $this->followRedirects($response);
+
+    $page
+        ->assertSuccessful()
+        ->assertSee('data-validation-summary', false)
+        ->assertSee('تعذّر إرسال الطلب. يرجى مراجعة الحقول التالية:')
+        ->assertSee('data-validation-error-for="country"', false)
+        ->assertSee('data-validation-error-for="ready_date"', false)
+        ->assertSee('data-validation-error-for="previous_role"', false)
+        ->assertSee('data-validation-error-for="consent_accurate"', false)
+        ->assertSee('data-validation-error-for="consent_ai"', false);
+});
 
 it('uses Oman as the default phone country code', function () {
     Mail::fake();

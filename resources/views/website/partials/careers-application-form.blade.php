@@ -40,7 +40,7 @@
         </div>
 
         <form data-job-application-form class="rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-sm sm:p-8"
-            action="{{ route('jobs.apply.unified') }}" method="POST">
+            action="{{ route('jobs.apply.unified') }}" method="POST" novalidate>
             @csrf
 
             {{-- Honeypot: hidden from humans via CSS, bots tend to fill every field they see --}}
@@ -51,6 +51,18 @@
             <input type="hidden" name="form_rendered_at" id="formRenderedAt" value="{{ now()->timestamp }}">
             <input type="hidden" name="submission_token"
                 value="{{ old('submission_token', session('application_submission_token', (string) \Illuminate\Support\Str::uuid())) }}">
+
+            @if ($errors->any())
+                <div data-validation-summary role="alert" aria-live="assertive"
+                    class="mb-8 rounded-xl border border-red-200 border-r-4 border-r-red-600 bg-red-50 p-4 text-red-800">
+                    <p class="font-bold">تعذّر إرسال الطلب. يرجى مراجعة الحقول التالية:</p>
+                    <ul class="mt-2 list-disc space-y-1 pr-5 text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             <!-- 1 -->
             <div class="mb-8">
@@ -122,16 +134,25 @@
                             <label class="text-sm font-medium text-alisary-deep">الجنسية</label>
                             <input name="nationality" value="{{ old('nationality') }}"
                                 class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                            @error('nationality')
+                                <div data-validation-error-for="nationality" class="text-xs text-red-600">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <label class="text-sm font-medium text-alisary-deep">دولة الإقامة</label>
                             <input name="country" value="{{ old('country') }}"
                                 class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                            @error('country')
+                                <div data-validation-error-for="country" class="text-xs text-red-600">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <label class="text-sm font-medium text-alisary-deep">المدينة</label>
                             <input name="city" value="{{ old('city') }}"
                                 class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                            @error('city')
+                                <div data-validation-error-for="city" class="text-xs text-red-600">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                 </div>
@@ -219,6 +240,9 @@
                         <label class="text-sm font-medium text-alisary-deep">متى يمكنك المباشرة؟</label>
                         <input name="ready_date" type="date" value="{{ old('ready_date') }}"
                             class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                        @error('ready_date')
+                            <div data-validation-error-for="ready_date" class="text-xs text-red-600">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="flex flex-col gap-1.5">
                         <label class="text-sm font-medium text-alisary-deep">الراتب الشهري المتوقّع <span
@@ -267,6 +291,9 @@
                             الاصطناعي) التي تُتقن استخدامها لتسريع عملك؟</label>
                         <textarea name="tools_and_ai" placeholder="مثال: أستخدم ChatGPT في كذا، وأداة كذا في..." rows="3"
                             class="w-full min-h-[78px] rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">{{ old('tools_and_ai') }}</textarea>
+                        @error('tools_and_ai')
+                            <div data-validation-error-for="tools_and_ai" class="text-xs text-red-600">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="flex flex-col gap-1.5">
@@ -277,6 +304,9 @@
                             <option value="0" @selected(!old('previously_worked'))>لا</option>
                             <option value="1" @selected(old('previously_worked'))>نعم</option>
                         </select>
+                        @error('previously_worked')
+                            <div data-validation-error-for="previously_worked" class="text-xs text-red-600">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="grid gap-4 sm:col-span-2 sm:grid-cols-3" id="previousWorkWrapper"
@@ -285,17 +315,26 @@
                             <label class="text-sm font-medium text-alisary-deep">أيّ مؤسسة؟</label>
                             <input name="previous_institution" value="{{ old('previous_institution') }}"
                                 class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                            @error('previous_institution')
+                                <div data-validation-error-for="previous_institution" class="text-xs text-red-600">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <label class="text-sm font-medium text-alisary-deep">ما الدور؟</label>
                             <input name="previous_role" value="{{ old('previous_role') }}"
                                 class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                            @error('previous_role')
+                                <div data-validation-error-for="previous_role" class="text-xs text-red-600">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <label class="text-sm font-medium text-alisary-deep">في أيّ فترة؟</label>
                             <input name="previous_period" value="{{ old('previous_period') }}"
                                 placeholder="مثال: 2018–2021"
                                 class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                            @error('previous_period')
+                                <div data-validation-error-for="previous_period" class="text-xs text-red-600">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                 </div>
@@ -407,6 +446,9 @@
                         <span>أُقرّ بأنّ جميع البيانات المُدخلة صحيحةٌ ودقيقةٌ وتُمثّل قدراتي ومؤهلاتي الفعلية.<span
                                 class="text-red-600">*</span></span>
                     </label>
+                    @error('consent_accurate')
+                        <div data-validation-error-for="consent_accurate" class="text-xs text-red-600">{{ $message }}</div>
+                    @enderror
                     <label class="flex items-start gap-3 text-sm text-alisary-ink">
                         <input type="checkbox" name="consent_ai" value="1" required
                             class="mt-1 flex-none text-alisary-green focus:ring-alisary-green"
@@ -414,6 +456,9 @@
                         <span>أوافق على قيام المجموعة باستخدام أدوات المعالجة الآلية والذكاء الاصطناعي لتحليل إجاباتي
                             لفرزها وتقييم ملاءمتي.<span class="text-red-600">*</span></span>
                     </label>
+                    @error('consent_ai')
+                        <div data-validation-error-for="consent_ai" class="text-xs text-red-600">{{ $message }}</div>
+                    @enderror
                     <label class="flex items-start gap-3 text-sm text-alisary-ink">
                         <input type="checkbox" name="consent_pool" value="1"
                             class="mt-1 flex-none text-alisary-green focus:ring-alisary-green"
@@ -421,6 +466,9 @@
                         <span>أوافق على الاحتفاظ ببياناتي ضمن «بركة المواهب» (Talent Pool) للتواصل معي متى ما توفّر
                             شاغرٌ مناسبٌ مستقبلًا (اختياري).</span>
                     </label>
+                    @error('consent_pool')
+                        <div data-validation-error-for="consent_pool" class="text-xs text-red-600">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
 

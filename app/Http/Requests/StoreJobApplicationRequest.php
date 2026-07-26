@@ -3,14 +3,15 @@
 namespace App\Http\Requests;
 
 use App\Enums\JobTrack;
+use App\Models\JobApplication;
 use App\Models\JobListing;
 use App\Support\CountryDialCodes;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreJobApplicationRequest extends FormRequest
 {
@@ -33,6 +34,9 @@ class StoreJobApplicationRequest extends FormRequest
      */
     public function rules(): array
     {
+        $existingApplication = JobApplication::query()
+            ->where('submission_token', $this->string('submission_token')->toString())
+            ->first();
         $jobTrack = JobListing::query()
             ->where('job_code', $this->string('job_priority_1')->toString())
             ->with('jobFamily')
@@ -50,7 +54,8 @@ class StoreJobApplicationRequest extends FormRequest
                 'email:rfc',
                 'max:255',
                 Rule::unique('job_applications', 'email')
-                    ->where(fn($query) => $query->where('job_priority_1', $this->input('job_priority_1'))),
+                    ->where(fn ($query) => $query->where('job_priority_1', $this->input('job_priority_1')))
+                    ->ignore($existingApplication),
             ],
             'gender' => ['required', Rule::in(['male', 'female'])],
             'nationality' => ['nullable', 'string', 'max:100'],
@@ -142,12 +147,23 @@ class StoreJobApplicationRequest extends FormRequest
             'phone' => 'رقم الهاتف',
             'email' => 'البريد الإلكتروني',
             'gender' => 'الجنس',
+            'nationality' => 'الجنسية',
+            'country' => 'دولة الإقامة',
+            'city' => 'المدينة',
             'company_id' => 'المؤسسة',
+            'governorate' => 'المحافظة',
             'branch' => 'الفرع',
             'job_priority_1' => 'أولوية الوظيفة الأولى',
             'contract_types' => 'نمط التعاقد',
+            'ready_date' => 'تاريخ المباشرة',
             'expected_salary' => 'الراتب الشهري المتوقع',
             'years_experience' => 'سنوات الخبرة في مجال الوظيفة',
+            'previously_worked' => 'العمل السابق في المجموعة',
+            'previous_institution' => 'المؤسسة السابقة',
+            'previous_role' => 'الدور السابق',
+            'previous_period' => 'فترة العمل السابقة',
+            'tools_and_ai' => 'الأدوات والبرمجيات',
+            'cv_link' => 'رابط السيرة الذاتية أو معرض الأعمال',
             'q_achievement' => 'سؤال الإنجاز',
             'q_sample_teaching' => 'سؤال عينة العمل لمسار التدريس',
             'q_sample_operations' => 'سؤال عينة العمل لمسار التنسيق والعمليات',
@@ -155,6 +171,7 @@ class StoreJobApplicationRequest extends FormRequest
             'q_compelling_reason' => 'سبب اختيارك من بين المتقدمين',
             'consent_accurate' => 'إقرار صحة البيانات',
             'consent_ai' => 'موافقة المعالجة بالذكاء الاصطناعي',
+            'consent_pool' => 'موافقة الاحتفاظ بالبيانات',
         ];
     }
 }
