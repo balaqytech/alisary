@@ -2,8 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\JobTrack;
+use App\Models\JobListing;
+use App\Support\CountryDialCodes;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class StoreJobApplicationRequest extends FormRequest
 {
@@ -26,11 +31,20 @@ class StoreJobApplicationRequest extends FormRequest
      */
     public function rules(): array
     {
+        $jobTrack = JobListing::query()
+            ->where('job_code', $this->string('job_priority_1')->toString())
+            ->with('jobFamily')
+            ->first()
+            ?->jobFamily
+            ?->track;
+
         return [
             // Section 1: Basic Info
             'full_name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:50'],
-            'email' => ['required', 'email', 'max:255'],
+            'phone_country_code' => ['required', Rule::in(CountryDialCodes::allowedCodes())],
+            'phone' => ['required', 'string', 'regex:/^[0-9]{6,15}$/'],
+            'email' => ['required', 'email:rfc', 'max:255'],
+            'gender' => ['required', Rule::in(['male', 'female'])],
             'nationality' => ['nullable', 'string', 'max:100'],
             'country' => ['nullable', 'string', 'max:100'],
             'city' => ['nullable', 'string', 'max:100'],
@@ -43,11 +57,12 @@ class StoreJobApplicationRequest extends FormRequest
             'contract_types' => ['required', 'array', 'min:1'],
             'contract_types.*' => ['string'],
             'ready_date' => ['nullable', 'date'],
-            'expected_salary' => ['required', 'string', 'max:255'],
+            'expected_salary' => ['required', 'numeric', 'min:0', 'max:999999999'],
 
             // Section 3: Experience & Tools
             'years_experience' => ['nullable', 'integer', 'min:0', 'max:60'],
             'previously_worked' => ['nullable', 'boolean'],
+            'previously_worked_where' => ['nullable', 'string'],
             'previous_institution' => ['nullable', 'string', 'max:255'],
             'previous_role' => ['nullable', 'string', 'max:255'],
             'previous_period' => ['nullable', 'string', 'max:255'],
@@ -56,13 +71,10 @@ class StoreJobApplicationRequest extends FormRequest
 
             // Section 4: Pivotal questions
             'q_achievement' => ['required', 'string', 'max:1200'],
-            // Only one of the three is actually enabled client-side, based on the
-            // applicant's job track — the others are disabled and never submitted.
-            // Not marked required here since a track without a matching question
-            // (currently "support") must still be able to submit.
-            'q_sample_teaching' => ['nullable', 'string', 'max:1200'],
-            'q_sample_operations' => ['nullable', 'string', 'max:1200'],
-            'q_sample_leadership' => ['nullable', 'string', 'max:1200'],
+            'q_sample_teaching' => [Rule::requiredIf($jobTrack === JobTrack::Teach), 'nullable', 'string', 'max:1200'],
+            'q_sample_operations' => [Rule::requiredIf($jobTrack === JobTrack::Ops), 'nullable', 'string', 'max:1200'],
+            'q_sample_leadership' => [Rule::requiredIf($jobTrack === JobTrack::Lead), 'nullable', 'string', 'max:1200'],
+            'q_compelling_reason' => ['required', 'string', 'max:1200'],
 
             // Section 5: Consents
             'consent_accurate' => ['required', 'accepted'],
@@ -72,7 +84,19 @@ class StoreJobApplicationRequest extends FormRequest
             // Anti-spam: honeypot field must stay empty, must not be filled too fast.
             'website' => ['prohibited'],
             'form_rendered_at' => ['nullable', 'integer'],
+            'submission_token' => ['required', 'uuid'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $phone = preg_replace('/[\s\-().]+/', '', $this->string('phone')->toString());
+
+        $this->merge([
+            'phone' => $phone,
+            'phone_country_code' => $this->input('phone_country_code', CountryDialCodes::DEFAULT),
+            'submission_token' => $this->input('submission_token', (string) Str::uuid()),
+        ]);
     }
 
     /**
@@ -82,13 +106,21 @@ class StoreJobApplicationRequest extends FormRequest
     {
         return [
             'full_name' => 'الاسم الكامل',
+            'phone_country_code' => 'مفتاح الدولة',
             'phone' => 'رقم الهاتف',
             'email' => 'البريد الإلكتروني',
+            'gender' => 'الجنس',
             'company_id' => 'المؤسسة',
             'branch' => 'الفرع',
             'job_priority_1' => 'أولوية الوظيفة الأولى',
             'contract_types' => 'نمط التعاقد',
             'expected_salary' => 'الراتب الشهري المتوقع',
+            'years_experience' => 'سنوات الخبرة في مجال الوظيفة',
+            'q_achievement' => 'سؤال الإنجاز',
+            'q_sample_teaching' => 'سؤال عينة العمل لمسار التدريس',
+            'q_sample_operations' => 'سؤال عينة العمل لمسار التنسيق والعمليات',
+            'q_sample_leadership' => 'سؤال عينة العمل لمسار القيادة',
+            'q_compelling_reason' => 'سبب اختيارك من بين المتقدمين',
             'consent_accurate' => 'إقرار صحة البيانات',
             'consent_ai' => 'موافقة المعالجة بالذكاء الاصطناعي',
         ];

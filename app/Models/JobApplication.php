@@ -22,6 +22,7 @@ class JobApplication extends Model
 
     protected $attributes = [
         'status' => 'new',
+        'phone_country_code' => '+968',
         'previously_worked' => false,
         'consent_accurate' => false,
         'consent_ai' => false,

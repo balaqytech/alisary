@@ -1,105 +1,172 @@
 <?php
 
 use App\Enums\JobApplicationStatus;
+use App\Enums\JobTrack;
 use App\Models\Company;
 use App\Models\JobApplication;
-use Illuminate\Http\UploadedFile;
+use App\Models\JobFamily;
+use App\Models\JobListing;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
-it('stores a job application successfully and redirects back', function () {
-    Storage::fake('public');
+function jobApplicationListing(Company $company): JobListing
+{
+    $jobFamily = JobFamily::factory()->create(['track' => JobTrack::Teach]);
+
+    return JobListing::factory()
+        ->for($company)
+        ->for($jobFamily)
+        ->create(['title' => 'Software Engineer']);
+}
+
+/**
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function validJobApplicationPayload(Company $company, JobListing $jobListing, array $overrides = []): array
+{
+    return array_replace([
+        'submission_token' => (string) Str::uuid(),
+        'full_name' => 'John Doe',
+        'phone_country_code' => '+968',
+        'phone' => '91234567',
+        'email' => 'john@example.com',
+        'gender' => 'male',
+        'nationality' => 'Omani',
+        'country' => 'Oman',
+        'city' => 'Muscat',
+        'company_id' => $company->id,
+        'job_priority_1' => $jobListing->job_code,
+        'contract_types' => ['دوام كامل'],
+        'expected_salary' => 1000,
+        'years_experience' => 5,
+        'previously_worked' => 1,
+        'previous_institution' => 'Al Aisary',
+        'q_achievement' => 'I improved a measurable process from ten hours to two hours.',
+        'q_sample_teaching' => 'I would assess the learner, adapt the activity, and measure reading fluency.',
+        'q_compelling_reason' => 'I combine relevant experience with measurable ownership and fast learning.',
+        'consent_accurate' => 1,
+        'consent_ai' => 1,
+        'consent_pool' => 1,
+    ], $overrides);
+}
+
+it('stores a job application, shows its reference number, and locks the submit button', function () {
     Mail::fake();
 
     $company = Company::factory()->create();
+    $jobListing = jobApplicationListing($company);
 
     $jobsPage = $this->get(route('jobs.index'))
         ->assertSuccessful()
         ->assertSee('data-job-application-form', false)
         ->assertSee('data-job-application-submit', false)
+        ->assertSee('value="+968" selected', false)
         ->assertDontSee('aria-disabled="true"', false);
 
     expect($jobsPage->getContent())
         ->not->toMatch('/<button\b(?=[^>]*\bdata-job-application-submit\b)(?=[^>]*\sdisabled(?:\s|=|\/?>))[^>]*>/');
 
-    $response = $this->from(route('jobs.index'))->post(route('jobs.apply.unified'), [
-        'full_name' => 'John Doe',
-        'phone' => '123456789',
-        'email' => 'john@example.com',
-        'nationality' => 'Omani',
-        'country' => 'Oman',
-        'city' => 'Muscat',
-        'company_id' => $company->id,
-        'job_priority_1' => 'Software Engineer',
-        'job_priority_2' => 'Web Developer',
-        'job_priority_3' => 'Backend Developer',
-        'contract_types' => ['دوام كامل', 'عمل حرّ مستقل (Freelance)'],
-        'expected_salary' => '1000 OMR',
-        'years_experience' => 5,
-        'previously_worked' => 1,
-        'previously_worked_where' => 'Al Aisary',
-        'q_automate' => 'Automated deployment',
-        'q_learn' => 'Learned Laravel',
-        'q_own' => 'Built a CRM',
-        'q_brand' => 'I would refuse',
-        'q_ethics' => 'I would choose ethics',
-        'q_mission' => 'Preparing for a good life',
-        'consent_accurate' => 1,
-        'consent_ai' => 1,
-        'consent_pool' => 1,
-        'cv' => UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf'),
-    ]);
+    $response = $this->from(route('jobs.index'))->post(
+        route('jobs.apply.unified'),
+        validJobApplicationPayload($company, $jobListing),
+    );
+
+    $application = JobApplication::query()->firstOrFail();
 
     $response->assertRedirect(route('jobs.index').'#apply-form')
-        ->assertSessionHas('application_success', true);
+        ->assertSessionHas('application_success', true)
+        ->assertSessionHas('application_reference_number', $application->reference_number);
 
     $successPage = $this->get(route('jobs.index'))
         ->assertSuccessful()
         ->assertSee('aria-disabled="true"', false)
-        ->assertSee('تم إرسال الطلب');
+        ->assertSee('تم إرسال الطلب')
+        ->assertSee($application->reference_number);
 
     expect($successPage->getContent())
         ->toMatch('/<button\b(?=[^>]*\bdata-job-application-submit\b)(?=[^>]*\sdisabled(?:\s|=|\/?>))[^>]*>/');
 
-    $application = JobApplication::first();
-
     expect($application)
-        ->not->toBeNull()
         ->full_name->toBe('John Doe')
+        ->phone_country_code->toBe('+968')
+        ->phone->toBe('91234567')
         ->email->toBe('john@example.com')
+        ->gender->toBe('male')
         ->status->toBe(JobApplicationStatus::New)
         ->previously_worked->toBeTrue()
         ->consent_pool->toBeTrue()
-        ->cv_path->not->toBeNull()
         ->reference_number->not->toBeNull()
-        ->contract_types->toBe(['دوام كامل', 'عمل حرّ مستقل (Freelance)']);
-
-    Storage::disk('public')->assertExists($application->cv_path);
-
-    // If Settings returns emails in testing, it will queue.
-    // In tests, the database settings might be empty by default,
-    // so we can just assert nothing broke, or mock Settings if needed.
+        ->contract_types->toBe(['دوام كامل'])
+        ->q_compelling_reason->not->toBeEmpty();
 });
 
 it('stores a long previous work history without truncating it', function () {
     Mail::fake();
 
     $company = Company::factory()->create();
+    $jobListing = jobApplicationListing($company);
     $previousWorkHistory = str_repeat('Worked on educational and administrative projects. ', 80);
 
-    $this->from(route('jobs.index'))->post(route('jobs.apply.unified'), [
-        'full_name' => 'John Doe',
-        'phone' => '123456789',
-        'email' => 'john@example.com',
-        'company_id' => $company->id,
-        'job_priority_1' => 'Software Engineer',
-        'contract_types' => ['Full time'],
-        'expected_salary' => '1000 OMR',
-        'previously_worked_where' => $previousWorkHistory,
-        'consent_accurate' => 1,
-        'consent_ai' => 1,
-    ])->assertRedirect(route('jobs.index').'#apply-form');
+    $this->from(route('jobs.index'))->post(route('jobs.apply.unified'), validJobApplicationPayload(
+        $company,
+        $jobListing,
+        ['previously_worked_where' => $previousWorkHistory],
+    ))->assertRedirect(route('jobs.index').'#apply-form');
 
     expect(JobApplication::query()->firstOrFail()->previously_worked_where)
         ->toBe(rtrim($previousWorkHistory));
+});
+
+it('validates contact, numeric, gender, and pivotal question fields', function (string $field, mixed $invalidValue) {
+    Mail::fake();
+
+    $company = Company::factory()->create();
+    $jobListing = jobApplicationListing($company);
+
+    $this->from(route('jobs.index'))
+        ->post(route('jobs.apply.unified'), validJobApplicationPayload($company, $jobListing, [
+            $field => $invalidValue,
+        ]))
+        ->assertRedirect(route('jobs.index'))
+        ->assertSessionHasErrors($field);
+
+    expect(JobApplication::query()->count())->toBe(0);
+})->with([
+    'invalid email' => ['email', 'not-an-email'],
+    'non-numeric expected salary' => ['expected_salary', '1000 OMR'],
+    'non-numeric experience years' => ['years_experience', 'five'],
+    'missing gender' => ['gender', null],
+    'missing achievement answer' => ['q_achievement', null],
+    'missing track-specific answer' => ['q_sample_teaching', null],
+    'missing compelling reason' => ['q_compelling_reason', null],
+]);
+
+it('uses Oman as the default phone country code', function () {
+    Mail::fake();
+
+    $company = Company::factory()->create();
+    $jobListing = jobApplicationListing($company);
+    $payload = validJobApplicationPayload($company, $jobListing);
+    unset($payload['phone_country_code']);
+
+    $this->post(route('jobs.apply.unified'), $payload)->assertRedirect();
+
+    expect(JobApplication::query()->firstOrFail()->phone_country_code)->toBe('+968');
+});
+
+it('does not create a duplicate application for the same submission token', function () {
+    Mail::fake();
+
+    $company = Company::factory()->create();
+    $jobListing = jobApplicationListing($company);
+    $payload = validJobApplicationPayload($company, $jobListing);
+
+    $firstResponse = $this->post(route('jobs.apply.unified'), $payload)->assertRedirect();
+    $secondResponse = $this->post(route('jobs.apply.unified'), $payload)->assertRedirect();
+    $application = JobApplication::query()->sole();
+
+    $firstResponse->assertSessionHas('application_reference_number', $application->reference_number);
+    $secondResponse->assertSessionHas('application_reference_number', $application->reference_number);
+    expect(JobApplication::query()->count())->toBe(1);
 });

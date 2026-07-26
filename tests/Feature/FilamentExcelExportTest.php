@@ -16,30 +16,54 @@ beforeEach(function () {
     $this->actingAs(User::factory()->create());
 });
 
-function jobApplicationTableColumns(): array
+function jobApplicationTableColumns(bool $includeLegacyColumns = false): array
 {
-    return [
+    $columns = [
         'reference_number',
         'status',
         'full_name',
         'phone',
         'email',
+        'gender',
         'nationality',
         'country',
         'city',
         'company.name',
+        'governorate',
         'branch',
         'job_priority_1',
-        'job_priority_2',
-        'job_priority_3',
+        'track',
         'contract_types',
         'ready_date',
         'expected_salary',
         'years_experience',
         'previously_worked',
-        'previously_worked_where',
+        'previous_institution',
+        'previous_role',
+        'previous_period',
         'tools_and_ai',
         'cv_link',
+        'q_achievement',
+        'q_sample_teaching',
+        'q_sample_operations',
+        'q_sample_leadership',
+        'q_compelling_reason',
+        'consent_accurate',
+        'consent_ai',
+        'consent_pool',
+        'internal_notes',
+        'created_at',
+    ];
+
+    if (! $includeLegacyColumns) {
+        return $columns;
+    }
+
+    return [
+        ...$columns,
+        'job_priority_2',
+        'job_priority_3',
+        'previously_worked_where',
         'cv_path',
         'q_automate',
         'q_learn',
@@ -50,12 +74,8 @@ function jobApplicationTableColumns(): array
         'future_aspirations',
         'q_build',
         'extra_notes',
-        'consent_accurate',
-        'consent_ai',
-        'consent_pool',
         'consent_transfer',
-        'internal_notes',
-        'created_at',
+        'form_version',
     ];
 }
 
@@ -101,9 +121,6 @@ test('job application excel export contains every application table column', fun
 
     expect(array_keys($export->getColumns()))->toBe($columns)
         ->and($mappedApplication['job_priority_1'])->toBe($firstJobListing->title)
-        ->and($mappedApplication['job_priority_2'])->toBe($secondJobListing->title)
-        ->and($mappedApplication['job_priority_3'])->toBe($thirdJobListing->title)
-        ->and($mappedApplication['q_automate'])->toBe($fullAnswer)
         ->and($mappedApplication['consent_pool'])->toBe('نعم');
 });
 
@@ -157,7 +174,7 @@ test('job listing relation manager scopes job applications across all priorities
     $exportedIds = $exportedApplications->keys()->sort()->values()->all();
 
     expect(JobListingResource::getRelations())->toBe([JobApplicationsRelationManager::class])
-        ->and($relationColumns)->toBe(jobApplicationTableColumns())
+        ->and($relationColumns)->toBe(jobApplicationTableColumns(includeLegacyColumns: true))
         ->and($exportedIds)->toBe(collect([
             $primaryApplication->id,
             $secondaryApplication->id,
@@ -165,7 +182,5 @@ test('job listing relation manager scopes job applications across all priorities
             $legacyApplication->id,
         ])->sort()->values()->all())
         ->and($export->map($exportedApplications->get($primaryApplication->id))['job_priority_1'])->toBe($jobListing->title)
-        ->and($export->map($exportedApplications->get($secondaryApplication->id))['job_priority_2'])->toBe($jobListing->title)
-        ->and($export->map($exportedApplications->get($tertiaryApplication->id))['job_priority_3'])->toBe($jobListing->title)
         ->and($export->map($exportedApplications->get($legacyApplication->id))['job_priority_1'])->toBe($jobListing->title);
 });

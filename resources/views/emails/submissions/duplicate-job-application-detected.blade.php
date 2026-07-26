@@ -20,7 +20,7 @@
 </tr>
 <tr>
 <td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#756553;">الهاتف</td>
-<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#201812;">{{ $application->phone }}</td>
+<td style="padding:10px 0;border-bottom:1px solid #EADFCE;color:#201812;" dir="ltr">{{ $application->phone_country_code }} {{ $application->phone }}</td>
 </tr>
 <tr>
 <td style="padding:10px 0;color:#756553;">وقت التقديم</td>

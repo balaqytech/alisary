@@ -4,16 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Enums\ListingLocation;
 use App\Http\Requests\StoreJobApplicationRequest;
+use App\Mail\DuplicateJobApplicationDetected;
+use App\Mail\JobSubmissionReceived;
 use App\Models\JobApplication;
 use App\Models\JobListing;
+use App\Settings\GeneralSettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Mail;
 
 class JobApplicationController extends Controller
 {
     private const MIN_FILL_SECONDS = 3;
 
-    public function store(StoreJobApplicationRequest $request, \App\Settings\GeneralSettings $settings): RedirectResponse
+    public function store(StoreJobApplicationRequest $request, GeneralSettings $settings): RedirectResponse
     {
         $validated = Arr::except($request->validated(), ['website', 'form_rendered_at']);
 
@@ -31,11 +35,13 @@ class JobApplicationController extends Controller
         // spans more than one governorate. Otherwise fall back to deriving
         // it from the chosen branch, or the job listing's single location.
         $locationValue = $validated['branch'] ?? $jobListing?->location?->value;
-        $governorate = $validated['governorate']
+        $governorate = ($validated['governorate'] ?? null)
             ?: ListingLocation::tryFrom($locationValue ?? '')?->governorate()?->value;
 
-        $application = JobApplication::create([
-            ...$validated,
+        $application = JobApplication::query()->firstOrCreate([
+            'submission_token' => $validated['submission_token'],
+        ], [
+            ...Arr::except($validated, ['submission_token']),
             'form_version' => 'v2',
             'governorate' => $governorate,
             'track' => $jobListing?->jobFamily?->track?->value,
@@ -43,16 +49,20 @@ class JobApplicationController extends Controller
             'consent_pool' => (bool) ($validated['consent_pool'] ?? false),
         ]);
 
-        $this->notifyOnPossibleDuplicate($application, $settings);
+        if ($application->wasRecentlyCreated) {
+            $this->notifyOnPossibleDuplicate($application, $settings);
 
-        $emails = $settings->jobSubmissionRecipientEmails();
-        if (! empty($emails)) {
-            \Illuminate\Support\Facades\Mail::to($emails)->queue(new \App\Mail\JobSubmissionReceived($application));
+            $emails = $settings->jobSubmissionRecipientEmails();
+            if (! empty($emails)) {
+                Mail::to($emails)->queue(new JobSubmissionReceived($application));
+            }
         }
 
         return back()
             ->withFragment('apply-form')
-            ->with('application_success', true);
+            ->with('application_success', true)
+            ->with('application_reference_number', $application->reference_number)
+            ->with('application_submission_token', $application->submission_token);
     }
 
     private function submittedTooFast(StoreJobApplicationRequest $request): bool
@@ -66,13 +76,16 @@ class JobApplicationController extends Controller
         return (time() - $renderedAt) < self::MIN_FILL_SECONDS;
     }
 
-    private function notifyOnPossibleDuplicate(JobApplication $application, \App\Settings\GeneralSettings $settings): void
+    private function notifyOnPossibleDuplicate(JobApplication $application, GeneralSettings $settings): void
     {
         $duplicate = JobApplication::query()
             ->where('id', '!=', $application->id)
             ->where(function ($query) use ($application): void {
                 $query->where('email', $application->email)
-                    ->orWhere('phone', $application->phone);
+                    ->orWhere(function ($query) use ($application): void {
+                        $query->where('phone_country_code', $application->phone_country_code)
+                            ->where('phone', $application->phone);
+                    });
             })
             ->first();
 
@@ -85,8 +98,8 @@ class JobApplicationController extends Controller
             return;
         }
 
-        \Illuminate\Support\Facades\Mail::to($emails)->queue(
-            new \App\Mail\DuplicateJobApplicationDetected($application, $duplicate)
+        Mail::to($emails)->queue(
+            new DuplicateJobApplicationDetected($application, $duplicate)
         );
     }
 }

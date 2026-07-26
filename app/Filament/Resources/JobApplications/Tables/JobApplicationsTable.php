@@ -26,8 +26,18 @@ class JobApplicationsTable
                 TextColumn::make('reference_number')->label('الرقم المرجعي')->searchable()->sortable(),
                 TextColumn::make('status')->label('الحالة')->badge()->sortable(),
                 TextColumn::make('full_name')->label('الاسم الكامل')->searchable(),
-                TextColumn::make('phone')->label('رقم الهاتف')->searchable(),
+                TextColumn::make('phone')
+                    ->label('رقم الهاتف')
+                    ->formatStateUsing(fn (?string $state, JobApplication $record): string => trim("{$record->phone_country_code} {$state}"))
+                    ->searchable(),
                 TextColumn::make('email')->label('البريد الإلكتروني')->searchable(),
+                TextColumn::make('gender')
+                    ->label('الجنس')
+                    ->formatStateUsing(fn (?string $state): ?string => match ($state) {
+                        'male' => 'ذكر',
+                        'female' => 'أنثى',
+                        default => $state,
+                    }),
                 TextColumn::make('nationality')->label('الجنسية')->searchable(),
                 TextColumn::make('country')->label('الدولة')->searchable(),
                 TextColumn::make('city')->label('المدينة')->searchable(),
@@ -55,6 +65,7 @@ class JobApplicationsTable
                 TextColumn::make('q_sample_teaching')->label('عيّنة عمل — تدريس')->limit(50)->wrap(),
                 TextColumn::make('q_sample_operations')->label('عيّنة عمل — تنسيق وعمليات')->limit(50)->wrap(),
                 TextColumn::make('q_sample_leadership')->label('عيّنة عمل — قيادة')->limit(50)->wrap(),
+                TextColumn::make('q_compelling_reason')->label('سبب الاختيار')->limit(50)->wrap(),
                 TextColumn::make('consent_accurate')
                     ->label('إقرار صحة البيانات')
                     ->formatStateUsing(fn (mixed $state): string => $state ? 'نعم' : 'لا'),

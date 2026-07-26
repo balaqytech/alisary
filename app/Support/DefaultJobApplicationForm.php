@@ -36,14 +36,14 @@ class DefaultJobApplicationForm
                         ['label' => 'عبر جهة مزوّدة', 'value' => 'vendor'],
                     ]),
                     self::field('available_from', 'تاريخ الجاهزية للبدء', CustomFieldType::Date),
-                    self::field('expected_salary', 'الراتب الشهري المتوقّع', required: true),
+                    self::field('expected_salary', 'الراتب الشهري المتوقّع', CustomFieldType::Number, true),
                 ],
             ],
             [
                 'title' => 'الخبرة والأدوات',
                 'description' => null,
                 'fields' => [
-                    self::field('experience_years', 'سنوات الخبرة في هذا المجال', CustomFieldType::Number),
+                    self::field('experience_years', 'سنوات الخبرة في نفس مجال الوظيفة', CustomFieldType::Number),
                     self::field('worked_with_group', 'هل سبق أن عملت في إحدى مؤسسات المجموعة؟', CustomFieldType::Select, false, [
                         ['label' => 'لا', 'value' => 'no'],
                         ['label' => 'نعم', 'value' => 'yes'],

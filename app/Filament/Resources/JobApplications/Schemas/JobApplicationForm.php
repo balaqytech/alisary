@@ -2,7 +2,11 @@
 
 namespace App\Filament\Resources\JobApplications\Schemas;
 
+use App\Enums\Governorate;
 use App\Enums\JobApplicationStatus;
+use App\Enums\JobTrack;
+use App\Enums\ListingLocation;
+use App\Models\JobApplication;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -32,8 +36,17 @@ class JobApplicationForm
                 Section::make('1. البيانات الأساسية')
                     ->schema([
                         TextInput::make('full_name')->label('الاسم الكامل')->disabled(),
+                        TextInput::make('phone_country_code')->label('مفتاح الدولة')->disabled(),
                         TextInput::make('phone')->label('رقم الهاتف')->disabled(),
                         TextInput::make('email')->label('البريد الإلكتروني')->disabled(),
+                        TextInput::make('gender')
+                            ->label('الجنس')
+                            ->formatStateUsing(fn (?string $state): ?string => match ($state) {
+                                'male' => 'ذكر',
+                                'female' => 'أنثى',
+                                default => $state,
+                            })
+                            ->disabled(),
                         TextInput::make('nationality')->label('الجنسية')->disabled(),
                         TextInput::make('country')->label('الدولة')->disabled(),
                         TextInput::make('city')->label('المدينة')->disabled(),
@@ -45,11 +58,11 @@ class JobApplicationForm
                         Select::make('company_id')->label('المؤسسة')->relationship('company', 'name')->disabled(),
                         TextInput::make('job_priority_1')->label('أولوية الوظيفة 1')->disabled(),
                         TextInput::make('governorate')->label('المحافظة')->disabled()
-                            ->formatStateUsing(fn (mixed $state): ?string => $state instanceof \App\Enums\Governorate ? $state->label() : $state),
+                            ->formatStateUsing(fn (mixed $state): ?string => $state instanceof Governorate ? $state->label() : $state),
                         TextInput::make('branch')->label('الفرع')->disabled()
-                            ->formatStateUsing(fn (mixed $state): ?string => $state instanceof \App\Enums\ListingLocation ? $state->label() : $state),
+                            ->formatStateUsing(fn (mixed $state): ?string => $state instanceof ListingLocation ? $state->label() : $state),
                         TextInput::make('track')->label('مسار الوظيفة')->disabled()
-                            ->formatStateUsing(fn (mixed $state): ?string => $state instanceof \App\Enums\JobTrack ? $state->label() : $state),
+                            ->formatStateUsing(fn (mixed $state): ?string => $state instanceof JobTrack ? $state->label() : $state),
                         TagsInput::make('contract_types')->label('أنماط التعاقد')->disabled(),
                         DatePicker::make('ready_date')->label('تاريخ الجاهزية')->disabled(),
                         TextInput::make('expected_salary')->label('الراتب المتوقع')->disabled(),
@@ -78,6 +91,7 @@ class JobApplicationForm
                         Textarea::make('q_sample_teaching')->label('عيّنة عمل — مسار التدريس')->disabled()->columnSpanFull(),
                         Textarea::make('q_sample_operations')->label('عيّنة عمل — مسار التنسيق والعمليات')->disabled()->columnSpanFull(),
                         Textarea::make('q_sample_leadership')->label('عيّنة عمل — مسار القيادة')->disabled()->columnSpanFull(),
+                        Textarea::make('q_compelling_reason')->label('سبب الاختيار من بين المتقدمين')->disabled()->columnSpanFull(),
                     ]),
 
                 Section::make('5. الكفاءة والإنجاز (نموذج قديم)')
@@ -88,7 +102,7 @@ class JobApplicationForm
                     ])
                     ->collapsible()
                     ->collapsed()
-                    ->visible(fn (?\App\Models\JobApplication $record): bool => filled($record?->q_automate) || filled($record?->q_learn) || filled($record?->q_own)),
+                    ->visible(fn (?JobApplication $record): bool => filled($record?->q_automate) || filled($record?->q_learn) || filled($record?->q_own)),
 
                 Section::make('6. مواقف (نموذج قديم)')
                     ->schema([
@@ -98,7 +112,7 @@ class JobApplicationForm
                     ])
                     ->collapsible()
                     ->collapsed()
-                    ->visible(fn (?\App\Models\JobApplication $record): bool => filled($record?->q_brand) || filled($record?->q_ethics) || filled($record?->q_mission)),
+                    ->visible(fn (?JobApplication $record): bool => filled($record?->q_brand) || filled($record?->q_ethics) || filled($record?->q_mission)),
 
                 Section::make('7. آفاق مستقبلية (نموذج قديم)')
                     ->schema([
@@ -108,7 +122,7 @@ class JobApplicationForm
                     ])
                     ->collapsible()
                     ->collapsed()
-                    ->visible(fn (?\App\Models\JobApplication $record): bool => filled($record?->future_aspirations) || filled($record?->q_build) || filled($record?->extra_notes)),
+                    ->visible(fn (?JobApplication $record): bool => filled($record?->future_aspirations) || filled($record?->q_build) || filled($record?->extra_notes)),
 
                 Section::make('8. الإقرارات')
                     ->schema([
