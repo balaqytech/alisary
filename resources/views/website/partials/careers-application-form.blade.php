@@ -87,9 +87,10 @@
                     <div class="flex min-w-0 flex-col gap-1.5">
                         <label class="text-sm font-medium text-alisary-deep">رقم الجوال <span
                                 class="text-red-600">*</span></label>
-                        <div dir="ltr" class="flex min-w-0 max-w-full gap-2">
+                        <div data-phone-controls dir="ltr"
+                            class="grid min-w-0 max-w-full gap-2 sm:grid-cols-[10rem_minmax(0,1fr)]">
                             <select name="phone_country_code" required aria-label="مفتاح الدولة"
-                                class="w-32 max-w-[42%] flex-none rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20 sm:w-40">
+                                class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                                 @foreach (\App\Support\CountryDialCodes::options() as $dialCode)
                                     <option value="{{ $dialCode['code'] }}" @selected(old('phone_country_code', \App\Support\CountryDialCodes::DEFAULT) === $dialCode['code'])>
                                         {{ $dialCode['code'] }} · {{ $dialCode['country'] }}
@@ -97,8 +98,9 @@
                                 @endforeach
                             </select>
                             <input name="phone" type="tel" inputmode="numeric" pattern="[0-9]{6,15}"
-                                autocomplete="tel-national" value="{{ old('phone') }}" required
-                                class="min-w-0 flex-1 rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 text-left font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                                autocomplete="tel-national" aria-label="رقم الهاتف بدون مفتاح الدولة"
+                                placeholder="91234567" value="{{ old('phone') }}" required
+                                class="min-w-0 w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 text-left font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                         </div>
                         @error('phone_country_code')
                             <div class="text-xs text-red-600">{{ $message }}</div>

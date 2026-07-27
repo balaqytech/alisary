@@ -63,6 +63,9 @@ it('stores a job application, shows its reference number, and locks the submit b
     $jobsPage = $this->get(route('jobs.index'))
         ->assertSuccessful()
         ->assertSee('data-job-application-form', false)
+        ->assertSee('data-phone-controls', false)
+        ->assertSee('sm:grid-cols-[10rem_minmax(0,1fr)]', false)
+        ->assertSee('aria-label="رقم الهاتف بدون مفتاح الدولة"', false)
         ->assertSee('data-job-application-submit', false)
         ->assertSee('value="+968" selected', false)
         ->assertDontSee('aria-disabled="true"', false);
