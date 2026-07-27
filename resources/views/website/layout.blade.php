@@ -23,7 +23,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-alisary-ivory text-alisary-ink antialiased selection:bg-alisary-gold selection:text-alisary-deep">
-    <header data-site-header class="fixed inset-x-0 top-0 z-50 px-3 pt-3 text-white sm:px-5">
+    <x-local-environment-alert class="fixed inset-x-0 top-0 z-[60]" />
+
+    <header data-site-header
+        class="fixed inset-x-0 z-50 px-3 pt-3 text-white sm:px-5 {{ app()->environment('local') ? 'top-24 sm:top-14' : 'top-0' }}">
         <nav class="site-nav-shell mx-auto flex items-center justify-between gap-6 px-4 py-3 lg:px-6">
             <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-3 sm:gap-4">
                 <img src="{{ $logoUrl }}" alt="{{ $settings->site_name }}" class="h-10 w-auto max-w-24 object-contain sm:h-14 sm:max-w-44">
