@@ -3,6 +3,7 @@
     'title',
     'eyebrow' => 'تعذّر إكمال الطلب',
     'actionLabel' => 'العودة إلى الرئيسية',
+    'showActions' => true,
 ])
 
 <!DOCTYPE html>
@@ -54,16 +55,18 @@
                 </div>
             </div>
 
-            <div class="mt-10 flex flex-wrap items-center gap-3 border-t border-white/10 pt-6">
-                <a href="{{ url('/') }}"
-                    class="inline-flex min-h-12 items-center justify-center rounded-md border border-alisary-gold bg-alisary-gold px-6 font-bold text-alisary-deep hover:bg-alisary-brass">
-                    {{ $actionLabel }}
-                </a>
-                <a href="{{ url('/jobs') }}"
-                    class="inline-flex min-h-12 items-center justify-center rounded-md border border-white/15 px-6 font-bold text-white/80 hover:border-alisary-gold/60 hover:text-white">
-                    تصفّح الوظائف
-                </a>
-            </div>
+            @if ($showActions)
+                <div data-error-actions class="mt-10 flex flex-wrap items-center gap-3 border-t border-white/10 pt-6">
+                    <a href="{{ url('/') }}"
+                        class="inline-flex min-h-12 items-center justify-center rounded-md border border-alisary-gold bg-alisary-gold px-6 font-bold text-alisary-deep hover:bg-alisary-brass">
+                        {{ $actionLabel }}
+                    </a>
+                    <a href="{{ url('/jobs') }}"
+                        class="inline-flex min-h-12 items-center justify-center rounded-md border border-white/15 px-6 font-bold text-white/80 hover:border-alisary-gold/60 hover:text-white">
+                        تصفّح الوظائف
+                    </a>
+                </div>
+            @endif
         </section>
     </main>
 </body>

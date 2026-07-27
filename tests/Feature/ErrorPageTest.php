@@ -28,7 +28,18 @@ it('renders the requested maintenance message on the 503 page', function () {
     $this->get('/__testing/error/503')
         ->assertServiceUnavailable()
         ->assertSee('😍نخبئ لكم تحديثات ستبهج قلوبكم')
-        ->assertSee('الموقع تحت التحديث مؤقتا');
+        ->assertSee('الموقع تحت التحديث مؤقتا')
+        ->assertDontSee('data-error-actions', false)
+        ->assertDontSee('تصفّح الوظائف');
+});
+
+it('shows the legal notice in the public website layout locally', function () {
+    $this->app->detectEnvironment(fn (): string => 'local');
+
+    $this->get('/')
+        ->assertSuccessful()
+        ->assertSee('data-website-layout-alert', false)
+        ->assertSee('هذه الصفحة تجريبية لاكتشاف الثغرات والأخطاء فقط');
 });
 
 it('uses a branded fallback for other client errors', function () {

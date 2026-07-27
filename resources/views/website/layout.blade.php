@@ -23,7 +23,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-alisary-ivory text-alisary-ink antialiased selection:bg-alisary-gold selection:text-alisary-deep">
-    <x-local-environment-alert class="fixed inset-x-0 top-0 z-[60]" />
+    <x-local-environment-alert data-website-layout-alert class="fixed inset-x-0 top-0 z-[60]" />
 
     <header data-site-header
         class="fixed inset-x-0 z-50 px-3 pt-3 text-white sm:px-5 {{ app()->environment('local') ? 'top-24 sm:top-14' : 'top-0' }}">
