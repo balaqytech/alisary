@@ -36,8 +36,8 @@ class JobListingsTable
                     ->badge()
                     ->wrap()
                     ->formatStateUsing(fn (string $state): string => ListingLocation::tryFrom($state)?->label() ?? $state),
-                TextColumn::make('published_at')->label('النشر')->dateTime()->sortable(),
-                TextColumn::make('expires_at')->label('ينتهي')->dateTime()->sortable(),
+                TextColumn::make('published_at')->label('النشر')->dateTime('Y-m-d H:i:s')->sortable(),
+                TextColumn::make('expires_at')->label('ينتهي')->dateTime('Y-m-d H:i:s')->sortable(),
                 TextColumn::make('applications_count')
                     ->label('الطلبات')
                     ->state(fn (JobListing $record): int => $record->applicationsCount())

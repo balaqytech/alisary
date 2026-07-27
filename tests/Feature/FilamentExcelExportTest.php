@@ -94,6 +94,28 @@ test('submission, job application, and job listing tables expose excel export ac
         ->assertTableBulkActionExists('export');
 });
 
+test('job listing excel export can resolve and map every table column', function () {
+    $jobListing = JobListing::factory()->create();
+    $component = Livewire::test(ListJobListings::class);
+    $exportAction = $component->instance()->getTable()->getAction('export');
+    $export = invade($exportAction)->exports->first()->hydrate($component->instance());
+
+    expect(array_keys($export->getColumns()))->toBe([
+        'status',
+        'job_code',
+        'title',
+        'company.name',
+        'jobFamily.name',
+        'job_level',
+        'type',
+        'locations',
+        'published_at',
+        'expires_at',
+        'applications_count',
+    ])->and($export->map($export->getQuery()->findOrFail($jobListing->id)))
+        ->toHaveKeys(['published_at', 'expires_at']);
+});
+
 test('job application excel export contains every application table column', function () {
     $fullAnswer = str_repeat('إجابة تفصيلية ', 10);
     $firstJobListing = JobListing::factory()->create(['title' => 'الوظيفة الأولى']);
