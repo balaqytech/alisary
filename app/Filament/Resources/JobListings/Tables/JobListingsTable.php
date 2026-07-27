@@ -14,6 +14,9 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
+use pxlrbt\FilamentExcel\Actions\ExportAction;
+use pxlrbt\FilamentExcel\Actions\ExportBulkAction;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 class JobListingsTable
 {
@@ -74,9 +77,27 @@ class JobListingsTable
                 EditAction::make(),
             ])
             ->toolbarActions([
+                ExportAction::make()
+                    ->exports([
+                        ExcelExport::make('job-listings')
+                            ->fromTable()
+                            ->withFilename(fn (): string => 'job-listings-'.now()->format('Y-m-d'))
+                            ->rtl(),
+                    ]),
                 BulkActionGroup::make([
+                    ExportBulkAction::make()
+                        ->exports([
+                            ExcelExport::make('job-listings')
+                                ->fromTable()
+                                ->withFilename(fn (): string => 'job-listings-'.now()->format('Y-m-d'))
+                                ->rtl(),
+                        ]),
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with([
+                'company:id,name',
+                'jobFamily:id,name',
+            ]));
     }
 }

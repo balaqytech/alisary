@@ -3,6 +3,7 @@
 use App\Filament\Resources\JobApplications\Pages\ListJobApplications;
 use App\Filament\Resources\JobListings\JobListingResource;
 use App\Filament\Resources\JobListings\Pages\EditJobListing;
+use App\Filament\Resources\JobListings\Pages\ListJobListings;
 use App\Filament\Resources\JobListings\RelationManagers\JobApplicationsRelationManager;
 use App\Filament\Resources\Submissions\Pages\ListSubmissions;
 use App\Models\JobApplication;
@@ -79,12 +80,16 @@ function jobApplicationTableColumns(bool $includeLegacyColumns = false): array
     ];
 }
 
-test('submission and job application tables expose excel export actions', function () {
+test('submission, job application, and job listing tables expose excel export actions', function () {
     Livewire::test(ListSubmissions::class)
         ->assertTableActionExists('export')
         ->assertTableBulkActionExists('export');
 
     Livewire::test(ListJobApplications::class)
+        ->assertTableActionExists('export')
+        ->assertTableBulkActionExists('export');
+
+    Livewire::test(ListJobListings::class)
         ->assertTableActionExists('export')
         ->assertTableBulkActionExists('export');
 });
