@@ -20,6 +20,11 @@ class JobApplication extends Model
 
     protected $guarded = [];
 
+    protected $hidden = [
+        'cv_link',
+        'cv_path',
+    ];
+
     protected $attributes = [
         'status' => 'new',
         'phone_country_code' => '+968',

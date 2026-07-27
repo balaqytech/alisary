@@ -7,6 +7,8 @@ use App\Enums\JobApplicationStatus;
 use App\Enums\JobTrack;
 use App\Enums\ListingLocation;
 use App\Models\JobApplication;
+use App\Support\JobExperienceRanges;
+use App\Support\ResidenceCountries;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -48,7 +50,8 @@ class JobApplicationForm
                             })
                             ->disabled(),
                         TextInput::make('nationality')->label('الجنسية')->disabled(),
-                        TextInput::make('country')->label('الدولة')->disabled(),
+                        TextInput::make('country')->label('الدولة')->disabled()
+                            ->formatStateUsing(fn (?string $state): ?string => ResidenceCountries::label($state)),
                         TextInput::make('city')->label('المدينة')->disabled(),
                     ])
                     ->columns(2),
@@ -73,7 +76,8 @@ class JobApplicationForm
 
                 Section::make('3. الخبرة والأدوات')
                     ->schema([
-                        TextInput::make('years_experience')->label('سنوات الخبرة')->disabled(),
+                        TextInput::make('years_experience')->label('سنوات الخبرة في المجال نفسه')->disabled()
+                            ->formatStateUsing(fn (?string $state): ?string => JobExperienceRanges::label($state)),
                         TextInput::make('cv_link')->label('رابط السيرة الذاتية')->url()->disabled(),
                         Textarea::make('tools_and_ai')->label('الأدوات والذكاء الاصطناعي')->disabled()->columnSpanFull(),
                         Checkbox::make('previously_worked')->label('سبق العمل في المجموعة؟')->disabled(),
@@ -81,7 +85,7 @@ class JobApplicationForm
                         TextInput::make('previous_role')->label('ما الدور؟')->disabled(),
                         TextInput::make('previous_period')->label('في أيّ فترة؟')->disabled(),
                         TextInput::make('previously_worked_where')->label('أين ومتى؟ (نموذج قديم)')->disabled()->columnSpanFull(),
-                        FileUpload::make('cv_path')->label('ملف السيرة الذاتية (نموذج قديم)')->disk('public')->disabled()->downloadable(),
+                        FileUpload::make('cv_path')->label('ملف السيرة الذاتية')->disk('public')->disabled()->downloadable(),
                     ])
                     ->columns(2),
 

@@ -5,6 +5,8 @@ namespace App\Filament\Resources\JobApplications\Tables;
 use App\Enums\JobApplicationStatus;
 use App\Enums\ListingLocation;
 use App\Models\JobApplication;
+use App\Support\JobExperienceRanges;
+use App\Support\ResidenceCountries;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -39,7 +41,9 @@ class JobApplicationsTable
                         default => $state,
                     }),
                 TextColumn::make('nationality')->label('الجنسية')->searchable(),
-                TextColumn::make('country')->label('الدولة')->searchable(),
+                TextColumn::make('country')->label('الدولة')
+                    ->formatStateUsing(fn (?string $state): ?string => ResidenceCountries::label($state))
+                    ->searchable(),
                 TextColumn::make('city')->label('المدينة')->searchable(),
                 TextColumn::make('company.name')->label('المؤسسة')->searchable(),
                 TextColumn::make('governorate')->label('المحافظة')->badge()->sortable(),
@@ -52,7 +56,9 @@ class JobApplicationsTable
                 TextColumn::make('contract_types')->label('أنماط التعاقد')->badge(),
                 TextColumn::make('ready_date')->label('تاريخ الجاهزية')->date('Y-m-d')->sortable(),
                 TextColumn::make('expected_salary')->label('الراتب المتوقع'),
-                TextColumn::make('years_experience')->label('سنوات الخبرة')->numeric()->sortable(),
+                TextColumn::make('years_experience')->label('سنوات الخبرة في المجال نفسه')
+                    ->formatStateUsing(fn (?string $state): ?string => JobExperienceRanges::label($state))
+                    ->sortable(),
                 TextColumn::make('previously_worked')
                     ->label('سبق العمل في المجموعة؟')
                     ->formatStateUsing(fn (mixed $state): string => $state ? 'نعم' : 'لا'),
@@ -88,7 +94,7 @@ class JobApplicationsTable
                     ->formatStateUsing(fn (JobApplication $record): ?string => $record->thirdPriorityJobTitle())
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('previously_worked_where')->label('أين ومتى؟ (نموذج قديم)')->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('cv_path')->label('ملف السيرة الذاتية (نموذج قديم)')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('cv_path')->label('ملف السيرة الذاتية')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('q_automate')->label('مهمة متكررة تم أتمتتها (قديم)')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('q_learn')->label('آخر مهارة تعلمتها (قديم)')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('q_own')->label('مشروع تملكته بالكامل (قديم)')->limit(50)->wrap()->toggleable(isToggledHiddenByDefault: true),

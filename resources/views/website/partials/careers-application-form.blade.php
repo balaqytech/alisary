@@ -1,5 +1,5 @@
-<section class="section pt-16" id="apply-form">
-    <div class="mx-auto max-w-4xl px-5">
+<section class="section overflow-x-clip pt-16" id="apply-form">
+    <div class="mx-auto w-full min-w-0 max-w-4xl px-4 sm:px-5">
         <div class="mb-10 text-center">
             <span class="text-alisary-gold font-bold">استمارة الترشّح</span>
             <h2 class="mt-2 font-display text-4xl text-alisary-deep">قدّم طلبك</h2>
@@ -39,8 +39,9 @@
                 title="إلغاء التحديد">×</button>
         </div>
 
-        <form data-job-application-form class="rounded-2xl border border-alisary-green/10 bg-white p-6 shadow-sm sm:p-8"
-            action="{{ route('jobs.apply.unified') }}" method="POST" novalidate>
+        <form data-job-application-form
+            class="min-w-0 max-w-full rounded-2xl border border-alisary-green/10 bg-white p-4 shadow-sm [&_input]:max-w-full [&_select]:max-w-full [&_textarea]:max-w-full sm:p-8"
+            action="{{ route('jobs.apply.unified') }}" method="POST" enctype="multipart/form-data" novalidate>
             @csrf
 
             {{-- Honeypot: hidden from humans via CSS, bots tend to fill every field they see --}}
@@ -73,8 +74,8 @@
                 </div>
                 <p class="mb-4 mr-10 text-sm text-alisary-soft">لنتمكّن من التواصل معك وتحديد الوظيفة المناسبة.</p>
 
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="flex flex-col gap-1.5">
+                <div class="grid min-w-0 gap-4 *:min-w-0 sm:grid-cols-2">
+                    <div class="flex min-w-0 flex-col gap-1.5">
                         <label class="text-sm font-medium text-alisary-deep">الاسم الكامل <span
                                 class="text-red-600">*</span></label>
                         <input name="full_name" value="{{ old('full_name') }}" required
@@ -83,12 +84,12 @@
                             <div class="text-xs text-red-600">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="flex flex-col gap-1.5">
+                    <div class="flex min-w-0 flex-col gap-1.5">
                         <label class="text-sm font-medium text-alisary-deep">رقم الجوال <span
                                 class="text-red-600">*</span></label>
-                        <div dir="ltr" class="flex gap-2">
+                        <div dir="ltr" class="flex min-w-0 max-w-full gap-2">
                             <select name="phone_country_code" required aria-label="مفتاح الدولة"
-                                class="w-40 flex-none rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                                class="w-32 max-w-[42%] flex-none rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20 sm:w-40">
                                 @foreach (\App\Support\CountryDialCodes::options() as $dialCode)
                                     <option value="{{ $dialCode['code'] }}" @selected(old('phone_country_code', \App\Support\CountryDialCodes::DEFAULT) === $dialCode['code'])>
                                         {{ $dialCode['code'] }} · {{ $dialCode['country'] }}
@@ -129,7 +130,7 @@
                             <div class="text-xs text-red-600">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="grid gap-4 sm:col-span-2 sm:grid-cols-3">
+                    <div class="grid min-w-0 gap-4 *:min-w-0 sm:col-span-2 sm:grid-cols-3">
                         <div class="flex flex-col gap-1.5">
                             <label class="text-sm font-medium text-alisary-deep">الجنسية</label>
                             <input name="nationality" value="{{ old('nationality') }}"
@@ -140,8 +141,14 @@
                         </div>
                         <div class="flex flex-col gap-1.5">
                             <label class="text-sm font-medium text-alisary-deep">دولة الإقامة</label>
-                            <input name="country" value="{{ old('country') }}"
+                            <select name="country"
                                 class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                                @foreach (\App\Support\ResidenceCountries::options() as $countryCode => $countryName)
+                                    <option value="{{ $countryCode }}" @selected(old('country', \App\Support\ResidenceCountries::DEFAULT) === $countryCode)>
+                                        {{ $countryName }}
+                                    </option>
+                                @endforeach
+                            </select>
                             @error('country')
                                 <div data-validation-error-for="country" class="text-xs text-red-600">{{ $message }}</div>
                             @enderror
@@ -167,7 +174,19 @@
                 </div>
                 <p class="mb-4 mr-10 text-sm text-alisary-soft">اختر ما يناسب شغفك وقدراتك.</p>
 
-                <div class="grid gap-4 sm:grid-cols-2">
+                <div class="mb-4 min-w-0 rounded-xl border border-alisary-green/15 bg-alisary-ivory p-4">
+                    <div class="mb-2 text-sm font-medium text-alisary-deep">
+                        سيتقدم لهذه الوظيفة مئات وربما آلاف. اذكر لنا سببًا مقنعًا يجعلنا نختارك من بينهم.
+                        <span class="text-red-600">*</span>
+                    </div>
+                    <textarea name="q_compelling_reason" rows="5" maxlength="1200" required
+                        class="min-h-[120px] w-full rounded-xl border border-alisary-green/20 bg-white p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:ring-4 focus:ring-alisary-gold/20">{{ old('q_compelling_reason') }}</textarea>
+                    @error('q_compelling_reason')
+                        <div data-validation-error-for="q_compelling_reason" class="mt-1 text-xs text-red-600">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="grid min-w-0 gap-4 *:min-w-0 sm:grid-cols-2">
                     <div class="flex flex-col gap-1.5">
                         <label class="text-sm font-medium text-alisary-deep">في أي مؤسسة تودّ العمل؟ <span
                                 class="text-red-600">*</span></label>
@@ -248,7 +267,7 @@
                         <label class="text-sm font-medium text-alisary-deep">الراتب الشهري المتوقّع <span
                                 class="text-red-600">*</span></label>
                         <input name="expected_salary" type="number" inputmode="decimal" min="0"
-                            step="any" value="{{ old('expected_salary') }}" required placeholder="مثال: 1000"
+                            step="any" value="{{ old('expected_salary') }}" required placeholder="300"
                             class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                         @error('expected_salary')
                             <div class="text-xs text-red-600">{{ $message }}</div>
@@ -265,24 +284,44 @@
                     الخبرة والأدوات
                 </div>
 
-                <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div class="mt-4 grid min-w-0 gap-4 *:min-w-0 sm:grid-cols-2">
                     <div class="flex flex-col gap-1.5">
-                        <label class="text-sm font-medium text-alisary-deep">سنوات الخبرة في نفس مجال الوظيفة</label>
-                        <input name="years_experience" type="number" inputmode="numeric" min="0"
-                            max="60" step="1" value="{{ old('years_experience') }}"
+                        <label class="text-sm font-medium text-alisary-deep">سنوات الخبرة في المجال نفسه</label>
+                        <select name="years_experience"
                             class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
-                        <p class="text-xs text-alisary-soft">أدخل سنوات خبرتك في المجال نفسه الذي تنتمي إليه الوظيفة.
-                        </p>
+                            <option value="">-- اختر --</option>
+                            @foreach (\App\Support\JobExperienceRanges::options() as $experienceValue => $experienceLabel)
+                                <option value="{{ $experienceValue }}" @selected(old('years_experience') === $experienceValue)>
+                                    {{ $experienceLabel }}
+                                </option>
+                            @endforeach
+                        </select>
                         @error('years_experience')
-                            <div class="text-xs text-red-600">{{ $message }}</div>
+                            <div data-validation-error-for="years_experience" class="text-xs text-red-600">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-sm font-medium text-alisary-deep">رابط سيرتك الذاتية أو معرض أعمالك</label>
+                    <div class="flex min-w-0 flex-col gap-2">
+                        <label class="text-sm font-medium text-alisary-deep">السيرة الذاتية <span
+                                class="text-red-600">*</span></label>
+                        <p class="text-xs text-alisary-soft">أضف رابطًا للسيرة الذاتية أو ارفع ملفًا بصيغة PDF أو DOC أو DOCX.</p>
+                        <label class="text-xs font-medium text-alisary-deep">رابط السيرة الذاتية</label>
                         <input name="cv_link" type="url" value="{{ old('cv_link') }}" placeholder="https://..."
                             class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 text-left font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
                         @error('cv_link')
-                            <div class="text-xs text-red-600">{{ $message }}</div>
+                            <div data-validation-error-for="cv_link" class="text-xs text-red-600">{{ $message }}</div>
+                        @enderror
+
+                        <div class="flex items-center gap-3 py-1 text-xs text-alisary-soft before:h-px before:flex-1 before:bg-alisary-green/15 after:h-px after:flex-1 after:bg-alisary-green/15">
+                            أو
+                        </div>
+
+                        <label class="text-xs font-medium text-alisary-deep">رفع ملف السيرة الذاتية</label>
+                        <input name="cv" type="file"
+                            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                            class="w-full cursor-pointer rounded-xl border border-alisary-green/20 bg-alisary-ivory p-2 font-body text-sm text-alisary-deep file:ml-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-alisary-green file:px-3 file:py-2 file:font-body file:text-sm file:text-white hover:file:bg-alisary-deep focus:border-alisary-gold focus:bg-white focus:outline-none focus:ring-4 focus:ring-alisary-gold/20">
+                        <p class="text-xs text-alisary-soft">الحد الأقصى لحجم الملف: 5 ميجابايت.</p>
+                        @error('cv')
+                            <div data-validation-error-for="cv" class="text-xs text-red-600">{{ $message }}</div>
                         @enderror
                     </div>
 
@@ -309,12 +348,19 @@
                         @enderror
                     </div>
 
-                    <div class="grid gap-4 sm:col-span-2 sm:grid-cols-3" id="previousWorkWrapper"
+                    <div class="grid min-w-0 gap-4 *:min-w-0 sm:col-span-2 sm:grid-cols-3" id="previousWorkWrapper"
                         style="display:none;">
                         <div class="flex flex-col gap-1.5">
                             <label class="text-sm font-medium text-alisary-deep">أيّ مؤسسة؟</label>
-                            <input name="previous_institution" value="{{ old('previous_institution') }}"
+                            <select name="previous_institution"
                                 class="w-full rounded-xl border border-alisary-green/20 bg-alisary-ivory p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:bg-white focus:ring-4 focus:ring-alisary-gold/20">
+                                <option value="">-- اختر المؤسسة --</option>
+                                @foreach ($companies ?? [] as $company)
+                                    <option value="{{ $company->name }}" @selected(old('previous_institution') === $company->name)>
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                             @error('previous_institution')
                                 <div data-validation-error-for="previous_institution" class="text-xs text-red-600">{{ $message }}</div>
                             @enderror
@@ -416,17 +462,6 @@
                         </div>
                     </div>
 
-                    <div class="rounded-xl border border-alisary-green/15 bg-alisary-ivory p-4">
-                        <div class="mb-2 text-sm font-medium text-alisary-deep">
-                            سيتقدم لهذه الوظيفة مئات وربما آلاف. اذكر لنا سببًا مقنعًا يجعلنا نختارك من بينهم.
-                            <span class="text-red-600">*</span>
-                        </div>
-                        <textarea name="q_compelling_reason" rows="5" maxlength="1200" required
-                            class="w-full min-h-[120px] rounded-xl border border-alisary-green/20 bg-white p-3 font-body text-alisary-deep outline-none focus:border-alisary-gold focus:ring-4 focus:ring-alisary-gold/20">{{ old('q_compelling_reason') }}</textarea>
-                        @error('q_compelling_reason')
-                            <div class="mt-1 text-xs text-red-600">{{ $message }}</div>
-                        @enderror
-                    </div>
                 </div>
             </div>
 

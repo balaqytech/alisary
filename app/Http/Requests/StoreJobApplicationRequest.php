@@ -6,6 +6,8 @@ use App\Enums\JobTrack;
 use App\Models\JobApplication;
 use App\Models\JobListing;
 use App\Support\CountryDialCodes;
+use App\Support\JobExperienceRanges;
+use App\Support\ResidenceCountries;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -59,7 +61,7 @@ class StoreJobApplicationRequest extends FormRequest
             ],
             'gender' => ['required', Rule::in(['male', 'female'])],
             'nationality' => ['nullable', 'string', 'max:100'],
-            'country' => ['nullable', 'string', 'max:100'],
+            'country' => ['nullable', Rule::in(ResidenceCountries::codes())],
             'city' => ['nullable', 'string', 'max:100'],
 
             // Section 2: Job & Institution
@@ -73,14 +75,22 @@ class StoreJobApplicationRequest extends FormRequest
             'expected_salary' => ['required', 'numeric', 'min:0', 'max:999999999'],
 
             // Section 3: Experience & Tools
-            'years_experience' => ['nullable', 'integer', 'min:0', 'max:60'],
+            'years_experience' => ['nullable', Rule::in(JobExperienceRanges::values())],
             'previously_worked' => ['nullable', 'boolean'],
             'previously_worked_where' => ['nullable', 'string'],
-            'previous_institution' => ['nullable', 'string', 'max:255'],
+            'previous_institution' => ['nullable', 'string', 'max:255', Rule::exists('companies', 'name')],
             'previous_role' => ['nullable', 'string', 'max:255'],
             'previous_period' => ['nullable', 'string', 'max:255'],
             'tools_and_ai' => ['nullable', 'string'],
-            'cv_link' => ['nullable', 'url', 'max:500'],
+            'cv_link' => ['nullable', 'required_without:cv', 'url', 'max:255'],
+            'cv' => [
+                'nullable',
+                'required_without:cv_link',
+                'file',
+                'extensions:pdf,doc,docx',
+                'mimetypes:application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'max:5120',
+            ],
 
             // Section 4: Pivotal questions
             'q_achievement' => ['required', 'string', 'max:1200'],
@@ -108,6 +118,7 @@ class StoreJobApplicationRequest extends FormRequest
         $this->merge([
             'phone' => $phone,
             'phone_country_code' => $this->input('phone_country_code', CountryDialCodes::DEFAULT),
+            'country' => $this->input('country', ResidenceCountries::DEFAULT),
             'submission_token' => $this->input('submission_token', (string) Str::uuid()),
         ]);
     }
@@ -133,6 +144,8 @@ class StoreJobApplicationRequest extends FormRequest
     {
         return [
             'email.unique' => 'لقد سبق أن تقدّمت بطلبٍ لهذه الوظيفة بهذا البريد الإلكتروني.',
+            'cv_link.required_without' => 'يرجى إضافة رابط للسيرة الذاتية أو رفع ملف.',
+            'cv.required_without' => 'يرجى إضافة رابط للسيرة الذاتية أو رفع ملف.',
         ];
     }
 
@@ -163,7 +176,8 @@ class StoreJobApplicationRequest extends FormRequest
             'previous_role' => 'الدور السابق',
             'previous_period' => 'فترة العمل السابقة',
             'tools_and_ai' => 'الأدوات والبرمجيات',
-            'cv_link' => 'رابط السيرة الذاتية أو معرض الأعمال',
+            'cv_link' => 'رابط السيرة الذاتية',
+            'cv' => 'ملف السيرة الذاتية',
             'q_achievement' => 'سؤال الإنجاز',
             'q_sample_teaching' => 'سؤال عينة العمل لمسار التدريس',
             'q_sample_operations' => 'سؤال عينة العمل لمسار التنسيق والعمليات',

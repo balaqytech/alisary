@@ -12,6 +12,9 @@ use App\Settings\GeneralSettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use RuntimeException;
+use Throwable;
 
 class JobApplicationController extends Controller
 {
@@ -19,11 +22,18 @@ class JobApplicationController extends Controller
 
     public function store(StoreJobApplicationRequest $request, GeneralSettings $settings): RedirectResponse
     {
-        $validated = Arr::except($request->validated(), ['website', 'form_rendered_at']);
+        $validated = Arr::except($request->validated(), ['website', 'form_rendered_at', 'cv']);
 
         if ($this->submittedTooFast($request)) {
             // Silently pretend success so bots don't learn their submission was rejected.
             return back()->withFragment('apply-form')->with('application_success', true);
+        }
+
+        $uploadedCv = $request->file('cv');
+        $cvPath = $uploadedCv?->store('job-applications/cvs', 'public');
+
+        if ($uploadedCv !== null && ! is_string($cvPath)) {
+            throw new RuntimeException('تعذّر حفظ ملف السيرة الذاتية.');
         }
 
         $jobListing = JobListing::query()
@@ -38,16 +48,29 @@ class JobApplicationController extends Controller
         $governorate = ($validated['governorate'] ?? null)
             ?: ListingLocation::tryFrom($locationValue ?? '')?->governorate()?->value;
 
-        $application = JobApplication::query()->firstOrCreate([
-            'submission_token' => $validated['submission_token'],
-        ], [
-            ...Arr::except($validated, ['submission_token']),
-            'form_version' => 'v2',
-            'governorate' => $governorate,
-            'track' => $jobListing?->jobFamily?->track?->value,
-            'previously_worked' => (bool) ($validated['previously_worked'] ?? false),
-            'consent_pool' => (bool) ($validated['consent_pool'] ?? false),
-        ]);
+        try {
+            $application = JobApplication::query()->firstOrCreate([
+                'submission_token' => $validated['submission_token'],
+            ], [
+                ...Arr::except($validated, ['submission_token']),
+                'cv_path' => $cvPath,
+                'form_version' => 'v2',
+                'governorate' => $governorate,
+                'track' => $jobListing?->jobFamily?->track?->value,
+                'previously_worked' => (bool) ($validated['previously_worked'] ?? false),
+                'consent_pool' => (bool) ($validated['consent_pool'] ?? false),
+            ]);
+        } catch (Throwable $exception) {
+            if ($cvPath !== null) {
+                Storage::disk('public')->delete($cvPath);
+            }
+
+            throw $exception;
+        }
+
+        if (! $application->wasRecentlyCreated && $cvPath !== null) {
+            Storage::disk('public')->delete($cvPath);
+        }
 
         if ($application->wasRecentlyCreated) {
             $this->notifyOnPossibleDuplicate($application, $settings);

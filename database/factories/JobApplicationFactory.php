@@ -5,6 +5,8 @@ namespace Database\Factories;
 use App\Enums\JobApplicationStatus;
 use App\Models\Company;
 use App\Models\JobApplication;
+use App\Support\JobExperienceRanges;
+use App\Support\ResidenceCountries;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -27,7 +29,7 @@ class JobApplicationFactory extends Factory
             'email' => fake()->safeEmail(),
             'gender' => fake()->randomElement(['male', 'female']),
             'nationality' => 'عُماني',
-            'country' => 'عُمان',
+            'country' => ResidenceCountries::DEFAULT,
             'city' => 'مسقط',
             'company_id' => Company::factory(),
             'job_priority_1' => fake()->jobTitle(),
@@ -36,7 +38,7 @@ class JobApplicationFactory extends Factory
             'contract_types' => ['دوام كامل'],
             'ready_date' => now()->addMonth()->toDateString(),
             'expected_salary' => fake()->numberBetween(500, 3000),
-            'years_experience' => fake()->numberBetween(0, 20),
+            'years_experience' => fake()->randomElement(JobExperienceRanges::values()),
             'previously_worked' => false,
             'previously_worked_where' => null,
             'tools_and_ai' => null,
